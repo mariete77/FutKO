@@ -1,0 +1,187 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:futko/domain/entities/question.dart';
+import '../../../../core/theme/app_colors.dart';
+
+/// Widget for typing answers in type-answer game mode
+class TypeAnswerWidget extends StatefulWidget {
+  final Question question;
+  final int timeRemaining;
+  final Function(String answer) onAnswerSubmitted;
+
+  const TypeAnswerWidget({
+    super.key,
+    required this.question,
+    required this.timeRemaining,
+    required this.onAnswerSubmitted,
+  });
+
+  @override
+  State<TypeAnswerWidget> createState() => _TypeAnswerWidgetState();
+}
+
+class _TypeAnswerWidgetState extends State<TypeAnswerWidget> {
+  final _textController = TextEditingController();
+  final _focusNode = FocusNode();
+  bool _submitted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-focus the text field
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+    // Listen to text changes to update button state
+    _textController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _submitAnswer() {
+    if (_submitted) return;
+    final answer = _textController.text.trim();
+    if (answer.isEmpty) return;
+
+    setState(() => _submitted = true);
+    _focusNode.unfocus();
+    widget.onAnswerSubmitted(answer);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Hint text based on question type
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.tertiary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.tertiary.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.keyboard, color: AppColors.tertiary.withOpacity(0.7), size: 20),
+              const SizedBox(width: 8),
+              Text(
+                _getHintText(),
+                style: GoogleFonts.workSans(
+                  color: AppColors.tertiary.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Text input
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _submitted
+                  ? AppColors.outlineVariant
+                  : AppColors.primary.withOpacity(0.5),
+              width: 2,
+            ),
+          ),
+          child: TextField(
+            controller: _textController,
+            focusNode: _focusNode,
+            enabled: !_submitted,
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.onSurface,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submitAnswer(),
+            decoration: InputDecoration(
+              hintText: 'Escribe tu respuesta...',
+              hintStyle: GoogleFonts.workSans(
+                color: AppColors.onSurfaceVariant.withOpacity(0.5),
+                fontSize: 18,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+              suffixIcon: !_submitted
+                  ? IconButton(
+                      icon: Icon(Icons.send, color: AppColors.primary),
+                      onPressed: _submitAnswer,
+                    )
+                  : Icon(Icons.check, color: AppColors.outline),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Submit button
+        if (!_submitted)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _textController.text.trim().isEmpty ? null : _submitAnswer,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                disabledBackgroundColor: AppColors.outlineVariant.withOpacity(0.3),
+              ),
+              child: Text(
+                'CONFIRMAR',
+                style: GoogleFonts.workSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  String _getHintText() {
+    switch (widget.question.type) {
+      case QuestionType.player:
+        return 'Escribe el nombre del jugador';
+      case QuestionType.team:
+        return 'Escribe el nombre del equipo';
+      case QuestionType.competition:
+        return 'Escribe el nombre de la competición';
+      case QuestionType.history:
+        return 'Escribe tu respuesta';
+      case QuestionType.rules:
+        return 'Escribe tu respuesta';
+      case QuestionType.stadium:
+        return 'Escribe el nombre del estadio';
+      case QuestionType.badge:
+        return 'Escribe el nombre del equipo';
+      case QuestionType.playerImage:
+        return 'Escribe el nombre del jugador';
+      case QuestionType.statistic:
+        return 'Escribe tu respuesta';
+      case QuestionType.transfer:
+        return 'Escribe el nombre del equipo';
+      default:
+        return 'Escribe tu respuesta';
+    }
+  }
+}

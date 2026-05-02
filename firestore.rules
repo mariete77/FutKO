@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper: Check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: Check if user is the resource owner
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+    }
+
+    // Matches collection
+    match /matches/{matchId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if false; // No deletion from client
+
+      // Answers subcollection
+      match /answers/{userId} {
+        allow read: if isAuth();
+        allow write: if isAuth();
+      }
+    }
+
+    // Questions collection (read-only for authenticated users)
+    match /questions/{questionId} {
+      allow read: if isAuth();
+      allow write: if false; // Managed server-side only
+    }
+
+    // Ghost runs collection
+    match /ghostRuns/{ghostRunId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if false;
+    }
+
+    // Friends & Requests
+    match /friends/{friendDocId} {
+      // Los documentos aquí serán IDs combinados, ej: "userId1_userId2"
+      // Solo permiten acceso si el usuario es uno de los dos amigos involucrados.
+      allow read, write: if isAuth() && (friendDocId.contains(request.auth.uid));
+    }
+
+    match /friendRequests/{requestId} {
+      allow read: if isAuth() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
+      allow create: if isAuth() && request.auth.uid == request.resource.data.from;
+      allow delete: if isAuth() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
+    }
+  }
+}
