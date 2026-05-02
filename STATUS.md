@@ -20,9 +20,12 @@
 ## 👷‍♂️ Trabajo Actual (En vivo)
 
 ### 🦀 Claw Bot (Rama: `feature/claw-predictions`)
-*   **Commit actual:** `d1845a1` (Modelos creados).
-*   **Tarea ahora mismo:** Creando `CreatePredictionScreen` y `MyPredictionsScreen`.
-*   **Siguiente paso:** Refinar `theme.dart` y `app_colors.dart`.
+*   **Commit actual:** `910f6a5` (CreatePredictionScreen añadida).
+*   **Fase 3 (Progreso):**
+    *   ✅ `prediction_model.dart`
+    *   ✅ `create_prediction_screen.dart`
+    *   ⏳ Pendiente: `my_predictions_screen.dart`
+*   **Siguiente paso:** Crear la pantalla de historial de predicciones.
 
 ### 👨‍💻 El Compa (Rama: `feature/compa-leagues`)
 *   **Tarea asignada:** Crear `LeagueModel` (aunque Claw ya lo hizo base, tú puedes ajustar), `TeamModel`, y `LeagueManagementScreen`.
