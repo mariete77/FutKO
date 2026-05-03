@@ -1,7 +1,7 @@
 {
   "@@locale": "es",
 
-  "appTitle": "FutKO Battle",
+  "appTitle": "FutKO",
   "@appTitle": { "description": "App name" },
 
   "loading": "Cargando...",
@@ -16,8 +16,8 @@
   "pageNotFound": "Página no encontrada",
   "@pageNotFound": { "description": "404 error text" },
 
-  "explorer": "EXPLORADOR",
-  "@explorer": { "description": "Explorer label above player name" },
+  "explorer": "JUGADOR",
+  "@explorer": { "description": "Player label above name" },
 
   "streak": "Streak: {count}",
   "@streak": {
@@ -37,7 +37,7 @@
   "quickPlayDesc": "Salta a una partida casual instantánea.",
   "@quickPlayDesc": { "description": "Quick Play description" },
 
-  "ranked": "Clasificatoria",
+  "ranked": "Ranked",
   "@ranked": { "description": "Ranked game mode" },
 
   "rankedDesc": "Compite por ELO y sube en el ranking global.",
@@ -166,7 +166,7 @@
   "loginApple": "Iniciar sesión con Apple",
   "@loginApple": { "description": "Apple sign in button" },
 
-  "loginAnonymous": "Continuar sin cuenta",
+  "loginAnonymous": "Jugar como invitado",
   "@loginAnonymous": { "description": "Anonymous login button" },
 
   "gameNext": "Siguiente",

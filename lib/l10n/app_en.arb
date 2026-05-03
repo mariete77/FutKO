@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
 
-  "appTitle": "FutKO Battle",
+  "appTitle": "FutKO",
 
   "loading": "Loading...",
 
@@ -11,7 +11,7 @@
 
   "pageNotFound": "Page not found",
 
-  "explorer": "EXPLORER",
+  "explorer": "PLAYER",
 
   "streak": "Streak: {count}",
 
@@ -109,7 +109,7 @@
 
   "loginApple": "Sign in with Apple",
 
-  "loginAnonymous": "Continue without account",
+  "loginAnonymous": "Play as guest",
 
   "gameNext": "Next",
 
