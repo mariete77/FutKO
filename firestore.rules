@@ -58,5 +58,18 @@ service cloud.firestore {
       allow create: if isAuth() && request.auth.uid == request.resource.data.from;
       allow delete: if isAuth() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
     }
+
+    // --- FASE 4: Ligas y Equipos ---
+    // Ligas: Lectura pública para usuarios auth, escritura solo servidor/admin
+    match /leagues/{leagueId} {
+      allow read: if isAuth();
+      allow write: if false; // Managed server-side only
+    }
+
+    // Equipos: Lectura pública para usuarios auth, escritura solo servidor/admin
+    match /teams/{teamId} {
+      allow read: if isAuth();
+      allow write: if false; // Managed server-side only
+    }
   }
 }
