@@ -7,6 +7,6 @@
     "runtime": "nodejs18"
   },
   "projects": {
-    "default": "geoquiz-7790d"
+    "default": "futko-app"
   }
 }
