@@ -15,6 +15,7 @@
 | Pantallas UI adaptadas | 🔲 Pendiente | 10% |
 | Firebase (nuevo proyecto) | 🔲 Pendiente | 0% |
 | Preguntas de fútbol (datos) | 🔲 Pendiente | 0% |
+| **Infraestructura Ligas/Equipos** | ✅ **Completado** | 100% |
 | Compilación y test | 🔲 Pendiente | 0% |
 
 ---
@@ -71,10 +72,11 @@ Archivos que tocará → no pisar estos si eres AGENTE A.
 | B1 | Crear nuevo proyecto Firebase `futko-app` (o similar) y configurar | Firebase Console | 🔲 |
 | B2 | Actualizar `firebase_constants.dart` si cambian nombres de colección | `lib/core/constants/firebase_constants.dart` | 🔲 |
 | B3 | Configurar `google-services.json` / `GoogleService-Info.plist` | `android/app/`, `ios/Runner/` | 🔲 |
-| B4 | `firebase.json` y `firestore.rules`: revisar y adaptar | Raíz del proyecto | 🔲 |
-| B5 | Crear primer lote de preguntas de fútbol en JSON → importar a Firestore | `scripts/questions_football.json` (nuevo) | 🔲 |
-| B6 | Crear segundo lote de preguntas (más categorías) | `scripts/questions_football_batch2.json` (nuevo) | 🔲 |
-| B7 | Script de importación de preguntas a Firestore | `scripts/import_questions.dart` o `.js` (nuevo) | 🔲 |
+| B4 | `firebase.json` y `firestore.rules`: revisar y adaptar | Raíz del proyecto | ✅ **Completado** |
+| **B5** | **Modelos de datos para Ligas y Equipos (Entities, Models, Repos)** | `lib/domain/`, `lib/data/` | ✅ **Completado** |
+| B6 | Crear primer lote de preguntas de fútbol en JSON → importar a Firestore | `scripts/questions_football.json` (nuevo) | 🔲 |
+| B7 | Crear segundo lote de preguntas (más categorías) | `scripts/questions_football_batch2.json` (nuevo) | 🔲 |
+| B8 | **Cargar datos iniciales de Ligas y Equipos (La Liga, Premier, etc.)** | Firestore Console / Script | 🔲 |
 
 ---
 
@@ -136,4 +138,4 @@ On Surface:   #1A1C1B
 
 | Fecha | Commit | Descripción |
 |-------|--------|-------------|
-| 2026-05-02 | — | Clonado GeoC, adaptación base FutKO (colores, tipos, iconos, branding) |
+| 2026-05-03 | bea439d | Fase 4: Infraestructura Ligas y Equipos (Models, Repos, Providers) |
