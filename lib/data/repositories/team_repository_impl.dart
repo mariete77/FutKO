@@ -33,12 +33,18 @@ class TeamRepositoryImpl implements TeamRepository {
   }) async {
     Query query = _firestore.collection('teams');
 
+    // Nota: Firestore no soporta '!=' nativamente en todas las versiones.
+    // La lógica de filtrado se hace en cliente o se asume que la colección es manejable.
+    // Si se requiere eficiencia, se debe usar una consulta de array-contains o estructura distinta.
+    final snapshot = await query.limit(limit * 2).get();
+    
+    List<Team> teams = _mapSnapshotToTeams(snapshot);
+    
     if (excludeLeagueId != null) {
-      query = query.where('leagueId', isNotEqualTo: excludeLeagueId);
+      teams = teams.where((team) => team.leagueId != excludeLeagueId).toList();
     }
-
-    final snapshot = await query.limit(limit).get();
-    return _mapSnapshotToTeams(snapshot);
+    
+    return teams.take(limit).toList();
   }
 
   // --- Helper Methods ---
