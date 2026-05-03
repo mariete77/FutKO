@@ -165,7 +165,7 @@ class SEs extends S {
   String get loginWelcome => 'Bienvenido a FutKO';
 
   @override
-  String get loginSubtitle => 'Demuestra tus conocimientos de geografía';
+  String get loginSubtitle => 'Demuestra tus conocimientos de fútbol';
 
   @override
   String get loginGoogle => 'Iniciar sesión con Google';

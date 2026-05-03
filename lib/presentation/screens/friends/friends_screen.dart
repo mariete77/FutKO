@@ -269,7 +269,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Icon(
-                    Icons.sports_esports,
+                    Icons.sports_soccer,
                     size: 20,
                     color: AppColors.primary,
                   ),
@@ -701,12 +701,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
               label: 'AMIGOS',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history_edu),
-              label: 'JOURNAL',
+              icon: Icon(Icons.sports_soccer),
+              label: 'HISTORIAL',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'PROFILE',
+              label: 'PERFIL',
             ),
           ],
         ),
@@ -773,14 +773,14 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
           label: Text('AMIGOS'),
         ),
         NavigationRailDestination(
-          icon: Icon(Icons.history_edu),
-          selectedIcon: Icon(Icons.history_edu),
-          label: Text('JOURNAL'),
+          icon: Icon(Icons.sports_soccer),
+          selectedIcon: Icon(Icons.sports_soccer),
+          label: Text('HISTORIAL'),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.person),
           selectedIcon: Icon(Icons.person),
-          label: Text('PROFILE'),
+          label: Text('PERFIL'),
         ),
       ],
     );

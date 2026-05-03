@@ -35,7 +35,7 @@ class MatchCard extends StatelessWidget {
 
     // Mode and type labels
     final modeLabel = match.mode == MatchMode.realtime ? 'Tiempo Real' : ' Asíncrono';
-    final typeLabel = match.type == MatchType.ranked ? 'Ranked' : 'Casual';
+    final typeLabel = match.type == MatchType.ranked ? 'Competitivo' : 'Casual';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

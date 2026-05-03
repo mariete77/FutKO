@@ -34,7 +34,7 @@ class User extends Equatable {
   factory User.fromFirebaseUser(dynamic firebaseUser) {
     return User(
       userId: firebaseUser.uid,
-      displayName: firebaseUser.displayName ?? 'Player',
+      displayName: firebaseUser.displayName ?? 'Jugador',
       email: firebaseUser.email,
       photoUrl: firebaseUser.photoURL,
       elo: 1000,
@@ -50,13 +50,13 @@ class User extends Equatable {
   /// Check if user is premium
   bool get isPremium => subscription.isActive;
 
-  /// Get rank name
+  /// Get rank name — football-themed tiers in Spanish
   String get rank {
-    if (elo >= 1800) return 'Diamond';
-    if (elo >= 1600) return 'Platinum';
-    if (elo >= 1400) return 'Gold';
-    if (elo >= 1200) return 'Silver';
-    return 'Bronze';
+    if (elo >= 1800) return '⚽ Leyenda';
+    if (elo >= 1600) return '🏆 Balón de Oro';
+    if (elo >= 1400) return '🥇 Campeón';
+    if (elo >= 1200) return '⭐ Titular';
+    return '🌱 Promesa';
   }
 
   /// Get win rate

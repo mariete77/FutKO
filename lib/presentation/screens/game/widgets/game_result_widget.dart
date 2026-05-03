@@ -542,7 +542,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'MEJOR ACIERTO',
+                          'MEJOR GOL',
                           style: GoogleFonts.workSans(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -552,7 +552,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
                         ),
                         const SizedBox(height: 4),
                         Icon(
-                          Icons.location_on,
+                          Icons.emoji_events,
                           color: AppColors.primary,
                           size: 32,
                         ),
@@ -1074,19 +1074,19 @@ class _GameResultWidgetState extends State<GameResultWidget>
 
   String _getRank() {
     final s = widget.score;
-    if (s >= 1500) return 'Cartógrafo Maestro';
-    if (s >= 1200) return 'Explorador Experto';
-    if (s >= 900) return 'Viajero Hábil';
-    if (s >= 600) return 'Aprendiz Navegante';
-    return 'Novato';
+    if (s >= 1500) return 'Leyenda del Fútbol';
+    if (s >= 1200) return 'Crack Mundial';
+    if (s >= 900) return 'Jugador Titular';
+    if (s >= 600) return 'Promesa de Cantera';
+    return 'Novato del Fútbol';
   }
 
   String _getPerformanceMessage(double accuracy) {
-    if (accuracy >= 90) return '🎯 ¡Increíble! ¡Eres un maestro de la geografía!';
-    if (accuracy >= 80) return '🌟 ¡Gran trabajo! ¡Sigue así!';
-    if (accuracy >= 70) return '👏 ¡Bien! ¡Cada vez mejor!';
-    if (accuracy >= 60) return '💪 ¡Buen esfuerzo! ¡La práctica hace al maestro!';
-    return '📚 ¡Sigue aprendiendo! ¡Cada partida cuenta!';
+    if (accuracy >= 90) return '🏆 ¡Increíble! ¡Eres un crack del fútbol!';
+    if (accuracy >= 80) return '⚽ ¡Gran partido! ¡Sigue así!';
+    if (accuracy >= 70) return '👏 ¡Buen juego! ¡Cada vez mejor!';
+    if (accuracy >= 60) return '💪 ¡Buen esfuerzo! ¡La práctica hace al campeón!';
+    return '🏟️ ¡Sigue entrenando! ¡Cada partido cuenta!';
   }
 }
 

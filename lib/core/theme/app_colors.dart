@@ -9,6 +9,7 @@ class AppColors {
 
   // ── Primary (Pitch Green) ───────────────────────────────
   static const Color primary = Color(0xFF1B5E20);
+  static const Color primaryDark = Color(0xFF0D3B12);
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color primaryContainer = Color(0xFF2E7D32);
   static const Color onPrimaryContainer = Color(0xFFF1F8E9);

@@ -335,7 +335,7 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
                                 );
                               },
                               icon: Icon(
-                                Icons.flag_outlined,
+                                Icons.report_outlined,
                                 size: 16,
                                 color: AppColors.error,
                               ),

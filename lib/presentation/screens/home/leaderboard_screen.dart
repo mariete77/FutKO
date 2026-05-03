@@ -7,7 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user.dart';
 
-/// Leaderboard screen — shows all players ranked by ELO.
+/// Tabla de Posiciones — ranking de jugadores FutKO por ELO.
 class LeaderboardScreen extends ConsumerWidget {
   const LeaderboardScreen({super.key});
 
@@ -33,7 +33,7 @@ class LeaderboardScreen extends ConsumerWidget {
                     const CircularProgressIndicator(color: AppColors.primary),
                     const SizedBox(height: 16),
                     Text(
-                      'Cargando clasificación...',
+                      'Cargando tabla de posiciones...',
                       style: GoogleFonts.workSans(
                         color: AppColors.onSurfaceVariant,
                         fontSize: 14,
@@ -49,7 +49,7 @@ class LeaderboardScreen extends ConsumerWidget {
                     Icon(Icons.error_outline, size: 48, color: AppColors.error),
                     const SizedBox(height: 12),
                     Text(
-                      'Error al cargar clasificación',
+                      'Error al cargar la tabla',
                       style: GoogleFonts.workSans(
                         color: AppColors.onSurfaceVariant,
                         fontSize: 14,
@@ -97,7 +97,7 @@ class LeaderboardScreen extends ConsumerWidget {
             ),
             const SizedBox(width: 16),
             Text(
-              'Clasificación',
+              'Tabla de Posiciones',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -120,10 +120,10 @@ class LeaderboardScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.leaderboard, size: 64, color: AppColors.onSurfaceVariant.withOpacity(0.3)),
+            Icon(Icons.sports_soccer, size: 64, color: AppColors.onSurfaceVariant.withOpacity(0.3)),
             const SizedBox(height: 16),
             Text(
-              'No hay jugadores todavía',
+              '¡Aún no hay jugadores en la cancha!',
               style: GoogleFonts.workSans(
                 color: AppColors.onSurfaceVariant,
                 fontSize: 16,
@@ -217,7 +217,7 @@ class LeaderboardScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'TU POSICIÓN',
+                  'TU PUESTO',
                   style: GoogleFonts.workSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -291,10 +291,10 @@ class LeaderboardScreen extends ConsumerWidget {
   Widget _buildPodiumCard(BuildContext context, User user, int rank, String? currentUserId, {required double height}) {
     final isMe = user.userId == currentUserId;
     final medalColor = rank == 1
-        ? const Color(0xFFFFD700) // Gold
+        ? AppColors.secondary // Gold (FutKO theme)
         : rank == 2
             ? const Color(0xFFC0C0C0) // Silver
-            : const Color(0xFFCD7F32); // Bronze
+            : AppColors.tertiary; // Deep Navy for 3rd (FutKO theme)
 
     return Container(
       height: height,

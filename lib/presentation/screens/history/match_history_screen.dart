@@ -85,7 +85,7 @@ class MatchHistoryScreen extends ConsumerWidget {
             const CircularProgressIndicator(color: AppColors.primary),
             const SizedBox(height: 16),
             Text(
-              'Cargando partidas...',
+              'Cargando partidos...',
               style: GoogleFonts.workSans(
                 color: AppColors.onSurfaceVariant,
                 fontSize: 14,
@@ -138,7 +138,7 @@ class MatchHistoryScreen extends ConsumerWidget {
               Icon(Icons.sports_soccer, size: 64, color: AppColors.primary.withOpacity(0.3)),
               const SizedBox(height: 16),
               Text(
-                'Sin partidas aún',
+                'Sin partidos aún',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -147,7 +147,7 @@ class MatchHistoryScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Juega tu primera partida\ny aparecerá aquí.',
+                'Juega tu primer partido\ny aparecerá aquí.',
                 style: GoogleFonts.workSans(
                   fontSize: 14,
                   color: AppColors.onSurfaceVariant,
@@ -246,7 +246,7 @@ class MatchHistoryScreen extends ConsumerWidget {
               label: 'AMIGOS',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history_edu),
+              icon: Icon(Icons.history),
               label: 'HISTORIAL',
             ),
             BottomNavigationBarItem(

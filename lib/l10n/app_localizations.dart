@@ -406,7 +406,7 @@ abstract class S {
   /// Login screen subtitle
   ///
   /// In es, this message translates to:
-  /// **'Demuestra tus conocimientos de geografía'**
+  /// **'Demuestra tus conocimientos de fútbol'**
   String get loginSubtitle;
 
   /// Google sign in button

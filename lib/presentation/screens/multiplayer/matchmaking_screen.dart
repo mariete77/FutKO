@@ -5,7 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../providers/multiplayer_provider.dart';
 
-/// Matchmaking screen - search for opponents
+/// Matchmaking screen – search for football rivals
 class MatchmakingScreen extends ConsumerStatefulWidget {
   final MultiplayerMode mode;
 
@@ -53,7 +53,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
     // Listen for state changes and navigate
     ref.listen<MultiplayerState>(multiplayerProvider, (prev, next) {
       if (next.status == MultiplayerStatus.found) {
-        // Show opponent found animation briefly, then game starts
+        // Show rival found animation briefly, then game starts
       }
       if (next.status == MultiplayerStatus.playing) {
         context.go('/multiplayer-game');
@@ -72,7 +72,9 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
           next.status == MultiplayerStatus.found) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No se encontraron oponentes. ¡Modo Ghost Run!'),
+            content: Text(
+              'No se encontraron rivales. ¡Tú contra el estadio! Modo Ghost Run activado.',
+            ),
             backgroundColor: Colors.orange,
             duration: Duration(seconds: 3),
           ),
@@ -90,13 +92,14 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
       },
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: [
                 AppColors.primaryDark,
                 AppColors.primary,
+                AppColors.primaryDark,
               ],
             ),
           ),
@@ -143,7 +146,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
       case MultiplayerStatus.searching:
         return _buildSearching();
       case MultiplayerStatus.found:
-        return _buildOpponentFound(state);
+        return _buildRivalFound(state);
       case MultiplayerStatus.error:
         return _buildError(state.errorMessage ?? 'Error desconocido');
       default:
@@ -154,7 +157,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
   Widget _buildSearching() {
     return Column(
       children: [
-        // Spinning radar animation
+        // Spinning football animation
         AnimatedBuilder(
           animation: _spinController,
           builder: (context, child) {
@@ -166,7 +169,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: AppColors.secondary.withOpacity(0.4),
                     width: 2,
                   ),
                 ),
@@ -184,7 +187,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
             return Opacity(
               opacity: 0.5 + (_pulseController.value * 0.5),
               child: Text(
-                'Buscando oponente...',
+                'Buscando rival...',
                 style: AppTextStyles.h2.copyWith(color: Colors.white),
               ),
             );
@@ -192,7 +195,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         ),
         const SizedBox(height: 16),
         Text(
-          _getModeLabel(),
+          'Preparando la cancha...',
           style: AppTextStyles.bodyMedium.copyWith(
             color: Colors.white70,
           ),
@@ -201,18 +204,25 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
     );
   }
 
-  Widget _buildOpponentFound(MultiplayerState state) {
+  Widget _buildRivalFound(MultiplayerState state) {
     return Column(
       children: [
         const Icon(
-          Icons.check_circle,
-          color: AppColors.correct,
+          Icons.sports_soccer,
+          color: AppColors.secondary,
           size: 80,
         ),
         const SizedBox(height: 24),
         Text(
-          '¡Oponente encontrado!',
+          '¡Rival encontrado!',
           style: AppTextStyles.h2.copyWith(color: Colors.white),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '⚽ ¡Que suene el silbato! ⚽',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.secondary,
+          ),
         ),
         const SizedBox(height: 16),
         Container(
@@ -220,20 +230,35 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.secondary.withOpacity(0.3),
+              width: 1,
+            ),
           ),
           child: Column(
             children: [
               Text(
-                state.opponentName ?? 'Oponente',
+                state.opponentName ?? 'Rival',
                 style: AppTextStyles.h3.copyWith(color: Colors.white),
               ),
               if (state.opponentElo != null) ...[
                 const SizedBox(height: 4),
-                Text(
-                  '${state.opponentElo} ELO',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.emoji_events,
+                      color: AppColors.secondary,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${state.opponentElo} ELO',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
@@ -241,7 +266,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         ),
         const SizedBox(height: 24),
         Text(
-          'Comenzando partida...',
+          '¡Comienza el partido!',
           style: AppTextStyles.bodyMedium.copyWith(
             color: Colors.white70,
           ),
@@ -254,14 +279,20 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
     return Column(
       children: [
         const Icon(
-          Icons.error_outline,
+          Icons.sports_soccer,
           color: AppColors.error,
           size: 80,
         ),
         const SizedBox(height: 24),
         Text(
-          message,
+          '¡Fuera de juego!',
           style: AppTextStyles.h3.copyWith(color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -270,7 +301,11 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
             ref.read(multiplayerProvider.notifier).reset();
             context.go('/home');
           },
-          child: const Text('Volver'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.secondary,
+            foregroundColor: AppColors.onSecondary,
+          ),
+          child: const Text('Volver al vestuario'),
         ),
       ],
     );
@@ -279,18 +314,18 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
   String _getModeLabel() {
     switch (widget.mode) {
       case MultiplayerMode.casual:
-        return 'Partida Casual';
+        return '⚽ Partido Amistoso';
       case MultiplayerMode.ranked:
-        return 'Partida Ranked';
+        return '🏆 Partido Competitivo';
       case MultiplayerMode.ghostRun:
-        return 'Ghost Run';
+        return '👻 Ghost Run';
       case MultiplayerMode.friendChallenge:
-        return 'Reto de Amigo';
+        return '🤝 Reto de Amigo';
     }
   }
 }
 
-/// Custom painter for radar animation
+/// Custom painter for radar animation – styled as a football pitch circle
 class _RadarPainter extends CustomPainter {
   final double progress;
 
@@ -301,7 +336,7 @@ class _RadarPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    // Draw sweep
+    // Draw sweep – gold accent sweep
     final sweepPaint = Paint()
       ..color = AppColors.secondary.withOpacity(0.3)
       ..style = PaintingStyle.fill;
@@ -314,14 +349,20 @@ class _RadarPainter extends CustomPainter {
       sweepPaint,
     );
 
-    // Draw inner circles
+    // Draw inner circles – pitch line style
     final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withOpacity(0.15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
     canvas.drawCircle(center, radius * 0.33, circlePaint);
     canvas.drawCircle(center, radius * 0.66, circlePaint);
+
+    // Draw center dot
+    final dotPaint = Paint()
+      ..color = AppColors.secondary.withOpacity(0.6)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 4, dotPaint);
   }
 
   @override

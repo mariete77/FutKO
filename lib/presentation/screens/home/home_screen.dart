@@ -274,7 +274,7 @@ class HomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EXPLORADOR',
+                      'JUGADOR',
                       style: GoogleFonts.workSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -307,7 +307,7 @@ class HomeScreen extends ConsumerWidget {
                               size: 16, color: AppColors.tertiary),
                           const SizedBox(width: 4),
                           Text(
-                            'Streak: $winStreak',
+                            'Racha: $winStreak',
                             style: GoogleFonts.workSans(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -432,7 +432,7 @@ class HomeScreen extends ConsumerWidget {
                     color: Colors.white.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.bolt, size: 28, color: AppColors.primary),
+                  child: Icon(Icons.sports_soccer, size: 28, color: AppColors.primary),
                 ),
                 const SizedBox(height: 48),
                 Text(
@@ -618,7 +618,7 @@ class HomeScreen extends ConsumerWidget {
                     color: AppColors.secondaryContainer.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.history_edu,
+                  child: Icon(Icons.replay,
                       size: 28, color: AppColors.secondary),
                 ),
                 const SizedBox(width: 20),
@@ -713,7 +713,7 @@ class HomeScreen extends ConsumerWidget {
                     color: AppColors.primaryContainer.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.history_edu, size: 24, color: AppColors.primary),
+                  child: Icon(Icons.history, size: 24, color: AppColors.primary),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -824,7 +824,7 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(width: 8),
                   _buildStatPill(
                     icon: Icons.percent,
-                    label: 'Win Rate',
+                    label: 'Victorias %',
                     value: '$winRate%',
                     color: AppColors.primary,
                   ),
@@ -1143,12 +1143,12 @@ class HomeScreen extends ConsumerWidget {
               label: 'AMIGOS',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history_edu),
-              label: 'JOURNAL',
+              icon: Icon(Icons.history),
+              label: 'HISTORIAL',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'PROFILE',
+              label: 'PERFIL',
             ),
           ],
         ),

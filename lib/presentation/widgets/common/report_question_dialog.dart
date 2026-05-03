@@ -229,7 +229,7 @@ class _ReportQuestionDialogState extends State<ReportQuestionDialog> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.flag_outlined, size: 18),
+                        const Icon(Icons.report_outlined, size: 18),
                         const SizedBox(width: 8),
                         Text(
                           'Enviar Reporte',
