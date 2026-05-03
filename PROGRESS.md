@@ -9,14 +9,14 @@
 
 | Área | Estado | Progreso |
 |------|--------|----------|
-| Estructura base (copia de GeoC) | ✅ Completado | 100% |
-| Branding (nombre, colores, iconos) | 🔄 En progreso | 70% |
-| Tipos de pregunta (fútbol) | ✅ Completado | 100% |
-| Pantallas UI adaptadas | 🔲 Pendiente | 10% |
-| Firebase (nuevo proyecto) | 🔲 Pendiente | 0% |
-| Preguntas de fútbol (datos) | 🔲 Pendiente | 0% |
-| **Infraestructura Ligas/Equipos** | ✅ **Completado** | 100% |
-| Compilación y test | 🔲 Pendiente | 0% |
+|| Estructura base (copia de GeoC) | ✅ Completado | 100% |
+|| Branding (nombre, colores, iconos) | ✅ Completado | 100% |
+|| Tipos de pregunta (fútbol) | ✅ Completado | 100% |
+|| Pantallas UI adaptadas | ✅ Completado | 100% |
+|| Firebase (nuevo proyecto) | 🔄 En progreso (El Compa) | 0% |
+|| Preguntas de fútbol (datos) | 🔄 En progreso (El Compa) | 0% |
+|| **Infraestructura Ligas/Equipos** | ✅ **Completado** | 100% |
+|| Infraestructura y compilación | 🔄 Hermes Bot — En progreso | 10% |
 
 ---
 
@@ -46,20 +46,20 @@
 
 Archivos que tocará → no pisar estos si eres AGENTE B.
 
-| # | Tarea | Archivos | Estado |
-|---|-------|----------|--------|
-| A1 | Renombrar `geoc_page_transitions.dart` → `futko_page_transitions.dart` y actualizar imports | `lib/presentation/widgets/common/geoc_page_transitions.dart`, `lib/app.dart` | 🔲 |
-| A2 | Cambiar `Icons.flag_outlined` → `Icons.report_outlined` en feedback y report dialog | `answer_feedback_widget.dart`, `report_question_dialog.dart` | 🔲 |
-| A3 | Pantalla login: actualizar branding GeoC → FutKO, textos e iconos | `lib/presentation/screens/auth/login_screen.dart` | 🔲 |
-| A4 | Home screen: actualizar textos vacíos ("Explora el mundo" → algo fútbol), iconos | `lib/presentation/screens/home/home_screen.dart` | 🔲 |
-| A5 | Match history screen: textos, iconos, nav bar labels | `lib/presentation/screens/history/match_history_screen.dart` | 🔲 |
-| A6 | Friends screen: textos, iconos, nav bar labels | `lib/presentation/screens/friends/friends_screen.dart` | 🔲 |
-| A7 | Leaderboard: textos y estilos | `lib/presentation/screens/home/leaderboard_screen.dart` | 🔲 |
-| A8 | Matchmaking screen: textos ("Buscando oponente...", estilo fútbol) | `lib/presentation/screens/multiplayer/matchmaking_screen.dart` | 🔲 |
-| A9 | Game result widget: textos ("Aciertos", "Precisión", etc.) — verificar que están en español | `lib/presentation/screens/game/widgets/game_result_widget.dart` | 🔲 |
-| A10 | Localización: regenerar o actualizar `lib/l10n/` (eliminar refs a geografía) | `lib/l10n/*.dart` | 🔲 |
-| A11 | README.md: reescribir para FutKO | `README.md` | 🔲 |
-| A12 |DESIGN.md: actualizar tema visual | `DESIGN.md` | 🔲 |
+|| # | Tarea | Archivos | Estado ||
+---|-------|----------|--------||
+ A1 | Renombrar `geoc_page_transitions.dart` → `futko_page_transitions.dart` y actualizar imports | `lib/presentation/widgets/common/futko_page_transitions.dart`, `lib/app.dart` | ✅ ||
+ A2 | Cambiar `Icons.flag_outlined` → `Icons.report_outlined` en feedback y report dialog | `answer_feedback_widget.dart`, `report_question_dialog.dart` | ✅ ||
+ A3 | Pantalla login: actualizar branding GeoC → FutKO, textos e iconos | `lib/presentation/screens/auth/login_screen.dart` | ✅ ||
+ A4 | Home screen: actualizar textos vacíos, iconos → tema fútbol | `lib/presentation/screens/home/home_screen.dart` | ✅ ||
+ A5 | Match history screen: textos, iconos, nav bar labels | `lib/presentation/screens/history/match_history_screen.dart` | ✅ ||
+ A6 | Friends screen: textos, iconos, nav bar labels | `lib/presentation/screens/friends/friends_screen.dart` | ✅ ||
+ A7 | Leaderboard: textos y estilos → Tabla de Posiciones | `lib/presentation/screens/home/leaderboard_screen.dart` | ✅ ||
+ A8 | Matchmaking screen: estilo fútbol/estadio | `lib/presentation/screens/multiplayer/matchmaking_screen.dart` | ✅ ||
+ A9 | Game result widget: rangos fútbol, textos en español | `lib/presentation/screens/game/widgets/game_result_widget.dart` | ✅ ||
+ A10 | Localización: GeoQuiz→FutKO, geografía→fútbol | `lib/l10n/*.arb`, `lib/l10n/*.dart` | ✅ ||
+ A11 | README.md: reescribir para FutKO | `README.md` | ✅ ||
+ A12 | DESIGN.md: actualizar tema visual | `DESIGN.md` | ✅ ||
 
 ---
 
@@ -139,3 +139,4 @@ On Surface:   #1A1C1B
 | Fecha | Commit | Descripción |
 |-------|--------|-------------|
 | 2026-05-03 | bea439d | Fase 4: Infraestructura Ligas y Equipos (Models, Repos, Providers) |
+| 2026-05-03 | da84a49 | Bloque 1 completo: Branding y UI adaptada a tema fútbol (19 archivos) |
