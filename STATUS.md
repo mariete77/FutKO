@@ -36,14 +36,13 @@
 *   **No tocar:** Bloque 2 (Firebase) → es del Compa.
 
 ### 👨‍💻 El Compa (Rama: `feature/compa-leagues`)
-*   **Tarea asignada:** 🔥 **BLOQUE 2 — Firebase y Datos** (B1-B3, B6-B8).
-    - B1: Crear proyecto Firebase `futko-app`
-    - B2: Actualizar `firebase_constants.dart`
-    - B3: Configurar `google-services.json` / `GoogleService-Info.plist`
-    - B6: Primer lote de preguntas de fútbol (JSON → Firestore)
-    - B7: Segundo lote de preguntas
-    - B8: Cargar datos iniciales de Ligas y Equipos
+*   **⚡ HACER PULL AHORA** — Se han subido `leagues_seed.json` y `teams_seed.json` como ejemplo de formato.
+*   **Tarea asignada:** 🔥 **BLOQUE 2 — Firebase y Datos** (solo estas tareas para evitar conflictos):
+    - **B1:** Crear proyecto Firebase `futko-app` y descargar `google-services.json` + `GoogleService-Info.plist`
+    - **B6:** Generar más preguntas de fútbol (JSON). Solo hay 6 equipos, se necesitan **cientos** para que el juego sea jugable.
+    - **B8:** Importar las preguntas a Firestore (manualmente o con script)
 *   **Ya completado:** B4 (firestore.rules) ✅, B5 (Modelos Ligas/Equipos) ✅
+*   **⚠️ NO TOCAR:** `android/`, `ios/`, `lib/presentation/screens/` (Hermes y Mario los están modificando)
 
 ---
 
