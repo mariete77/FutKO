@@ -1,0 +1,56 @@
+[
+  {
+    "id": "real_madrid",
+    "name": "Real Madrid CF",
+    "leagueId": "laliga",
+    "city": "Madrid",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
+    "primaryColor": "#FFFFFF",
+    "secondaryColor": "#FEBE10"
+  },
+  {
+    "id": "fc_barcelona",
+    "name": "FC Barcelona",
+    "leagueId": "laliga",
+    "city": "Barcelona",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1200px-FC_Barcelona_%28crest%29.svg.png",
+    "primaryColor": "#A50044",
+    "secondaryColor": "#004D98"
+  },
+  {
+    "id": "man_city",
+    "name": "Manchester City",
+    "leagueId": "premier",
+    "city": "Manchester",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/1200px-Manchester_City_FC_badge.svg.png",
+    "primaryColor": "#6CABDD",
+    "secondaryColor": "#1C2C5B"
+  },
+  {
+    "id": "liverpool",
+    "name": "Liverpool FC",
+    "leagueId": "premier",
+    "city": "Liverpool",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/1200px-Liverpool_FC.svg.png",
+    "primaryColor": "#C8102E",
+    "secondaryColor": "#00B2A9"
+  },
+  {
+    "id": "juventus",
+    "name": "Juventus FC",
+    "leagueId": "seriea",
+    "city": "Turín",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/Juventus_FC_2017_logo.svg/1200px-Juventus_FC_2017_logo.svg.png",
+    "primaryColor": "#000000",
+    "secondaryColor": "#FFFFFF"
+  },
+  {
+    "id": "ac_milan",
+    "name": "AC Milan",
+    "leagueId": "seriea",
+    "city": "Milán",
+    "badgeUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c6/Logo_of_AC_Milan.svg/1200px-Logo_of_AC_Milan.svg.png",
+    "primaryColor": "#FB090B",
+    "secondaryColor": "#000000"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "laliga",
+    "name": "La Liga",
+    "country": "España",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/es/thumb/9/91/LaLiga_Santander_logo.svg/1200px-LaLiga_Santander_logo.svg.png",
+    "isActive": true
+  },
+  {
+    "id": "premier",
+    "name": "Premier League",
+    "country": "Inglaterra",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png",
+    "isActive": true
+  },
+  {
+    "id": "champions",
+    "name": "Champions League",
+    "country": "Europa",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/UEFA_Champions_League_logo_2.svg/1200px-UEFA_Champions_League_logo_2.svg.png",
+    "isActive": true
+  },
+  {
+    "id": "seriea",
+    "name": "Serie A",
+    "country": "Italia",
+    "logoUrl": "https://upload.wikimedia.org/wikipedia/it/thumb/e/e1/Serie_A_logo_2022.svg/1200px-Serie_A_logo_2022.svg.png",
+    "isActive": true
+  }
+]
