@@ -1,12 +1,1 @@
-{
-  "firestore": {
-    "rules": "firestore.rules"
-  },
-  "functions": {
-    "source": "functions",
-    "runtime": "nodejs18"
-  },
-  "projects": {
-    "default": "geoquiz-7790d"
-  }
-}
+{"firestore":{"rules":"firestore.rules"},"functions":{"source":"functions","runtime":"nodejs18"},"projects":{"default":"geoquiz-7790d"},"flutter":{"platforms":{"android":{"default":{"projectId":"geoquiz-7790d","appId":"1:475890223603:android:738e8f34a1fa4fc32f6a86","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"geoquiz-7790d","configurations":{"android":"1:475890223603:android:738e8f34a1fa4fc32f6a86","ios":"1:475890223603:ios:df442053dec5eb692f6a86","web":"1:475890223603:web:df216926b600644c2f6a86"}}}}}}

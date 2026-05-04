@@ -23,14 +23,14 @@ class MultiplayerGameScreen extends ConsumerWidget {
     final isFinished = state.status == MultiplayerStatus.finished;
 
     return Scaffold(
-      backgroundColor: isFinished ? AppColors.background : const Color(0xFF1A1A2E),
+      backgroundColor: isFinished ? AppColors.background : AppColors.surface,
       appBar: isFinished
           ? null
           : AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
+                icon: Icon(Icons.close, color: AppColors.onSurface),
                 onPressed: () => _showExitDialog(context, ref),
               ),
               actions: [
@@ -46,37 +46,35 @@ class MultiplayerGameScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(right: 16),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.2),
+        color: AppColors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.orange.withOpacity(0.5)),
+        border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Player score
           Text(
             '${state.playerScore}',
-            style: const TextStyle(
-              color: Colors.greenAccent,
+            style: TextStyle(
+              color: AppColors.success,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'VS',
             style: TextStyle(
-              color: Colors.white54,
+              color: AppColors.onSurfaceVariant,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(width: 8),
-          // Opponent score
           Text(
             '${state.opponentScore}',
-            style: const TextStyle(
-              color: Colors.redAccent,
+            style: TextStyle(
+              color: AppColors.error,
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -100,18 +98,18 @@ class MultiplayerGameScreen extends ConsumerWidget {
   }
 
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            color: Colors.orange,
+            color: AppColors.tertiary,
             strokeWidth: 3,
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Text(
             'Cargando...',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: AppColors.onSurface, fontSize: 18),
           ),
         ],
       ),
@@ -145,8 +143,8 @@ class MultiplayerGameScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.grey.withOpacity(0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+                    backgroundColor: AppColors.onSurface.withOpacity(0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiary),
                     minHeight: 8,
                   ),
                 ),
@@ -154,8 +152,8 @@ class MultiplayerGameScreen extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 '${currentIndex + 1}/$totalQuestions',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppColors.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -208,31 +206,30 @@ class MultiplayerGameScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isWinning
-              ? Colors.greenAccent.withOpacity(0.3)
-              : Colors.redAccent.withOpacity(0.3),
+              ? AppColors.success.withOpacity(0.3)
+              : AppColors.incorrect.withOpacity(0.3),
         ),
       ),
       child: Row(
         children: [
-          // Player side
           Expanded(
             child: Row(
               children: [
-                const Icon(Icons.person, color: Colors.greenAccent, size: 20),
+                Icon(Icons.person, color: AppColors.success, size: 20),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'Tú',
-                  style: TextStyle(color: Colors.greenAccent, fontSize: 14),
+                  style: TextStyle(color: AppColors.success, fontSize: 14),
                 ),
                 const Spacer(),
                 Text(
                   '${state.playerScore}',
-                  style: const TextStyle(
-                    color: Colors.greenAccent,
+                  style: TextStyle(
+                    color: AppColors.success,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -243,17 +240,16 @@ class MultiplayerGameScreen extends ConsumerWidget {
           Container(
             width: 1,
             height: 24,
-            color: Colors.white24,
+            color: AppColors.outlineVariant,
             margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          // Opponent side
           Expanded(
             child: Row(
               children: [
                 Text(
                   '${state.opponentScore}',
-                  style: const TextStyle(
-                    color: Colors.redAccent,
+                  style: TextStyle(
+                    color: AppColors.error,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -261,10 +257,10 @@ class MultiplayerGameScreen extends ConsumerWidget {
                 const Spacer(),
                 Text(
                   state.opponentName ?? 'Oponente',
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                  style: TextStyle(color: AppColors.error, fontSize: 14),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.person_outline, color: Colors.redAccent, size: 20),
+                Icon(Icons.person_outline, color: AppColors.error, size: 20),
               ],
             ),
           ),
@@ -370,19 +366,19 @@ class MultiplayerGameScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               message,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: AppColors.onSurface, fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.go('/home'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.tertiary,
+                foregroundColor: AppColors.onSurface,
               ),
               child: const Text('Volver'),
             ),
@@ -396,16 +392,16 @@ class MultiplayerGameScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF2D2D44),
-        title: const Text('¿Salir?', style: TextStyle(color: Colors.white)),
-        content: const Text(
+        backgroundColor: AppColors.surfaceContainerHigh,
+        title: Text('¿Salir?', style: TextStyle(color: AppColors.onSurface)),
+        content: Text(
           'Perderás tu progreso. ¿Estás seguro?',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: AppColors.onSurfaceVariant),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            child: Text('Cancelar', style: TextStyle(color: AppColors.onSurfaceVariant)),
           ),
           TextButton(
             onPressed: () {
@@ -413,7 +409,7 @@ class MultiplayerGameScreen extends ConsumerWidget {
               ref.read(multiplayerProvider.notifier).reset();
               context.go('/home');
             },
-            child: const Text('Salir', style: TextStyle(color: Colors.red)),
+            child: Text('Salir', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),

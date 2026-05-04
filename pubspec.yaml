@@ -16,7 +16,7 @@ dependencies:
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.0
   cloud_firestore: ^6.0.0
-  # firebase_storage: ^13.0.0  # TODO: reactivar cuando se necesiten siluetas/fotos
+  firebase_storage: ^13.0.0
   firebase_database: ^12.0.0
   firebase_analytics: ^12.0.0
 

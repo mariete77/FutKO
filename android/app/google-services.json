@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "475890223603",
+    "firebase_url": "https://geoquiz-7790d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "geoquiz-7790d",
+    "storage_bucket": "geoquiz-7790d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475890223603:android:738e8f34a1fa4fc32f6a86",
+        "android_client_info": {
+          "package_name": "com.example.futko"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "475890223603-qkrp6fr6v8iuujudm55lgk5d7ilhuteu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD6CQT1bx__NH8figYqT57RMwZW-xKTzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "475890223603-qkrp6fr6v8iuujudm55lgk5d7ilhuteu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "475890223603-3nvhvvb16b5f6dee1qufv4vnvb8sv79c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.futko"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

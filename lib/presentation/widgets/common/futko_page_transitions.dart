@@ -190,4 +190,114 @@ class FutKOTransitions {
       child: child,
     );
   }
+
+  /// 3D slide from left — simulates a diagonal, football-like entrance.
+  /// Creates a perspective effect with slight rotation on Y axis.
+  static CustomTransitionPage<void> slideInFromLeft3D({
+    required Widget child,
+    Duration duration = const Duration(milliseconds: 400),
+  }) {
+    return CustomTransitionPage<void>(
+      transitionDuration: duration,
+      reverseTransitionDuration: duration,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        final slideTween = Tween<Offset>(
+          begin: const Offset(-0.3, 0.0),
+          end: Offset.zero,
+        ).chain(CurveTween(curve: Curves.easeOutCubic));
+
+        final rotateTween = Tween<double>(
+          begin: -0.05,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeOutCubic));
+
+        return AnimatedBuilder(
+          animation: curvedAnimation,
+          builder: (context, child) {
+            final value = curvedAnimation.value;
+            return SlideTransition(
+              position: slideTween.animate(curvedAnimation),
+              child: Transform(
+                alignment: Alignment.centerRight,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.001)
+                  ..rotateY(rotateTween.evaluate(curvedAnimation)),
+                child: Opacity(
+                  opacity: value.clamp(0.0, 1.0),
+                  child: child,
+                ),
+              ),
+            );
+          },
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
+
+  /// Football-style diagonal slide — enters from bottom-right with 3D perspective.
+  /// Great for game results or match transitions.
+  static CustomTransitionPage<void> diagonalFootball({
+    required Widget child,
+    Duration duration = const Duration(milliseconds: 450),
+  }) {
+    return CustomTransitionPage<void>(
+      transitionDuration: duration,
+      reverseTransitionDuration: const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.15, 1.0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+
+  /// Cupertino-style horizontal slide — smooth iOS-like transition.
+  /// Perfect for back navigation.
+  static CustomTransitionPage<void> slideHorizontal({
+    required Widget child,
+    Duration duration = const Duration(milliseconds: 300),
+    bool fromRight = true,
+  }) {
+    return CustomTransitionPage<void>(
+      transitionDuration: duration,
+      reverseTransitionDuration: duration,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        );
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: Offset(fromRight ? 1.0 : -1.0, 0.0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
 }

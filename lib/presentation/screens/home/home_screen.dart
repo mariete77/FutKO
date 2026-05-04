@@ -9,10 +9,6 @@ import '../../providers/elo_history_provider.dart';
 import '../../providers/match_history_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user.dart';
-import '../../../domain/entities/match.dart';
-import 'widgets/elo_sparkline.dart';
-import 'widgets/subscription_modal.dart';
-import '../../widgets/common/futko_page_transitions.dart';
 import 'package:intl/intl.dart';
 
 /// Home screen — "PantallaPrincipal" mockup.
@@ -140,29 +136,70 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Logo
+          // Logo with football icon
           Row(
             children: [
-              Icon(
-                Icons.sports_soccer,
-                size: 24,
-                color: AppColors.yellow500,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'FutKO',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.yellow500,
-                  fontStyle: FontStyle.italic,
-                  shadows: [
-                    Shadow(
-                      color: AppColors.yellow500.withOpacity(0.4),
-                      blurRadius: 10,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.yellow500.withOpacity(0.3),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
-                  ],
-                ),
+                    child: Icon(
+                      Icons.sports_soccer,
+                      size: 26,
+                      color: AppColors.yellow500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'FutKO',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.yellow500,
+                      fontStyle: FontStyle.italic,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.yellow500.withOpacity(0.4),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'BATTLE',
+                      style: GoogleFonts.lexend(
+                        fontSize: 7,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -170,6 +207,7 @@ class HomeScreen extends ConsumerWidget {
           // Right side
           Row(
             children: [
+              // Match indicator
               if (activeCount > 0)
                 Container(
                   margin: const EdgeInsets.only(right: 12),
@@ -177,23 +215,43 @@ class HomeScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(9999),
+                    border: Border.all(
+                      color: AppColors.success.withOpacity(0.3),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.success,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.success.withOpacity(0.5),
-                              blurRadius: 6,
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.success,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.success.withOpacity(0.5),
+                                  blurRadius: 6,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.success.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -207,36 +265,69 @@ class HomeScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+              // Profile avatar with jersey icon
               GestureDetector(
                 onTap: () {
                   // TODO: Profile
                 },
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppColors.yellow500,
                       width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.yellow500.withOpacity(0.2),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundImage:
-                        user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
-                    backgroundColor: AppColors.surfaceContainerHigh,
-                    child: user.photoUrl == null
-                        ? Text(
-                            user.displayName.isNotEmpty
-                                ? user.displayName[0].toUpperCase()
-                                : '?',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 17,
+                        backgroundImage:
+                            user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        child: user.photoUrl == null
+                            ? Text(
+                                user.displayName.isNotEmpty
+                                    ? user.displayName[0].toUpperCase()
+                                    : '?',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.onSurface,
+                                  fontSize: 14,
+                                ),
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: AppColors.emerald950,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.yellow500,
+                              width: 1,
                             ),
-                          )
-                        : null,
+                          ),
+                          child: Icon(
+                            Icons.style,
+                            size: 10,
+                            color: AppColors.yellow500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -686,7 +777,7 @@ class HomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${isWin ? 'Victoria' : 'Derrota'} vs ${lastMatch.opponentName ?? 'Oponente'}',
+                            '${isWin ? 'Victoria' : 'Derrota'} vs Oponente',
                             style: GoogleFonts.lexend(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -770,12 +861,12 @@ class HomeScreen extends ConsumerWidget {
                 onTap: () => context.go('/leaderboard'),
               ),
               _buildNavItem(
-                icon: Icons.fitness_center,
+                icon: Icons.stadium,
                 label: 'Rules',
                 onTap: () {},
               ),
               _buildNavItem(
-                icon: Icons.person,
+                icon: Icons.style,
                 label: 'Profile',
                 onTap: () {},
               ),

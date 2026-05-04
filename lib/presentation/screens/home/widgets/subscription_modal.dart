@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../services/revenuecat_service.dart';
+import '../../../providers/subscription_provider.dart';
 
-class SubscriptionModal extends StatelessWidget {
+class SubscriptionModal extends ConsumerStatefulWidget {
   const SubscriptionModal({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -15,7 +18,22 @@ class SubscriptionModal extends StatelessWidget {
   }
 
   @override
+  ConsumerState<SubscriptionModal> createState() => _SubscriptionModalState();
+}
+
+class _SubscriptionModalState extends ConsumerState<SubscriptionModal> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(subscriptionProvider.notifier).initialize();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final subState = ref.watch(subscriptionProvider);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
@@ -24,7 +42,6 @@ class SubscriptionModal extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // ── Vintage Warmth Overlay ─────────────────────
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -34,11 +51,9 @@ class SubscriptionModal extends StatelessWidget {
             ),
           ),
 
-          // ── Main Content ───────────────────────────────
           Column(
             children: [
               const SizedBox(height: 12),
-              // Pull handle
               Container(
                 width: 48,
                 height: 4,
@@ -55,7 +70,6 @@ class SubscriptionModal extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── Editorial Header ────────────────
                       Text(
                         'MEMBRESÍA',
                         style: GoogleFonts.workSans(
@@ -67,7 +81,7 @@ class SubscriptionModal extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Explorador\nElite',
+                        'Afición\nÉlite',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 52,
                           fontWeight: FontWeight.w800,
@@ -77,41 +91,40 @@ class SubscriptionModal extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      
+
                       Text(
-                        'Eleva tu experiencia geográfica con acceso extendido y funciones exclusivas de batalla.',
+                        'Lleva tu pasión futbolera al siguiente nivel con partidas ilimitadas y estadísticas exclusivas.',
                         style: GoogleFonts.workSans(
                           fontSize: 18,
                           color: AppColors.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 56),
 
-                      // ── Benefits Section (Tonal Layering) ──
                       _buildBenefitItem(
-                        icon: Icons.military_tech_outlined,
-                        title: 'Modo Clasificatorio',
-                        description: '5 Batallas diarias por ELO global.',
+                        icon: Icons.emoji_events_outlined,
+                        title: 'Partidas Clasificatorias',
+                        description: '5 batallas diarias para subir tu ELO.',
                       ),
                       const SizedBox(height: 24),
                       _buildBenefitItem(
                         icon: Icons.group_outlined,
                         title: 'Duelos con Amigos',
-                        description: '5 Partidas directas contra tus contactos.',
+                        description: 'Partidas ilimitadas contra tus contactos.',
                       ),
                       const SizedBox(height: 24),
                       _buildBenefitItem(
                         icon: Icons.bolt_outlined,
                         title: 'Partidas Rápidas',
-                        description: '5 Sesiones de entrenamiento instantáneo.',
+                        description: 'Entrenamiento sin límites diarios.',
                       ),
                       const SizedBox(height: 24),
                       _buildBenefitItem(
-                        icon: Icons.history_edu_outlined,
-                        title: 'Sin Interrupciones',
-                        description: 'Experiencia fluida sin pausas obligatorias.',
+                        icon: Icons.auto_graph_outlined,
+                        title: 'Estadísticas Avanzadas',
+                        description: 'Gráficas de rendimiento y análisis detallado.',
                       ),
 
                       const SizedBox(height: 64),
@@ -120,7 +133,6 @@ class SubscriptionModal extends StatelessWidget {
                 ),
               ),
 
-              // ── Footer CTA (Sticks to bottom) ────────────
               Container(
                 padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
                 decoration: BoxDecoration(
@@ -163,7 +175,6 @@ class SubscriptionModal extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // Badge
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
@@ -182,51 +193,69 @@ class SubscriptionModal extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    // Primary CTA
-                    SizedBox(
-                      width: double.infinity,
-                      height: 64,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
-                          borderRadius: BorderRadius.circular(9999),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+
+                    if (subState.status == SubscriptionStatus.loading)
+                      const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(),
+                      )
+                    else ...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
                             borderRadius: BorderRadius.circular(9999),
-                            onTap: () {
-                              // TODO: Process subscription
-                              Navigator.pop(context);
-                            },
-                            child: Center(
-                              child: Text(
-                                'Suscribirse Ahora',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onPrimary,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.3),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(9999),
+                              onTap: subState.isPremium
+                                  ? null
+                                  : () => _purchase(context),
+                              child: Center(
+                                child: Text(
+                                  subState.isPremium ? 'Ya eres Premium' : 'Suscribirse Ahora',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: subState.isPremium
+                                        ? AppColors.onSurfaceVariant
+                                        : AppColors.onPrimary,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => _restore(context),
+                        child: Text(
+                          'Restaurar compras',
+                          style: GoogleFonts.workSans(
+                            fontSize: 14,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
 
-          // ── Close Button ───────────────────────────────
           Positioned(
             top: 24,
             right: 24,
@@ -245,6 +274,38 @@ class SubscriptionModal extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _purchase(BuildContext context) async {
+    final notifier = ref.read(subscriptionProvider.notifier);
+    final offerings = await RevenueCatService.getOfferings();
+    if (offerings == null) return;
+
+    final current = offerings.current;
+    if (current == null) return;
+
+    final package = current.monthly?.storeProduct != null
+        ? current.monthly!
+        : current.annual ?? current.lifetime ?? current.weekly!;
+
+    final success = await notifier.purchasePackage(package);
+    if (success && mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('¡Bienvenido a la élite!')),
+      );
+    }
+  }
+
+  Future<void> _restore(BuildContext context) async {
+    final notifier = ref.read(subscriptionProvider.notifier);
+    final success = await notifier.restorePurchases();
+    if (success && mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Compras restauradas correctamente')),
+      );
+    }
   }
 
   Widget _buildBenefitItem({

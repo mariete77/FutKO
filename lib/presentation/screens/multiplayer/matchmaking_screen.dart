@@ -73,7 +73,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No se encontraron oponentes. ¡Modo Ghost Run!'),
-            backgroundColor: Colors.orange,
+            backgroundColor: AppColors.tertiary,
             duration: Duration(seconds: 3),
           ),
         );
@@ -111,7 +111,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
                       ref.read(multiplayerProvider.notifier).cancelSearch();
                       context.go('/home');
                     },
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(Icons.close, color: AppColors.onSurface),
                   ),
                 ),
 
@@ -126,7 +126,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
                 Text(
                   _getModeLabel(),
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white70,
+                    color: AppColors.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -154,19 +154,18 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
   Widget _buildSearching() {
     return Column(
       children: [
-        // Spinning radar animation
         AnimatedBuilder(
           animation: _spinController,
           builder: (context, child) {
             return Transform.rotate(
-              angle: _spinController.value * 6.28, // Full rotation
+              angle: _spinController.value * 6.28,
               child: Container(
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: AppColors.onSurface.withOpacity(0.3),
                     width: 2,
                   ),
                 ),
@@ -185,7 +184,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
               opacity: 0.5 + (_pulseController.value * 0.5),
               child: Text(
                 'Buscando oponente...',
-                style: AppTextStyles.h2.copyWith(color: Colors.white),
+                style: AppTextStyles.h2.copyWith(color: AppColors.onSurface),
               ),
             );
           },
@@ -194,7 +193,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         Text(
           _getModeLabel(),
           style: AppTextStyles.bodyMedium.copyWith(
-            color: Colors.white70,
+            color: AppColors.onSurfaceVariant,
           ),
         ),
       ],
@@ -212,20 +211,21 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         const SizedBox(height: 24),
         Text(
           '¡Oponente encontrado!',
-          style: AppTextStyles.h2.copyWith(color: Colors.white),
+          style: AppTextStyles.h2.copyWith(color: AppColors.onSurface),
         ),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
               Text(
                 state.opponentName ?? 'Oponente',
-                style: AppTextStyles.h3.copyWith(color: Colors.white),
+          style: AppTextStyles.h3.copyWith(color: AppColors.onSurface),
+          textAlign: TextAlign.center,
               ),
               if (state.opponentElo != null) ...[
                 const SizedBox(height: 4),
@@ -243,7 +243,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         Text(
           'Comenzando partida...',
           style: AppTextStyles.bodyMedium.copyWith(
-            color: Colors.white70,
+            color: AppColors.onSurfaceVariant,
           ),
         ),
       ],
@@ -261,8 +261,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         const SizedBox(height: 24),
         Text(
           message,
-          style: AppTextStyles.h3.copyWith(color: Colors.white),
-          textAlign: TextAlign.center,
+          style: AppTextStyles.h3.copyWith(color: AppColors.onSurface),
         ),
         const SizedBox(height: 24),
         ElevatedButton(
@@ -316,7 +315,7 @@ class _RadarPainter extends CustomPainter {
 
     // Draw inner circles
     final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = AppColors.onSurface.withOpacity(0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

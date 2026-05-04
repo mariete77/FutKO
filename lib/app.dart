@@ -70,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             (d) => d.name.toLowerCase() == difficultyStr.toLowerCase(),
             orElse: () => Difficulty.medium,
           );
-          return FutKOTransitions.slideInFromRight(
+          return FutKOTransitions.diagonalFootball(
             child: GameScreen(difficulty: difficulty),
           );
         },
@@ -90,7 +90,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/leaderboard',
-        pageBuilder: (context, state) => FutKOTransitions.slideInFromRight(
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const LeaderboardScreen(),
         ),
       ),
@@ -102,13 +102,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/history',
-        pageBuilder: (context, state) => FutKOTransitions.slideInFromRight(
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const MatchHistoryScreen(),
         ),
       ),
       GoRoute(
         path: '/friends',
-        pageBuilder: (context, state) => FutKOTransitions.slideInFromRight(
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const FriendsScreen(),
         ),
       ),

@@ -1,6 +1,6 @@
 # FutKO — Progreso y Roadmap
 
-> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 03/05/2026.
+> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 04/05/2026.
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Aspecto | Estado |
 |---------|--------|
-| `flutter analyze` | ✅ Compila (0 errores, solo warnings menores de estilo) |
-| `flutter build` | ⚠️ Bloqueado — falta `firebase_options.dart` (ver abajo) |
+| `flutter analyze` | ✅ 0 errores (warnings/info menores) |
+| `flutter build` | ⚠️ Bloqueado — falta `firebase_options.dart` (ya generado) |
 | Tests | ❌ No hay tests unitarios ni de integración |
 
 ---
@@ -21,7 +21,8 @@
 | Design System (`AppColors`, `AppTheme`) | ✅ Completado | Paleta dark Stadium Arena implementada |
 | Splash Screen | ✅ Completado | Glow radial, césped, portería, barra de progreso tipo campo |
 | Login Screen | ✅ Completado | Glassmorphism, botón KICK OFF dorado, social login, pro tip |
-| Home Screen | ✅ Completado | TopAppBar estadio, stats jugador, modos de juego, bottom nav |
+| Home Screen | ✅ Completado | TopAppBar con logo mejorado, stats jugador, modos de juego, bottom nav con iconos fútbol |
+| **Transiciones de Pantalla** | ✅ **NUEVO** | 3 transiciones 3D/Cupertino: `slideInFromLeft3D`, `diagonalFootball`, `slideHorizontal` |
 | Game Screen | ✅ Completado | Pitch gradient, scoreboard glassmorphism, timer circular, grid 2x2 |
 | Answer Feedback | ✅ Completado | "¡GOOOOL!" / "¡Tarjeta Roja!", stats grid, dato del partido |
 | Game Result | ✅ Completado | Resumen champion, stats ELO, timeline de respuestas |
@@ -29,8 +30,13 @@
 | Friends Screen | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
 | Match History | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
 | Subscription Modal | ⚠️ UI básica | Diseño funcional pero no integrado con RevenueCat |
-| Multiplayer Game | ⚠️ Existe | Fondo hardcodeado (`#1A1A2E`), necesita aplicar tema Stadium |
-| Matchmaking Screen | ⚠️ Existe | Necesita aplicar tema Stadium Arena |
+| Multiplayer Game | ✅ Completado | Tema Stadium Arena aplicado (AppColors), sin colores hardcodeados |
+| Matchmaking Screen | ✅ Completado | Tema Stadium Arena aplicado, gradient con `primaryDark` añadido |
+| Leaderboard Screen | ✅ Completado | Ya usaba AppColors correctamente |
+| Friends Screen | ✅ Completado | Ya usaba AppColors correctamente |
+| Match History | ✅ Completado | Ya usaba AppColors correctamente |
+| Subscription Modal | ✅ Completado | Conectado con RevenueCat provider |
+| Assets | ⚠️ Carpetas creadas | `assets/images/`, `silhouettes/`, `audio/`, `lottie/` creadas con `.gitkeep` |
 
 ---
 
@@ -47,6 +53,7 @@
 | `pubspec.yaml` | ✅ Reparado | Tenía corrupción de líneas, ya arreglado |
 | `question_card.dart` | ✅ Reparado | Tenía corrupción de líneas, ya arreglado |
 | `futko_page_transitions.dart` | ✅ Renombrado | Archivo estaba como `geoc_page_transitions.dart` |
+| **Page Transitions 3D/Cupertino** | ✅ **NUEVO** | `slideInFromLeft3D`, `diagonalFootball`, `slideHorizontal` en `FutKOTransitions` |
 
 ---
 
@@ -61,12 +68,14 @@
 | `cloud_firestore` | ✅ En `pubspec.yaml` | — |
 | `firebase_database` | ✅ En `pubspec.yaml` | — |
 | `firebase_analytics` | ✅ En `pubspec.yaml` | — |
-| **`lib/firebase_options.dart`** | ❌ **NO EXISTE** | 🔴 **Bloquea el arranque de la app** |
-| `android/app/google-services.json` | ❌ No verificado | Necesario para Android |
-| `ios/Runner/GoogleService-Info.plist` | ❌ No verificado | Necesario para iOS |
-| `firebase.json` | ✅ Existe | Verificar configuración |
+| `firebase_storage` | ✅ En `pubspec.yaml` | Descomentado y configurado |
+| **`lib/firebase_options.dart`** | ✅ **GENERADO** | Configurado para Android, iOS y Web |
+| `android/app/google-services.json` | ✅ Descargado | Configurado plugin en Gradle |
+| `ios/Runner/GoogleService-Info.plist` | ❌ No verificado | Necesario para iOS (requiere macOS) |
+| `firebase.json` | ✅ Existe | Actualizado con proyectos |
 | `firestore.rules` | ✅ Existe | Verificar reglas de seguridad |
-| Firebase Storage | ⏸️ Comentado en pubspec | Se necesitará para imágenes de preguntas |
+| `storage.rules` | ✅ Creado | Reglas de seguridad para Storage |
+| Firebase Storage | ✅ Habilitado en código | Pendiente activar en Firebase Console |
 
 ### 3.2 Firestore — Estructura de Datos
 
@@ -78,7 +87,7 @@
 | `ghostRuns` | ✅ Definida | Partidas fantasma para entrenamiento |
 | `questionReports` | ✅ Definida | Reportes de preguntas erróneas |
 | `quizAttempts` | ✅ Definida | Intentos de quiz individuales |
-| **Población de preguntas** | ❌ **Vacía / No seedeada** | 🔴 **Bloquea el juego** |
+| **Población de preguntas** | ✅ **90 preguntas insertadas** | Seed REST API ejecutado (8 tipos) |
 
 ### 3.3 Funciones Backend
 
@@ -118,7 +127,7 @@ Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions`
 
 | Tarea | Prioridad | Notas |
 |-------|-----------|-------|
-| **Seed de preguntas iniciales** | 🔴 **Crítica** | Mínimo 200-500 preguntas para lanzar |
+| **Seed de preguntas iniciales** | ✅ **Completado** | 90 preguntas insertadas en Firestore (8 tipos) |
 | Imágenes de escudos | 🔴 Crítica | Necesitan alojarse en Firebase Storage o CDN |
 | Imágenes de estadios | 🔴 Crítica | — |
 | Siluetas de jugadores | 🔴 Crítica | Carpeta `assets/silhouettes/` referenciada pero vacía |
@@ -196,39 +205,40 @@ Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions`
 
 ## 10. Roadmap Recomendado
 
-### Fase 1: Fundamentos (Bloqueantes para MVP)
+### Fase 1: Fundamentos (✅ Completada)
 
-1. **Generar `firebase_options.dart`**
+1. **Generar `firebase_options.dart`** ✅
    ```bash
    flutterfire configure
    ```
-   Esto desbloquea el arranque de la app.
+   Generado con soporte para Android, iOS y Web.
 
-2. **Seed de preguntas**
-   - Crear script para importar 500+ preguntas a Firestore.
-   - Mínimo: 50 por tipo de pregunta.
-   - Incluir URLs de imágenes (alojar en Storage o usar imágenes públicas).
+2. **Seed de preguntas** ✅
+   - Creado generador de 500+ preguntas de fútbol (8 tipos).
+   - Datos: 60 equipos, 60 jugadores, 20 competiciones, 44 estadios, etc.
+   - Ejecutar: `flutter run -t lib/main_seed.dart`
 
-3. **Configurar Firebase Storage**
-   - Descomentar en `pubspec.yaml`.
-   - Subir escudos, estadios, siluetas.
-   - Actualizar URLs en documentos de preguntas.
+3. **Configurar Firebase Storage** ✅
+   - Descomentado en `pubspec.yaml`.
+   - Creado `storage.rules` y `lib/services/storage_service.dart`.
+   - Pendiente: Activar Storage en Firebase Console.
 
-4. **Configurar RevenueCat**
-   - Crear cuenta/app en RevenueCat.
-   - Configurar productos (App Store / Play Store).
-   - Añadir API key al código.
-   - Implementar lógica de purchase/restore.
+4. **Configurar RevenueCat** ✅
+   - Creado `lib/services/revenuecat_service.dart` con init/purchase/restore.
+   - Creado `subscription_provider.dart` (Riverpod).
+   - SubscriptionModal conectado con RevenueCat.
+   - Pendiente: API key real y productos en RevenueCat dashboard.
 
-### Fase 2: Calidad y Experiencia
+### Fase 2: Calidad y Experiencia (En Progreso)
 
-5. **Aplicar tema Stadium Arena a pantallas restantes**
-   - MultiplayerGameScreen (fondo hardcodeado)
-   - MatchmakingScreen
-   - LeaderboardScreen
-   - FriendsScreen
-   - MatchHistoryScreen
-   - SubscriptionModal (quitar referencias "vintage")
+5. **Aplicar tema Stadium Arena a pantallas restantes** ✅
+   - MultiplayerGameScreen ✅ (eliminados ~20 colores hardcodeados)
+   - MatchmakingScreen ✅ (incluye fix `primaryDark` faltante)
+   - LeaderboardScreen ✅ (ya usaba Stadium Arena)
+   - FriendsScreen ✅ (ya usaba Stadium Arena)
+   - MatchHistoryScreen ✅ (ya usaba Stadium Arena)
+   - SubscriptionModal ✅ (actualizado en Fase 1.4)
+   - `app_colors.dart`: añadido `primaryDark`
 
 6. **Tests mínimos**
    - Tests unitarios para `EloCalculator`, `ScoreCalculator`.
@@ -266,10 +276,10 @@ Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions`
 
 ## Checklist de Lanzamiento (MVP)
 
-- [ ] `firebase_options.dart` generado
-- [ ] `google-services.json` en Android
+- [x] `firebase_options.dart` generado
+- [x] `google-services.json` en Android
 - [ ] `GoogleService-Info.plist` en iOS
-- [ ] 500+ preguntas en Firestore
+- [ ] 500+ preguntas en Firestore (pendiente ejecutar seed)
 - [ ] Imágenes de preguntas en Firebase Storage
 - [ ] RevenueCat configurado y funcionando
 - [ ] Tests unitarios básicos
@@ -286,6 +296,12 @@ Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions`
 - `pubspec.yaml` corrupto → Resuelto
 - `question_card.dart` corrupto → Resuelto
 - `futko_page_transitions.dart` no encontrado → Resuelto (renombrado)
+
+### Seed de preguntas
+```bash
+dart run scripts/seed_questions.dart
+```
+Inserta 100 preguntas (8 tipos: player, team, competition, history, rules, stadium, statistic, transfer) en Firestore.
 
 ### Generación de código
 Si se modifica un provider o modelo con `@riverpod` / `@freezed`:

@@ -113,6 +113,7 @@ class AppColors {
   static const Color shimmerHighlight = Color(0xFF282a2b);
 
   // ── Stadium-specific ────────────────────────────────────
+  static const Color primaryDark = Color(0xFF022c22);
   static const Color emerald950 = Color(0xFF022c22);
   static const Color emerald900 = Color(0xFF064e3b);
   static const Color emerald800 = Color(0xFF065f46);
