@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Lexend:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#1a1c1c",
+                    "on-secondary-container": "#725f00",
+                    "primary": "#accfb3",
+                    "surface-container-highest": "#333535",
+                    "on-secondary-fixed-variant": "#544600",
+                    "on-surface": "#e2e2e2",
+                    "outline-variant": "#424842",
+                    "on-tertiary-fixed": "#2e1500",
+                    "tertiary-container": "#402000",
+                    "surface-tint": "#accfb3",
+                    "background": "#121414",
+                    "on-secondary-fixed": "#221b00",
+                    "inverse-surface": "#e2e2e2",
+                    "surface-container-lowest": "#0c0f0f",
+                    "surface-variant": "#333535",
+                    "surface-container-high": "#282a2b",
+                    "on-error-container": "#ffdad6",
+                    "outline": "#8c928b",
+                    "on-primary": "#183623",
+                    "inverse-primary": "#46654f",
+                    "on-tertiary-container": "#ca7d30",
+                    "inverse-on-surface": "#2f3131",
+                    "on-tertiary-fixed-variant": "#6c3a00",
+                    "surface-bright": "#38393a",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb779",
+                    "tertiary-fixed-dim": "#ffb779",
+                    "surface-dim": "#121414",
+                    "surface-container": "#1e2020",
+                    "on-primary-fixed": "#02210f",
+                    "on-secondary": "#3a3000",
+                    "on-tertiary": "#4c2700",
+                    "surface": "#121414",
+                    "on-surface-variant": "#c2c8c0",
+                    "secondary-container": "#ffdb3c",
+                    "primary-container": "#0f2e1b",
+                    "on-primary-fixed-variant": "#2f4d38",
+                    "secondary-fixed-dim": "#e9c400",
+                    "on-error": "#690005",
+                    "secondary": "#fff9ef",
+                    "primary-fixed": "#c8ebce",
+                    "on-primary-container": "#76977e",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#ffdcc1",
+                    "on-background": "#e2e2e2",
+                    "primary-fixed-dim": "#accfb3",
+                    "secondary-fixed": "#ffe16d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "container-max": "1200px",
+                    "unit": "4px",
+                    "lg": "24px",
+                    "gutter": "20px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Lexend"],
+                    "label-bold": ["Lexend"],
+                    "body-md": ["Lexend"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-xl": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pitch-gradient {
+            background: radial-gradient(circle at center, #1a2e1d 0%, #121414 100%);
+        }
+        .glass-card {
+            background: rgba(26, 28, 28, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .scoreboard-glow {
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+        }
+        .pitch-line {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 h-16 bg-emerald-950/90 dark:bg-emerald-950/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.6)] border-b border-white/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500" data-icon="sports_soccer">sports_soccer</span>
+<h1 class="text-2xl font-black italic text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)] font-plus-jakarta tracking-tight">FutKO</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-highest px-3 py-1 rounded-full border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-label-bold text-label-bold text-on-surface">1,240 pts</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container border-2 border-yellow-500 overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A stylized digital avatar of a young male football fan with a modern haircut, wearing a sleek emerald green sports jersey. The lighting is dramatic, coming from the side like a stadium floodlight, with a subtle golden rim light around the silhouette to maintain brand cohesion and premium feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqjepDp4BBSePz-nDiax7WHZOG-ex583Ivg6h3hVDEmzPOaZIKmeds8S5JXk1nWaEjAfBIhmPfwrms9EtF6g7HyEfFcDLja3J6_bZxxwKgYexyF2YR9IPdwRdij-CnHiI--71UyPbR_ZIz5p5-S3gMf5zeGx14DBgeoyU-9TUAeMlWA7FqLe0cO_zo2RjgpNMgVBSRj0gMzyykivDdyb7mvRddhlYOxYQZpj0osP9urJ90pvP6T5KLpT0o4KzFaYcBwjPB9VssuwQa"/>
+</div>
+</div>
+</header>
+<main class="min-h-screen pt-20 pb-28 px-4 pitch-gradient relative overflow-hidden">
+<!-- Pitch Markings Overlay -->
+<div class="pitch-line w-[200%] h-[200%] -top-1/2 -left-1/2 rounded-full border-2 opacity-10"></div>
+<div class="pitch-line w-full h-[1px] top-1/2 left-0 opacity-10"></div>
+<div class="max-w-container-max mx-auto flex flex-col items-center">
+<!-- Live Match Header / Scoreboard -->
+<section class="w-full max-w-2xl mb-lg animate-fade-in">
+<div class="glass-card rounded-2xl p-md flex flex-col items-center gap-md relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-yellow-500/20">
+<div class="h-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)]" style="width: 70%;"></div>
+</div>
+<div class="flex justify-between w-full items-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-bold text-xs text-on-surface-variant uppercase tracking-widest">Global Rank</span>
+<span class="font-headline-md text-headline-md text-on-surface">#42</span>
+</div>
+<!-- Circular Countdown Timer -->
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-width="6"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline-lg text-headline-lg scoreboard-glow text-yellow-500">07</span>
+<span class="text-[8px] font-bold uppercase text-yellow-500/60 tracking-tighter">Seconds</span>
+</div>
+<!-- Ball Trail Element -->
+<div class="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_15px_#fff] flex items-center justify-center border border-black/20" style="transform: rotate(270deg) translate(40px) rotate(-270deg);">
+<span class="material-symbols-outlined text-[10px] text-emerald-950" data-icon="sports_soccer">sports_soccer</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-bold text-xs text-on-surface-variant uppercase tracking-widest">Match Score</span>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-primary scoreboard-glow">3</span>
+<span class="text-on-surface-variant font-bold text-lg">-</span>
+<span class="font-headline-md text-headline-md text-on-surface">2</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Question Area -->
+<section class="w-full max-w-3xl text-center mb-xl">
+<div class="mb-sm flex items-center justify-center gap-2">
+<span class="px-3 py-1 bg-primary-container text-primary rounded-full text-xs font-bold border border-primary/20">QUESTION 8/10</span>
+<span class="px-3 py-1 bg-surface-container-highest text-on-tertiary-container rounded-full text-xs font-bold border border-outline-variant">LIVE EVENT</span>
+</div>
+<h2 class="font-headline-xl text-headline-lg md:text-headline-xl text-on-surface drop-shadow-sm leading-tight px-4">
+                    ¿Quién ganó el Mundial de 2022?
+                </h2>
+</section>
+<!-- Options Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md w-full max-w-4xl px-4">
+<!-- Option A -->
+<button class="group relative flex items-center gap-md p-lg glass-card rounded-xl hover:bg-white/5 active:scale-95 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-yellow-500">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-highest font-headline-md text-on-surface-variant group-hover:bg-yellow-500 group-hover:text-emerald-950 transition-colors">
+                        A
+                    </div>
+<div class="flex flex-col items-start">
+<span class="font-headline-md text-on-surface">Brasil</span>
+<span class="text-xs text-on-surface-variant font-label-bold uppercase">5-time Champions</span>
+</div>
+<div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-yellow-500" data-icon="bolt">bolt</span>
+</div>
+</button>
+<!-- Option B -->
+<button class="group relative flex items-center gap-md p-lg glass-card rounded-xl hover:bg-white/5 active:scale-95 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-yellow-500">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-highest font-headline-md text-on-surface-variant group-hover:bg-yellow-500 group-hover:text-emerald-950 transition-colors">
+                        B
+                    </div>
+<div class="flex flex-col items-start">
+<span class="font-headline-md text-on-surface">Francia</span>
+<span class="text-xs text-on-surface-variant font-label-bold uppercase">Defending Champs (2018)</span>
+</div>
+<div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-yellow-500" data-icon="bolt">bolt</span>
+</div>
+</button>
+<!-- Option C (Correct Target Highlight) -->
+<button class="group relative flex items-center gap-md p-lg bg-primary-container/40 backdrop-blur-md rounded-xl active:scale-95 transition-all duration-150 border-l-4 border-l-primary border border-primary/20 shadow-[0_0_30px_rgba(172,207,179,0.15)]">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary text-emerald-950 font-headline-md transition-colors">
+                        C
+                    </div>
+<div class="flex flex-col items-start">
+<span class="font-headline-md text-on-surface">Argentina</span>
+<span class="text-xs text-primary font-label-bold uppercase">La Albiceleste Glory</span>
+</div>
+<div class="ml-auto text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</button>
+<!-- Option D -->
+<button class="group relative flex items-center gap-md p-lg glass-card rounded-xl hover:bg-white/5 active:scale-95 transition-all duration-150 border-l-4 border-l-transparent hover:border-l-yellow-500">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-highest font-headline-md text-on-surface-variant group-hover:bg-yellow-500 group-hover:text-emerald-950 transition-colors">
+                        D
+                    </div>
+<div class="flex flex-col items-start">
+<span class="font-headline-md text-on-surface">Alemania</span>
+<span class="text-xs text-on-surface-variant font-label-bold uppercase">4-time Winners</span>
+</div>
+<div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-yellow-500" data-icon="bolt">bolt</span>
+</div>
+</button>
+</section>
+<!-- Bottom Action/Status Bar -->
+<section class="mt-xl w-full max-w-4xl flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="flex -space-x-3 overflow-hidden p-2">
+<img alt="Participant" class="inline-block h-10 w-10 rounded-full ring-2 ring-emerald-950" data-alt="Close-up portrait of a passionate female football fan with face paint in national colors, illuminated by vibrant stadium lights with a bokeh background of a cheering crowd. High-contrast, cinematic style with a focus on intense emotion and energy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADEcPBKVLe5BebXfkhuBVcG49idcEONQvw9e04ZuL0VpwFcs8HY5CRF8vPj2MKTpnXI32YsuEHTOeJCUUW171pn4_ux8HOfv0fD3nGX5VIl91dNtR2Uapat0T2kKSIxWTEm70n8ve0d5jAtl0_u2FZguywmZWzKd0cCy05Hw8JbNdShv9dXUdOO1Ted8kmqB_T2Q1qVwavQXkcIgQKEKhF6tY0ynTNp5IF-uwxA0X8SzpxoC4ym6flQVBcuwm5r29ArwlasjWs07cn"/>
+<img alt="Participant" class="inline-block h-10 w-10 rounded-full ring-2 ring-emerald-950" data-alt="Portrait of a young male sports enthusiast wearing a high-tech football jersey, surrounded by glowing digital data overlays representing player stats. The lighting is cool-toned with neon green accents, creating a futuristic, high-stakes match day atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPiK1HwiG5e8RqV4SglVu5yqjF8CTK0t-Meo5dULD7jxlj9wQSbqkzP06w4ks4kmVDiFBpfpblKClDqQYrVXkcwPzMYP6PE_nKNtscVDU6N0cmDZZUH2zTgvMUUIMg9Es_e2LQSfUH3djL3YdbOXRqwZPezJ_KkKDO50FxYtJ9yLY0XCLeye8b_3bty8p7FlmXYOvlXXEKFOUn-z-0RP4J5BwhSGOY9d6jW5HJrO0z-k-J2o-ZtNRpmVdZib8gAOmd_8UD9GTzrU7O"/>
+<img alt="Participant" class="inline-block h-10 w-10 rounded-full ring-2 ring-emerald-950" data-alt="A diverse group of football fans in a modern sports bar, their faces lit by the glow of a large television screen off-camera. The scene is rich in texture with dark wood, metallic accents, and the warm yellow glow of ambient stadium-style lighting, emphasizing a competitive yet social mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPqdrdvK4rcEQTPzuXa3za0G5W78KYR0DrA61ho4oHtd6cjc_fehaxcYbrialTrf9NOulW61xW-mKv64Ve4G2P7--QrlbIPChFVtj85CA8_hDhL_lkAkhi__aN6EMjMQczftn_GfKNMBuYp82AxDoFQUDdmU5_RNvQV0OI7COfNOvPXAzW2pnLQnyiHpJN6_4DiAGq5Ra6O3mJGNJzfK8FoxwN-8kc5ojUGT3WKQ-QQEfhMxf-qIz0VFqtAvHt5wOxYjNz2klqv5oG"/>
+<div class="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-highest ring-2 ring-emerald-950">
+<span class="text-[10px] font-bold">+12k</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-highest text-on-surface rounded-xl font-label-bold hover:bg-white/10 transition-colors border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        HINT (50/50)
+                    </button>
+<button class="flex items-center gap-2 px-8 py-3 bg-gradient-to-b from-yellow-400 to-on-secondary-container text-emerald-950 rounded-xl font-headline-md shadow-[0_4px_0_#544600] active:translate-y-[2px] active:shadow-none transition-all">
+<span class="material-symbols-outlined" data-icon="send" style="font-variation-settings: 'FILL' 1;">send</span>
+                        SUBMIT
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-3 bg-emerald-950 dark:bg-emerald-950 rounded-t-2xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)]">
+<a class="flex flex-col items-center justify-center text-yellow-500 bg-white/5 rounded-xl px-3 py-1 shadow-[inset_0_0_15px_rgba(234,179,8,0.2)] active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer" style="font-variation-settings: 'FILL' 1;">sports_soccer</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Play</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="trophy">trophy</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Rankings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="sports">sports</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Rules</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -49,7 +49,6 @@ class _GameResultWidgetState extends State<GameResultWidget>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
-  late Animation<double> _barAnimation;
 
   @override
   void initState() {
@@ -66,12 +65,6 @@ class _GameResultWidgetState extends State<GameResultWidget>
     _slideAnimation = Tween<double>(begin: 30.0, end: 0.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
-    _barAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
 
     _controller.forward();
   }
@@ -84,1096 +77,389 @@ class _GameResultWidgetState extends State<GameResultWidget>
 
   @override
   Widget build(BuildContext context) {
-    final accuracy =
-        widget.totalQuestions > 0
-            ? (widget.correctAnswers / widget.totalQuestions) * 100
-            : 0.0;
-    final hasOpponent = widget.opponentName != null;
+    final accuracy = widget.totalQuestions > 0
+        ? (widget.correctAnswers / widget.totalQuestions) * 100
+        : 0.0;
 
     return Container(
       color: AppColors.background,
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 0.05),
-            end: Offset.zero,
-          ).animate(_controller),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Victory / Defeat Banner ────────────────────
-                _buildResultBanner(),
-                const SizedBox(height: 32),
-
-                // ── Bento Grid: Stats + ELO ────────────────────
-                _buildBentoRow(accuracy),
-                const SizedBox(height: 16),
-
-                // ── Score Comparison (multiplayer only) ────────
-                if (hasOpponent && widget.opponentScore != null) ...[
-                  _buildScoreComparison(),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Detail Cards Row ───────────────────────────
-                if (hasOpponent) ...[
-                  _buildDetailCards(),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Add Friend (multiplayer) ────────────────
-                if (hasOpponent && widget.onAddFriend != null && widget.opponentName != null) ...[
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: widget.onAddFriend,
-                      icon: Icon(Icons.person_add_outlined, size: 18, color: AppColors.primary),
-                      label: Text(
-                        'Agregar a ${widget.opponentName}',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Performance Message ────────────────────────
-                _buildPerformanceMessage(accuracy),
-                const SizedBox(height: 32),
-
-                // ── Answer Timeline ───────────────────────────
-                if (widget.userAnswers != null)
-                  AnswerTimeline(
-                    totalQuestions: widget.totalQuestions,
-                    playerAnswers: widget.userAnswers!.cast<Answer>(),
-                    opponentAnswers: widget.opponentAnswers?.cast<Answer>(),
-                    playerName: 'Tú',
-                    opponentName: widget.opponentName,
-                  ),
-                if (widget.userAnswers != null) const SizedBox(height: 24),
-
-                // ── Action Buttons ─────────────────────────────
-                _buildActionButtons(),
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // VICTORY / DEFEAT BANNER
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildResultBanner() {
-    final resultText = widget.isVictory ? 'Victoria' : 'Derrota';
-    final resultBg =
-        widget.isVictory
-            ? AppColors.primaryContainer
-            : AppColors.error.withOpacity(0.15);
-    final resultFg =
-        widget.isVictory
-            ? AppColors.onPrimaryContainer
-            : AppColors.error;
-    final bgText = widget.isVictory ? 'VICTORIA' : 'DERROTA';
-
-    return SizedBox(
-      height: 100,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Large background text
-          Positioned(
-            left: -8,
-            top: -10,
-            child: Text(
-              bgText,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 100,
-                fontWeight: FontWeight.w900,
-                color: AppColors.surfaceContainerHigh,
-                height: 1,
-                letterSpacing: -4,
-              ),
-            ),
-          ),
-          // Foreground banner pill
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.only(
-                left: 32,
-                right: 48,
-                top: 20,
-                bottom: 20,
-              ),
-              decoration: BoxDecoration(
-                color: resultBg,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(9999),
-                  bottomLeft: Radius.circular(9999),
-                  topRight: Radius.circular(9999),
-                  bottomRight: Radius.circular(9999),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (widget.isVictory ? AppColors.primary : AppColors.error)
-                        .withOpacity(0.15),
-                    blurRadius: 32,
-                    offset: const Offset(0, 16),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    resultText,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: resultFg,
-                      letterSpacing: -1,
-                    ),
-                  ),
-                  if (widget.opponentName != null)
-                    Text(
-                      'vs. ${widget.opponentName}',
-                      style: GoogleFonts.workSans(
-                        fontSize: 13,
-                        color: AppColors.inversePrimary,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // BENTO GRID: STATS CARD + ELO CARD
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildBentoRow(double accuracy) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Left: Key Stats Card ─────────────────────
-          Expanded(
-            flex: 5,
-            child: _buildAmbientCard(
-              color: AppColors.surfaceContainerLowest,
-              child: Stack(
-                children: [
-                  // Decorative corner
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: AppColors.highlight.withOpacity(0.1),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(80),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Content
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Resumen del Duelo',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Correct answers
-                        _buildStatBlock(
-                          label: 'Preguntas Correctas',
-                          value: RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '${widget.correctAnswers}',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: '/${widget.totalQuestions}',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.outline,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Points
-                        _buildStatBlock(
-                          label: 'Puntos Obtenidos',
-                          value: Text(
-                            '+${widget.score}',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.tertiaryContainer,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Accuracy & Time
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isWide = constraints.maxWidth > 300;
-                            
-                            // Safe time calculation with NaN/Infinity checks
-                            final avgTimeSeconds = widget.averageTime.isFinite 
-                                ? (widget.averageTime / 1000).toStringAsFixed(1) 
-                                : '0.0';
-                            
-                            if (isWide) {
-                              return Row(
-                                children: [
-                                  _buildMiniStat(
-                                    icon: Icons.percent,
-                                    value: '${accuracy.toStringAsFixed(0)}%',
-                                    label: 'Precisión',
-                                    color: AppColors.secondary,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _buildMiniStat(
-                                    icon: Icons.timer_outlined,
-                                    value: '${avgTimeSeconds}s',
-                                    label: 'Tiempo medio',
-                                    color: AppColors.tertiary,
-                                  ),
-                                ],
-                              );
-                            }
-                            
-                            return Column(
-                              children: [
-                                _buildMiniStat(
-                                  icon: Icons.percent,
-                                  value: '${accuracy.toStringAsFixed(0)}%',
-                                  label: 'Precisión',
-                                  color: AppColors.secondary,
-                                  fullWidth: true,
-                                ),
-                                const SizedBox(height: 12),
-                                _buildMiniStat(
-                                  icon: Icons.timer_outlined,
-                                  value: '${avgTimeSeconds}s',
-                                  label: 'Tiempo medio',
-                                  color: AppColors.tertiary,
-                                  fullWidth: true,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // ── Right: ELO Card ──────────────────────────
-          Expanded(
-            flex: 7,
-            child: _buildAmbientCard(
-              color: AppColors.surfaceContainerLow,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
+        child: AnimatedBuilder(
+          animation: _slideAnimation,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, _slideAnimation.value),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Progresión ELO',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Rango: ${_getRank()}',
-                                style: GoogleFonts.workSans(
-                                  fontSize: 13,
-                                  color: AppColors.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (widget.eloChange != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryContainer,
-                              borderRadius: BorderRadius.circular(9999),
-                            ),
-                            child: Text(
-                              '${widget.eloChange! > 0 ? "+" : ""}${widget.eloChange} ELO',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.onSecondaryContainer,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                    // ── Main Result Card ────────────
+                    _buildResultCard(accuracy),
                     const SizedBox(height: 24),
 
-                    // ELO Graph (fixed height to avoid IntrinsicHeight + Expanded conflict)
-                    SizedBox(
-                      height: 120,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return _buildEloGraph(constraints);
-                        },
+                    // ── Performance Message ─────────
+                    _buildPerformanceMessage(accuracy),
+                    const SizedBox(height: 24),
+
+                    // ── Answer Timeline ─────────────
+                    if (widget.userAnswers != null)
+                      AnswerTimeline(
+                        totalQuestions: widget.totalQuestions,
+                        playerAnswers: widget.userAnswers!.cast<Answer>(),
+                        opponentAnswers: widget.opponentAnswers?.cast<Answer>(),
+                        playerName: 'Tú',
+                        opponentName: widget.opponentName,
                       ),
-                    ),
+                    if (widget.userAnswers != null) const SizedBox(height: 24),
+
+                    // ── Action Buttons ──────────────
+                    _buildActionButtons(),
                   ],
                 ),
               ),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildEloGraph(BoxConstraints constraints) {
-    return CustomPaint(
-      size: Size(constraints.maxWidth, constraints.maxHeight),
-      painter: _EloGraphPainter(),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // DETAIL CARDS (opponent / best answer)
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildDetailCards() {
-    return IntrinsicHeight(
-      child: Row(
+  Widget _buildResultCard(double accuracy) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: widget.isVictory
+                ? AppColors.primary.withOpacity(0.1)
+                : AppColors.error.withOpacity(0.1),
+            blurRadius: 50,
+            spreadRadius: -10,
+          ),
+        ],
+      ),
+      child: Column(
         children: [
-          // Best Answer Card
-          Expanded(
-            child: Container(
-              height: 180,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(16),
+          // ── Header ──────────────────────
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            decoration: BoxDecoration(
+              color: widget.isVictory
+                  ? AppColors.primary.withOpacity(0.15)
+                  : AppColors.error.withOpacity(0.15),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
               ),
-              child: Stack(
-                children: [
-                  // Gradient overlay
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          AppColors.surfaceContainerHighest,
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Content
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'MEJOR ACIERTO',
-                          style: GoogleFonts.workSans(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.onSurfaceVariant,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Icon(
-                          Icons.location_on,
-                          color: AppColors.primary,
-                          size: 32,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '¡Sigue jugando!',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: AppColors.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Opponent Card
-          Expanded(
-            child: _buildAmbientCard(
-              color: AppColors.surfaceContainerLowest,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'OPONENTE',
-                      style: GoogleFonts.workSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.onSurfaceVariant,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.opponentName ?? 'Oponente',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16,
-                                  color: AppColors.onSurface,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                'Duelo finalizado',
-                                style: GoogleFonts.workSans(
-                                  fontSize: 12,
-                                  color: AppColors.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withOpacity(0.06),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // SCORE COMPARISON (multiplayer)
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildScoreComparison() {
-    final playerScore = widget.score.toDouble();
-    final oppScore = (widget.opponentScore ?? 0).toDouble();
-    
-    // Safety check for maxScore
-    double maxScore = (playerScore > oppScore ? playerScore : oppScore);
-    if (maxScore <= 0) maxScore = 1.0; 
-    maxScore *= 1.1;
-
-    final playerAccuracy =
-        widget.totalQuestions > 0
-            ? (widget.correctAnswers / widget.totalQuestions) * 100
-            : 0.0;
-    final oppAccuracy =
-        widget.totalQuestions > 0
-            ? (widget.opponentCorrectAnswers ?? 0) /
-                widget.totalQuestions *
-                100
-            : 0.0;
-
-    final playerTime = widget.averageTime.isFinite ? widget.averageTime : 0.0;
-    final oppTime = (widget.opponentAverageTime != null && widget.opponentAverageTime!.isFinite) 
-        ? widget.opponentAverageTime! 
-        : 0.0;
-
-    return AnimatedBuilder(
-      animation: _barAnimation,
-      builder: (context, _) {
-        return _buildAmbientCard(
-          color: AppColors.surfaceContainerLowest,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header
-                Text(
-                  'COMPARATIVA',
-                  style: GoogleFonts.workSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.onSurfaceVariant,
-                    letterSpacing: 2,
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.isVictory ? AppColors.primary : AppColors.error,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                      width: 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (widget.isVictory ? AppColors.primary : AppColors.error)
+                            .withOpacity(0.3),
+                        blurRadius: 30,
+                        spreadRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    widget.isVictory ? Icons.emoji_events : Icons.rectangle,
+                    size: 40,
+                    color: widget.isVictory ? AppColors.onPrimary : AppColors.onError,
                   ),
                 ),
                 const SizedBox(height: 16),
+                Text(
+                  widget.isVictory ? '¡CAMPEÓN!' : 'FIN DEL PARTIDO',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    color: widget.isVictory ? AppColors.primary : AppColors.error,
+                    letterSpacing: -1,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (widget.opponentName != null)
+                  Text(
+                    'vs ${widget.opponentName}',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
+          ),
 
-                // Player vs Opponent labels
+          // ── Stats Grid ──────────────────
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
                 Row(
                   children: [
-                    Text(
-                      'Tú',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: AppColors.onSurface,
+                    Expanded(
+                      child: _buildStatCard(
+                        label: 'Puntos',
+                        value: '${widget.score}',
+                        icon: Icons.stars,
+                        iconColor: AppColors.yellow500,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      widget.opponentName ?? 'Oponente',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: AppColors.onSurface,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        label: 'Aciertos',
+                        value: '${widget.correctAnswers}/${widget.totalQuestions}',
+                        icon: Icons.check_circle,
+                        iconColor: AppColors.primary,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-
-                // Player bar
-                _buildComparisonBar(
-                  label: '${widget.score} pts',
-                  fraction: (playerScore / maxScore) * _barAnimation.value,
-                  color: AppColors.primary,
-                  isWinner: widget.score >= (widget.opponentScore ?? 0),
-                ),
-                const SizedBox(height: 8),
-
-                // Opponent bar
-                _buildComparisonBar(
-                  label: '${widget.opponentScore ?? 0} pts',
-                  fraction: (oppScore / maxScore) * _barAnimation.value,
-                  color: AppColors.tertiary,
-                  isWinner: (widget.opponentScore ?? 0) > widget.score,
-                ),
-                const SizedBox(height: 20),
-
-                // Stats row
+                const SizedBox(height: 12),
                 Row(
                   children: [
-                    _buildComparisonStat(
-                      label: 'Aciertos',
-                      playerValue: '${widget.correctAnswers}/${widget.totalQuestions}',
-                      opponentValue: '${widget.opponentCorrectAnswers ?? 0}/${widget.totalQuestions}',
+                    Expanded(
+                      child: _buildStatCard(
+                        label: 'Precisión',
+                        value: '${accuracy.toStringAsFixed(0)}%',
+                        icon: Icons.percent,
+                        iconColor: AppColors.secondaryFixed,
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    _buildComparisonStat(
-                      label: 'Precisión',
-                      playerValue: '${playerAccuracy.toStringAsFixed(0)}%',
-                      opponentValue: '${oppAccuracy.toStringAsFixed(0)}%',
-                    ),
-                    const SizedBox(width: 8),
-                    _buildComparisonStat(
-                      label: 'Tiempo',
-                      playerValue: playerTime > 1000 
-                          ? '${(playerTime / 1000).toStringAsFixed(1)}s' 
-                          : '${playerTime.toStringAsFixed(0)}ms',
-                      opponentValue:
-                          widget.opponentAverageTime != null
-                              ? (oppTime > 1000 
-                                  ? '${(oppTime / 1000).toStringAsFixed(1)}s' 
-                                  : '${oppTime.toStringAsFixed(0)}ms')
-                              : '-',
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        label: 'Tiempo Medio',
+                        value: _formatTime(widget.averageTime),
+                        icon: Icons.timer,
+                        iconColor: AppColors.tertiary,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-        );
-      },
+
+          // ── ELO Change ──────────────────
+          if (widget.eloChange != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.06),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      widget.eloChange! > 0 ? Icons.trending_up : Icons.trending_down,
+                      color: widget.eloChange! > 0 ? AppColors.success : AppColors.error,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.eloChange! > 0 ? '+' : ''}${widget.eloChange} ELO',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: widget.eloChange! > 0 ? AppColors.success : AppColors.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  Widget _buildComparisonBar({
+  Widget _buildStatCard({
     required String label,
-    required double fraction,
-    required Color color,
-    required bool isWinner,
+    required String value,
+    required IconData icon,
+    required Color iconColor,
   }) {
-    return Row(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.03),
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: GoogleFonts.lexend(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.onSurfaceVariant,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 18, color: iconColor),
+              const SizedBox(width: 6),
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPerformanceMessage(double accuracy) {
+    String message;
+    if (accuracy >= 90) message = '🏆 ¡Eres una leyenda del fútbol!';
+    else if (accuracy >= 80) message = '⚽ ¡Gran partido! ¡Sigue así!';
+    else if (accuracy >= 70) message = '👟 ¡Bien jugado! ¡Cada vez mejor!';
+    else if (accuracy >= 60) message = '💪 ¡Buen esfuerzo! ¡La práctica hace al maestro!';
+    else message = '📚 ¡Sigue entrenando! ¡Cada partido cuenta!';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.05),
+        ),
+      ),
+      child: Text(
+        message,
+        style: GoogleFonts.lexend(
+          color: AppColors.onSurface,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
       children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              height: 28,
-              color: AppColors.surfaceContainer,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: fraction.clamp(0.0, 1.0),
-                  heightFactor: 1.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: isWinner
-                          ? [
-                              BoxShadow(
-                                color: color.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          : null,
-                    ),
+        // Play Again
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: const LinearGradient(
+                colors: [AppColors.secondaryContainer, AppColors.onSecondaryContainer],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.onSecondaryFixedVariant.withOpacity(0.3),
+                  blurRadius: 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: widget.onPlayAgain,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.replay, color: Colors.black, size: 22),
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.opponentName != null ? 'Revancha' : 'Jugar de Nuevo',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w800,
-            fontSize: 14,
-            color: AppColors.onSurface,
-          ),
-        ),
-      ],
-    );
-  }
+        const SizedBox(height: 12),
 
-  Widget _buildComparisonStat({
-    required String label,
-    required String playerValue,
-    required String opponentValue,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              playerValue,
+        // Go Home
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: OutlinedButton(
+            onPressed: widget.onGoHome,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.onSurface,
+              side: BorderSide(
+                color: AppColors.outlineVariant.withOpacity(0.3),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Text(
+              'Volver al Inicio',
               style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 fontSize: 16,
-                color: AppColors.primary,
               ),
             ),
-            Text(
-              opponentValue,
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                color: AppColors.tertiary,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: GoogleFonts.workSans(
-                fontSize: 10,
-                color: AppColors.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // PERFORMANCE MESSAGE
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildPerformanceMessage(double accuracy) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          _getPerformanceMessage(accuracy),
-          style: GoogleFonts.workSans(
-            color: AppColors.onSurface,
-            fontSize: 16,
-            fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // ACTION BUTTONS
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildActionButtons() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth > 350;
-
-        if (isWide) {
-          return Row(
-            children: [
-              Expanded(child: _buildHomeButton()),
-              const SizedBox(width: 12),
-              Expanded(child: _buildPlayAgainButton()),
-            ],
-          );
-        }
-
-        return Column(
-          children: [
-            _buildPlayAgainButton(isFullWidth: true),
-            const SizedBox(height: 12),
-            _buildHomeButton(isFullWidth: true),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildHomeButton({bool isFullWidth = false}) {
-    return SizedBox(
-      height: 56,
-      width: isFullWidth ? double.infinity : null,
-      child: OutlinedButton(
-        onPressed: widget.onGoHome,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(
-            color: AppColors.outlineVariant.withOpacity(0.4),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(9999),
           ),
         ),
-        child: Text(
-          'Volver al Inicio',
-          style: GoogleFonts.plusJakartaSans(
-            fontWeight: FontWeight.w700,
-            fontSize: 15,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlayAgainButton({bool isFullWidth = false}) {
-    return SizedBox(
-      height: 56,
-      width: isFullWidth ? double.infinity : null,
-      child: ElevatedButton(
-        onPressed: widget.onPlayAgain,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.tertiaryContainer,
-          foregroundColor: AppColors.onTertiaryContainer,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(9999),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.replay, size: 20),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                widget.opponentName != null ? 'Revancha' : 'Jugar de Nuevo',
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // HELPERS
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildAmbientCard({required Color color, required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1A1C1B).withOpacity(0.06),
-            blurRadius: 32,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildStatBlock({required String label, required Widget value}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.workSans(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.onSurfaceVariant,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 4),
-        value,
       ],
     );
   }
 
-  Widget _buildMiniStat({
-    required IconData icon,
-    required String value,
-    required String label,
-    required Color color,
-    bool fullWidth = false,
-  }) {
-    final content = Container(
-      width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
-              color: AppColors.onSurface,
-            ),
-          ),
-          Text(
-            label,
-            style: GoogleFonts.workSans(
-              fontSize: 10,
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (fullWidth) return content;
-    return Expanded(child: content);
+  String _formatTime(double ms) {
+    if (!ms.isFinite || ms <= 0) return '0.0s';
+    final seconds = ms / 1000;
+    return '${seconds.toStringAsFixed(1)}s';
   }
-
-  String _getRank() {
-    final s = widget.score;
-    if (s >= 1500) return 'Cartógrafo Maestro';
-    if (s >= 1200) return 'Explorador Experto';
-    if (s >= 900) return 'Viajero Hábil';
-    if (s >= 600) return 'Aprendiz Navegante';
-    return 'Novato';
-  }
-
-  String _getPerformanceMessage(double accuracy) {
-    if (accuracy >= 90) return '🎯 ¡Increíble! ¡Eres un maestro de la geografía!';
-    if (accuracy >= 80) return '🌟 ¡Gran trabajo! ¡Sigue así!';
-    if (accuracy >= 70) return '👏 ¡Bien! ¡Cada vez mejor!';
-    if (accuracy >= 60) return '💪 ¡Buen esfuerzo! ¡La práctica hace al maestro!';
-    return '📚 ¡Sigue aprendiendo! ¡Cada partida cuenta!';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CUSTOM PAINTER: ELO Graph
-// ═══════════════════════════════════════════════════════════════
-
-class _EloGraphPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = AppColors.outlineVariant.withOpacity(0.2)
-          ..strokeWidth = 1;
-
-    // Grid lines
-    for (int i = 0; i < 4; i++) {
-      final y = (size.height / 3) * i;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-
-    // ELO curve
-    final linePaint =
-        Paint()
-          ..color = AppColors.primary
-          ..strokeWidth = 2.5
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-    final fillPaint =
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primary.withOpacity(0.2),
-              Colors.transparent,
-            ],
-          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final path = Path();
-    final fillPath = Path();
-
-    // Simulated ELO data points
-    final points = [
-      Offset(0, size.height * 0.85),
-      Offset(size.width * 0.15, size.height * 0.78),
-      Offset(size.width * 0.25, size.height * 0.70),
-      Offset(size.width * 0.40, size.height * 0.62),
-      Offset(size.width * 0.55, size.height * 0.68),
-      Offset(size.width * 0.70, size.height * 0.42),
-      Offset(size.width * 0.85, size.height * 0.28),
-      Offset(size.width, size.height * 0.12),
-    ];
-
-    path.moveTo(points[0].dx, points[0].dy);
-    fillPath.moveTo(points[0].dx, points[0].dy);
-
-    for (int i = 1; i < points.length; i++) {
-      final prev = points[i - 1];
-      final curr = points[i];
-      final controlX = (prev.dx + curr.dx) / 2;
-      path.cubicTo(controlX, prev.dy, controlX, curr.dy, curr.dx, curr.dy);
-      fillPath.cubicTo(controlX, prev.dy, controlX, curr.dy, curr.dx, curr.dy);
-    }
-
-    canvas.drawPath(path, linePaint);
-
-    // Fill area under curve
-    fillPath.lineTo(size.width, size.height);
-    fillPath.lineTo(0, size.height);
-    fillPath.close();
-    canvas.drawPath(fillPath, fillPaint);
-
-    // Endpoint dot
-    final dotPaint =
-        Paint()
-          ..color = AppColors.primary;
-    canvas.drawCircle(points.last, 4, dotPaint);
-
-    // White inner dot
-    final innerDotPaint =
-        Paint()
-          ..color = AppColors.background;
-    canvas.drawCircle(points.last, 2, innerDotPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

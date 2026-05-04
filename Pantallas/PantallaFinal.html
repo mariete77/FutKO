@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Lexend:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#1a1c1c",
+                    "on-secondary-container": "#725f00",
+                    "primary": "#accfb3",
+                    "surface-container-highest": "#333535",
+                    "on-secondary-fixed-variant": "#544600",
+                    "on-surface": "#e2e2e2",
+                    "outline-variant": "#424842",
+                    "on-tertiary-fixed": "#2e1500",
+                    "tertiary-container": "#402000",
+                    "surface-tint": "#accfb3",
+                    "background": "#121414",
+                    "on-secondary-fixed": "#221b00",
+                    "inverse-surface": "#e2e2e2",
+                    "surface-container-lowest": "#0c0f0f",
+                    "surface-variant": "#333535",
+                    "surface-container-high": "#282a2b",
+                    "on-error-container": "#ffdad6",
+                    "outline": "#8c928b",
+                    "on-primary": "#183623",
+                    "inverse-primary": "#46654f",
+                    "on-tertiary-container": "#ca7d30",
+                    "inverse-on-surface": "#2f3131",
+                    "on-tertiary-fixed-variant": "#6c3a00",
+                    "surface-bright": "#38393a",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb779",
+                    "tertiary-fixed-dim": "#ffb779",
+                    "surface-dim": "#121414",
+                    "surface-container": "#1e2020",
+                    "on-primary-fixed": "#02210f",
+                    "on-secondary": "#3a3000",
+                    "on-tertiary": "#4c2700",
+                    "surface": "#121414",
+                    "on-surface-variant": "#c2c8c0",
+                    "secondary-container": "#ffdb3c",
+                    "primary-container": "#0f2e1b",
+                    "on-primary-fixed-variant": "#2f4d38",
+                    "secondary-fixed-dim": "#e9c400",
+                    "on-error": "#690005",
+                    "secondary": "#fff9ef",
+                    "primary-fixed": "#c8ebce",
+                    "on-primary-container": "#76977e",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#ffdcc1",
+                    "on-background": "#e2e2e2",
+                    "primary-fixed-dim": "#accfb3",
+                    "secondary-fixed": "#ffe16d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "container-max": "1200px",
+                    "unit": "4px",
+                    "lg": "24px",
+                    "gutter": "20px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Lexend"],
+                    "label-bold": ["Lexend"],
+                    "body-md": ["Lexend"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-xl": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .pitch-texture {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .stadium-glow-green {
+            box-shadow: 0 0 50px -10px rgba(172, 207, 179, 0.3);
+        }
+        .stadium-glow-red {
+            box-shadow: 0 0 50px -10px rgba(255, 180, 171, 0.3);
+        }
+        .pressed-lip {
+            box-shadow: 0 4px 0 0 rgba(0,0,0,0.3);
+        }
+        .pressed-lip:active {
+            box-shadow: 0 1px 0 0 rgba(0,0,0,0.3);
+            transform: translateY(3px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary selection:text-on-primary min-h-screen pitch-texture flex flex-col">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 h-16 bg-emerald-950/90 dark:bg-emerald-950/90 backdrop-blur-md border-b border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500" data-icon="sports_soccer">sports_soccer</span>
+<span class="text-2xl font-black italic text-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)] font-plus-jakarta">FutKO</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-white/10 px-3 py-1 rounded-full flex items-center gap-2 border border-white/10">
+<span class="material-symbols-outlined text-yellow-500 text-sm" data-icon="local_fire_department" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-bold text-label-bold text-white">12</span>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-yellow-500 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A stylized digital 3D avatar of a young football fan wearing a green and yellow jersey, set against a vibrant stadium-themed background with soft floodlight bokeh effects. The character has an energetic expression and modern athletic styling, maintaining a premium high-contrast sports aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8P_TEoy3cShEguN2p0JLNMjQs3rAhvO2f5Erz791X96yt8DyxHuhTUhsPqUlYaYJA-zK_XZjhKSxttBjbVaeO7Fb343IHB7T1t-Yt6bU4zVzLuLWrcjLfzKEFzW5SiKwtNerOyPZ2f5-acxaQ0skCabRuvvJdux_lctWZoKgGULMBgYfjcxIKcgUPq1M59Q71whzshaghhypMDQQQkNgkbYNLnuUD3-4dEcE9ro1_P1UtZQyZ64JXnZ3zLX6vcBjj_tHJ7NXPtyEO"/>
+</div>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-32 px-gutter flex items-center justify-center">
+<!-- Feedback Modal Container (Bento Layout style for results) -->
+<div class="w-full max-w-lg relative">
+<!-- Background Decoration: Stadium Floodlight -->
+<div class="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="absolute -bottom-20 -right-20 w-64 h-64 bg-secondary/10 blur-[100px] rounded-full"></div>
+<!-- Success State Content -->
+<div class="bg-surface-container-low border-2 border-white/10 rounded-xl overflow-hidden shadow-2xl stadium-glow-green relative z-10">
+<!-- Header Status Area -->
+<div class="bg-primary/20 p-8 flex flex-col items-center text-center border-b border-white/10">
+<div class="w-24 h-24 bg-primary text-on-primary rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(172,207,179,0.5)] border-4 border-white/20">
+<span class="material-symbols-outlined text-6xl" data-icon="sports_soccer">sports_soccer</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary drop-shadow-sm uppercase tracking-tighter">¡GOOOOL!</h1>
+<p class="font-headline-md text-headline-md text-on-surface">Correcto</p>
+</div>
+<!-- Stats Bento Grid -->
+<div class="p-lg grid grid-cols-2 gap-md">
+<div class="bg-surface-container-high border border-white/5 p-md rounded-lg flex flex-col items-center justify-center text-center">
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-1">Puntos</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500" data-icon="stars" data-weight="fill" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-headline-lg text-headline-lg text-white">+150</span>
+</div>
+</div>
+<div class="bg-surface-container-high border border-white/5 p-md rounded-lg flex flex-col items-center justify-center text-center">
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest mb-1">Racha</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="local_fire_department" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-headline-lg text-headline-lg text-white">5x</span>
+</div>
+</div>
+</div>
+<!-- Pitch Analysis Card -->
+<div class="px-lg pb-lg">
+<div class="bg-surface-container border border-white/10 p-md rounded-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-4xl" data-icon="query_stats">query_stats</span>
+</div>
+<h3 class="font-label-bold text-label-bold text-primary mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="info">info</span>
+                            Dato del Partido
+                        </h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-tight">
+                            Messi ha anotado más goles de tiro libre que cualquier otro jugador activo en las 5 grandes ligas.
+                        </p>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="p-lg bg-surface-container-highest border-t border-white/10">
+<button class="w-full py-4 bg-gradient-to-b from-secondary-container to-on-secondary-container text-black font-headline-md rounded-xl pressed-lip flex items-center justify-center gap-3 transition-transform active:scale-95">
+                        Siguiente Jugada
+                        <span class="material-symbols-outlined font-bold" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Failure State Preview (Small Anchor) -->
+<div class="mt-8 opacity-60 hover:opacity-100 transition-opacity">
+<div class="bg-surface-container-low border border-error/30 p-4 rounded-xl flex items-center gap-4">
+<div class="w-12 h-12 bg-error-container text-error rounded-lg flex items-center justify-center border border-error/50">
+<span class="material-symbols-outlined" data-icon="rectangle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">rectangle</span>
+</div>
+<div>
+<h4 class="font-label-bold text-error uppercase tracking-tighter">¡Tarjeta Roja!</h4>
+<p class="text-sm font-body-md text-on-surface-variant">La racha se ha detenido</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Shell (Bottom) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-3 bg-emerald-950 dark:bg-emerald-950 rounded-t-2xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)]">
+<a class="flex flex-col items-center justify-center text-yellow-500 bg-white/5 rounded-xl px-3 py-1 shadow-[inset_0_0_15px_rgba(234,179,8,0.2)] active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer">sports_soccer</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Play</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="trophy">trophy</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Rankings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="sports">sports</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Rules</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-100/60 hover:text-yellow-300 transition-all active:scale-90 duration-150 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-plus-jakarta text-[10px] font-bold uppercase tracking-wider">Profile</span>
+</a>
+</nav>
+<!-- Background Elements -->
+<div class="fixed inset-0 z-[-1] pointer-events-none opacity-20">
+<div class="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-yellow-500/10 rounded-full blur-[120px]"></div>
+</div>
+</body></html>

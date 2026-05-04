@@ -27,38 +27,51 @@ class GameScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.onSurface),
-          onPressed: () => _showExitDialog(context, ref),
-        ),
-        actions: [
-          // Score pill
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(9999),
-              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+      body: Stack(
+        children: [
+          // Pitch gradient background
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.3),
+                  radius: 1.2,
+                  colors: [
+                    const Color(0xFF1a2e1d),
+                    AppColors.background,
+                  ],
+                ),
+              ),
             ),
-            child: Row(
+          ),
+
+          // Pitch markings
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _PitchMarkingsPainter(),
+            ),
+          ),
+
+          // Main content
+          SafeArea(
+            bottom: false,
+            child: Column(
               children: [
-                const Icon(Icons.star, color: AppColors.primary, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  gameState.maybeWhen(
-                    playing: (_, __, ___, score, _____, ______, _______) => '$score',
-                    answered: (_, __, ___, score) => '$score',
-                    finished: (score, ___, _____, _______, ______) => '$score',
-                    orElse: () => '0',
-                  ),
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
+                // ── Top App Bar ─────────────────
+                _buildTopBar(context, ref, gameState),
+
+                // ── Game Content ────────────────
+                Expanded(
+                  child: gameState.when(
+                    initial: () => _buildInitial(context, ref),
+                    loading: () => _buildLoading(),
+                    playing: (_, currentQuestionIndex, ___, score, _____, correctAnswers, ________) =>
+                        _buildPlaying(context, ref, currentQuestion, currentQuestionIndex, progress, timerProgress, score, correctAnswers),
+                    answered: (isCorrect, correctAnswer, selectedAnswer, score) =>
+                        _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion),
+                    finished: (score, totalQuestions, correctAnswers, userAnswers, averageTime) =>
+                        _buildFinished(context, ref, score, totalQuestions, correctAnswers, userAnswers, averageTime),
+                    error: (message) => _buildError(context, message, ref),
                   ),
                 ),
               ],
@@ -66,16 +79,117 @@ class GameScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: gameState.when(
-        initial: () => _buildInitial(context, ref),
-        loading: () => _buildLoading(),
-        playing: (_, currentQuestionIndex, ___, score, _____, correctAnswers, ________) =>
-            _buildPlaying(context, ref, currentQuestion, currentQuestionIndex, progress, timerProgress, score, correctAnswers),
-        answered: (isCorrect, correctAnswer, selectedAnswer, score) =>
-            _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion),
-        finished: (score, totalQuestions, correctAnswers, userAnswers, averageTime) =>
-            _buildFinished(context, ref, score, totalQuestions, correctAnswers, userAnswers, averageTime),
-        error: (message) => _buildError(context, message, ref),
+      bottomNavigationBar: _buildBottomNavBar(context),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context, WidgetRef ref, AsyncValue<GameState> gameState) {
+    final score = gameState.maybeWhen(
+      playing: (_, __, ___, score, _____, ______, _______) => score,
+      answered: (_, __, ___, score) => score,
+      finished: (score, ___, _____, _______, ______) => score,
+      orElse: () => 0,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.emerald950.withOpacity(0.9),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withOpacity(0.1),
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Logo
+          Row(
+            children: [
+              Icon(
+                Icons.sports_soccer,
+                size: 24,
+                color: AppColors.yellow500,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'FutKO',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.yellow500,
+                  fontStyle: FontStyle.italic,
+                  shadows: [
+                    Shadow(
+                      color: AppColors.yellow500.withOpacity(0.4),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // Score pill + avatar
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(9999),
+                  border: Border.all(
+                    color: AppColors.outlineVariant.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.stars,
+                      size: 16,
+                      color: AppColors.yellow500,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '$score pts',
+                      style: GoogleFonts.lexend(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.yellow500,
+                    width: 2,
+                  ),
+                  color: AppColors.primaryContainer,
+                ),
+                child: const Icon(
+                  Icons.person,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -92,14 +206,21 @@ class GameScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.2),
+                ),
               ),
-              child: Icon(Icons.play_circle_outline, size: 80, color: AppColors.primary),
+              child: Icon(
+                Icons.play_circle_outline,
+                size: 64,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: 32),
             Text(
               '¿Listo para jugar?',
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: FontWeight.w700,
                 color: AppColors.onSurface,
               ),
@@ -107,8 +228,8 @@ class GameScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Text(
               'Difficulty: ${difficulty.name.toUpperCase()}',
-              style: GoogleFonts.workSans(
-                fontSize: 18,
+              style: GoogleFonts.lexend(
+                fontSize: 16,
                 color: AppColors.onSurfaceVariant,
               ),
             ),
@@ -118,22 +239,22 @@ class GameScreen extends ConsumerWidget {
               height: 56,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(9999),
-                  gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryContainer],
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.secondaryFixed, AppColors.onSecondaryContainer],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.3),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
+                      color: AppColors.onSecondaryFixedVariant.withOpacity(0.4),
+                      blurRadius: 0,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(9999),
+                    borderRadius: BorderRadius.circular(16),
                     onTap: () => ref.read(gameNotifierProvider.notifier).startGame(difficulty: difficulty),
                     child: Center(
                       child: Text(
@@ -141,7 +262,7 @@ class GameScreen extends ConsumerWidget {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.onPrimary,
+                          color: AppColors.onSecondaryFixedVariant,
                           letterSpacing: 2,
                         ),
                       ),
@@ -161,11 +282,17 @@ class GameScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
+          const CircularProgressIndicator(
+            color: AppColors.secondaryFixed,
+            strokeWidth: 3,
+          ),
           const SizedBox(height: 24),
           Text(
             'Cargando preguntas...',
-            style: GoogleFonts.workSans(fontSize: 18, color: AppColors.onSurfaceVariant),
+            style: GoogleFonts.lexend(
+              fontSize: 16,
+              color: AppColors.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -179,101 +306,26 @@ class GameScreen extends ConsumerWidget {
   ) {
     if (currentQuestion == null) return _buildLoading();
 
+    final timeRemaining = (timerProgress * GameConstants.secondsPerQuestion).ceil();
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Status Bar & Progress (Partida mockup) ────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'PREGUNTA ${currentQuestionIndex + 1}/10',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.onSurfaceVariant,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    difficulty.name == 'easy' ? 'World Tour' : difficulty.name == 'medium' ? 'Inmersión Profunda' : 'Experto',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'PUNTUACIÓN',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.onSurfaceVariant,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '$score',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          // ── Scoreboard ──────────────────────
+          _buildScoreboard(context, currentQuestionIndex, timeRemaining, score),
+          const SizedBox(height: 24),
+
+          // ── Question ────────────────────────
+          _buildQuestionArea(currentQuestion, currentQuestionIndex),
           const SizedBox(height: 28),
 
-          // ── Question Area with Overhanging Timer ──────
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Decorative accent blur
-              Positioned(
-                top: -40,
-                left: -30,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.secondaryContainer.withOpacity(0.20),
-                  ),
-                ),
-              ),
-              // Question card
-              QuestionCard(question: currentQuestion),
-              // Overhanging timer (top-right, overlapping border)
-              Positioned(
-                top: -24,
-                right: -12,
-                child: TimerWidget(progress: timerProgress),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-
-          // ── Answer Options ────────────────────────────
+          // ── Answer Options ──────────────────
           if (currentQuestion.options.isEmpty)
             TypeAnswerWidget(
               question: currentQuestion,
-              timeRemaining: ref.watch(timerProgressProvider) > 0
-                  ? (ref.watch(timerProgressProvider) * GameConstants.secondsPerTypeQuestion).round()
+              timeRemaining: timerProgress > 0
+                  ? (timerProgress * GameConstants.secondsPerTypeQuestion).round()
                   : 0,
               onAnswerSubmitted: (answer) {
                 ref.read(gameNotifierProvider.notifier).submitTypedAnswer(typedAnswer: answer);
@@ -286,8 +338,348 @@ class GameScreen extends ConsumerWidget {
                 ref.read(gameNotifierProvider.notifier).submitAnswer(selectedAnswer: answer, isTimeout: false);
               },
             ),
+
+          const SizedBox(height: 24),
+
+          // ── Bottom Actions ──────────────────
+          _buildBottomActions(context, ref),
         ],
       ),
+    );
+  }
+
+  Widget _buildScoreboard(BuildContext context, int currentQuestionIndex, int timeRemaining, int score) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: const ColorFilter.matrix([
+            1, 0, 0, 0, 0,
+            0, 1, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 0.8, 0,
+          ]),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                // Progress bar
+                Container(
+                  width: double.infinity,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.yellow500.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: (currentQuestionIndex + 1) / 10,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.yellow500,
+                        borderRadius: BorderRadius.circular(2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.yellow500.withOpacity(0.5),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Rank
+                    Column(
+                      children: [
+                        Text(
+                          'Global Rank',
+                          style: GoogleFonts.lexend(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.onSurfaceVariant,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '#42',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Timer
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: CircularProgressIndicator(
+                            value: timeRemaining / GameConstants.secondsPerQuestion,
+                            strokeWidth: 5,
+                            backgroundColor: AppColors.surfaceContainerHighest,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              timeRemaining <= 5 ? AppColors.error : AppColors.yellow500,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              timeRemaining.toString().padLeft(2, '0'),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.yellow500,
+                                shadows: [
+                                  Shadow(
+                                    color: AppColors.yellow500.withOpacity(0.4),
+                                    blurRadius: 10,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              'Seconds',
+                              style: GoogleFonts.lexend(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.yellow500.withOpacity(0.5),
+                                letterSpacing: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    // Match Score
+                    Column(
+                      children: [
+                        Text(
+                          'Match Score',
+                          style: GoogleFonts.lexend(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.onSurfaceVariant,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Text(
+                              '$score',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '-',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${score > 0 ? score - 1 : 0}',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionArea(dynamic currentQuestion, int currentQuestionIndex) {
+    return Column(
+      children: [
+        // Chips
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer,
+                borderRadius: BorderRadius.circular(9999),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.2),
+                ),
+              ),
+              child: Text(
+                'QUESTION ${currentQuestionIndex + 1}/10',
+                style: GoogleFonts.lexend(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(9999),
+                border: Border.all(
+                  color: AppColors.outlineVariant,
+                ),
+              ),
+              child: Text(
+                'LIVE EVENT',
+                style: GoogleFonts.lexend(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.onTertiaryContainer,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+
+        // Question text
+        Text(
+          currentQuestion.text,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: AppColors.onSurface,
+            height: 1.3,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomActions(BuildContext context, WidgetRef ref) {
+    return Row(
+      children: [
+        // Participants avatars (mock)
+        Expanded(
+          child: Row(
+            children: [
+              ...List.generate(3, (index) {
+                return Container(
+                  width: 36,
+                  height: 36,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surfaceContainerHighest,
+                    border: Border.all(
+                      color: AppColors.emerald950,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 16,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                );
+              }),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceContainerHighest,
+                  border: Border.all(
+                    color: AppColors.emerald950,
+                    width: 2,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    '+12k',
+                    style: GoogleFonts.lexend(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Hint button
+        Material(
+          color: AppColors.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {},
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.outlineVariant.withOpacity(0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.help_outline,
+                    size: 18,
+                    color: AppColors.onSurface,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'HINT',
+                    style: GoogleFonts.lexend(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -330,11 +722,18 @@ class GameScreen extends ConsumerWidget {
           children: [
             const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
-            Text(message, style: GoogleFonts.workSans(fontSize: 16, color: AppColors.onSurface), textAlign: TextAlign.center),
+            Text(
+              message,
+              style: GoogleFonts.lexend(fontSize: 16, color: AppColors.onSurface),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.go('/home'),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.onPrimary,
+              ),
               child: const Text('Volver'),
             ),
           ],
@@ -348,12 +747,24 @@ class GameScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.surfaceContainerHigh,
-        title: Text('¿Salir del juego?', style: GoogleFonts.plusJakartaSans(color: AppColors.onSurface, fontWeight: FontWeight.w700)),
-        content: Text('Tu progreso se perderá. ¿Estás seguro?', style: GoogleFonts.workSans(color: AppColors.onSurfaceVariant)),
+        title: Text(
+          '¿Salir del juego?',
+          style: GoogleFonts.plusJakartaSans(
+            color: AppColors.onSurface,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'Tu progreso se perderá. ¿Estás seguro?',
+          style: GoogleFonts.lexend(color: AppColors.onSurfaceVariant),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('Cancelar', style: TextStyle(color: AppColors.onSurfaceVariant)),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.onSurfaceVariant),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -361,10 +772,133 @@ class GameScreen extends ConsumerWidget {
               ref.read(gameNotifierProvider.notifier).cancelGame();
               context.go('/home');
             },
-            child: const Text('Salir', style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'Salir',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildBottomNavBar(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.emerald950,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withOpacity(0.08),
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                icon: Icons.sports_soccer,
+                label: 'Play',
+                isActive: true,
+              ),
+              _buildNavItem(
+                icon: Icons.emoji_events,
+                label: 'Rankings',
+              ),
+              _buildNavItem(
+                icon: Icons.fitness_center,
+                label: 'Rules',
+              ),
+              _buildNavItem(
+                icon: Icons.person,
+                label: 'Profile',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    bool isActive = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: isActive
+          ? BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.yellow500.withOpacity(0.1),
+                  blurRadius: 15,
+                ),
+              ],
+            )
+          : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: isActive
+                ? AppColors.yellow500
+                : AppColors.onSurfaceVariant.withOpacity(0.5),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: isActive
+                  ? AppColors.yellow500
+                  : AppColors.onSurfaceVariant.withOpacity(0.5),
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Pitch Markings Painter ────────────────────────────────
+class _PitchMarkingsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.03)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    // Center circle
+    final center = Offset(size.width / 2, size.height * 0.4);
+    canvas.drawCircle(center, 120, paint);
+
+    // Center line
+    canvas.drawLine(
+      Offset(0, size.height * 0.4),
+      Offset(size.width, size.height * 0.4),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

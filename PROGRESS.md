@@ -1,139 +1,303 @@
-# ⚽ FutKO — Hoja de Ruta Colaborativa
+# FutKO — Progreso y Roadmap
 
-> **Documento vivo** — actualizar con cada push.  
-> Dos agentes trabajan en paralelo. Cada tarea indica quién la hace para evitar conflictos.
-
----
-
-## 📋 Estado General
-
-| Área | Estado | Progreso |
-|------|--------|----------|
-| Estructura base (copia de GeoC) | ✅ Completado | 100% |
-| Branding (nombre, colores, iconos) | 🔄 En progreso | 70% |
-| Tipos de pregunta (fútbol) | ✅ Completado | 100% |
-| Pantallas UI adaptadas | 🔲 Pendiente | 10% |
-| Firebase (nuevo proyecto) | 🔲 Pendiente | 0% |
-| Preguntas de fútbol (datos) | 🔲 Pendiente | 0% |
-| Compilación y test | 🔲 Pendiente | 0% |
+> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 03/05/2026.
 
 ---
 
-## ✅ Completado
+## Estado de Compilación
 
-- [x] Clonado repositorio GeoC → FutKO
-- [x] `pubspec.yaml` renombrado (geoquiz_battle → futko)
-- [x] Colores cambiados: verde bosque → verde césped (#1B5E20), dorado (#C6A54E), navy (#1A237E)
-- [x] `QuestionType` enum: 10 categorías de fútbol (player, team, competition, history, rules, stadium, badge, playerImage, statistic, transfer)
-- [x] `app_constants.dart` actualizado (appName, storage paths, deep links)
-- [x] `game_constants.dart` actualizado (comentario question types)
-- [x] `json_key_converter.dart` fallback: flag → player
-- [x] `question_model.dart` fallback: flag → player
-- [x] `question_card.dart` reescrito con builders de fútbol
-- [x] `type_answer_widget.dart` hints traducidos a fútbol
-- [x] `question_repository_impl.dart` multipleChoiceTypes adaptado
-- [x] Iconos nav bar: explore → sports_soccer, sports_martial_arts → sports_soccer
-- [x] Labels nav: BATTLE → PARTIDO, HOME → INICIO, FRIENDS → AMIGOS
-- [x] Splash: brújula → balón de fútbol animado
-- [x] Renombradas todas las refs `geoquiz_battle` → `futko`
+| Aspecto | Estado |
+|---------|--------|
+| `flutter analyze` | ✅ Compila (0 errores, solo warnings menores de estilo) |
+| `flutter build` | ⚠️ Bloqueado — falta `firebase_options.dart` (ver abajo) |
+| Tests | ❌ No hay tests unitarios ni de integración |
 
 ---
 
-## 🔲 Tareas Pendientes
+## 1. Diseño y UI — Stadium Arena
 
-### 🔴 BLOQUE 1 — Branding y UI (AGENTE A)
-
-Archivos que tocará → no pisar estos si eres AGENTE B.
-
-| # | Tarea | Archivos | Estado |
-|---|-------|----------|--------|
-| A1 | Renombrar `geoc_page_transitions.dart` → `futko_page_transitions.dart` y actualizar imports | `lib/presentation/widgets/common/geoc_page_transitions.dart`, `lib/app.dart` | 🔲 |
-| A2 | Cambiar `Icons.flag_outlined` → `Icons.report_outlined` en feedback y report dialog | `answer_feedback_widget.dart`, `report_question_dialog.dart` | 🔲 |
-| A3 | Pantalla login: actualizar branding GeoC → FutKO, textos e iconos | `lib/presentation/screens/auth/login_screen.dart` | 🔲 |
-| A4 | Home screen: actualizar textos vacíos ("Explora el mundo" → algo fútbol), iconos | `lib/presentation/screens/home/home_screen.dart` | 🔲 |
-| A5 | Match history screen: textos, iconos, nav bar labels | `lib/presentation/screens/history/match_history_screen.dart` | 🔲 |
-| A6 | Friends screen: textos, iconos, nav bar labels | `lib/presentation/screens/friends/friends_screen.dart` | 🔲 |
-| A7 | Leaderboard: textos y estilos | `lib/presentation/screens/home/leaderboard_screen.dart` | 🔲 |
-| A8 | Matchmaking screen: textos ("Buscando oponente...", estilo fútbol) | `lib/presentation/screens/multiplayer/matchmaking_screen.dart` | 🔲 |
-| A9 | Game result widget: textos ("Aciertos", "Precisión", etc.) — verificar que están en español | `lib/presentation/screens/game/widgets/game_result_widget.dart` | 🔲 |
-| A10 | Localización: regenerar o actualizar `lib/l10n/` (eliminar refs a geografía) | `lib/l10n/*.dart` | 🔲 |
-| A11 | README.md: reescribir para FutKO | `README.md` | 🔲 |
-| A12 |DESIGN.md: actualizar tema visual | `DESIGN.md` | 🔲 |
+| Módulo | Estado | Notas |
+|--------|--------|-------|
+| Design System (`AppColors`, `AppTheme`) | ✅ Completado | Paleta dark Stadium Arena implementada |
+| Splash Screen | ✅ Completado | Glow radial, césped, portería, barra de progreso tipo campo |
+| Login Screen | ✅ Completado | Glassmorphism, botón KICK OFF dorado, social login, pro tip |
+| Home Screen | ✅ Completado | TopAppBar estadio, stats jugador, modos de juego, bottom nav |
+| Game Screen | ✅ Completado | Pitch gradient, scoreboard glassmorphism, timer circular, grid 2x2 |
+| Answer Feedback | ✅ Completado | "¡GOOOOL!" / "¡Tarjeta Roja!", stats grid, dato del partido |
+| Game Result | ✅ Completado | Resumen champion, stats ELO, timeline de respuestas |
+| Leaderboard Screen | ⚠️ Existe | Necesita revisar que use los nuevos colores del tema |
+| Friends Screen | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
+| Match History | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
+| Subscription Modal | ⚠️ UI básica | Diseño funcional pero no integrado con RevenueCat |
+| Multiplayer Game | ⚠️ Existe | Fondo hardcodeado (`#1A1A2E`), necesita aplicar tema Stadium |
+| Matchmaking Screen | ⚠️ Existe | Necesita aplicar tema Stadium Arena |
 
 ---
 
-### 🔵 BLOQUE 2 — Firebase y Datos (AGENTE B)
+## 2. Arquitectura y Código Base
 
-Archivos que tocará → no pisar estos si eres AGENTE A.
-
-| # | Tarea | Archivos | Estado |
-|---|-------|----------|--------|
-| B1 | Crear nuevo proyecto Firebase `futko-app` (o similar) y configurar | Firebase Console | 🔲 |
-| B2 | Actualizar `firebase_constants.dart` si cambian nombres de colección | `lib/core/constants/firebase_constants.dart` | 🔲 |
-| B3 | Configurar `google-services.json` / `GoogleService-Info.plist` | `android/app/`, `ios/Runner/` | 🔲 |
-| B4 | `firebase.json` y `firestore.rules`: revisar y adaptar | Raíz del proyecto | 🔲 |
-| B5 | Crear primer lote de preguntas de fútbol en JSON → importar a Firestore | `scripts/questions_football.json` (nuevo) | 🔲 |
-| B6 | Crear segundo lote de preguntas (más categorías) | `scripts/questions_football_batch2.json` (nuevo) | 🔲 |
-| B7 | Script de importación de preguntas a Firestore | `scripts/import_questions.dart` o `.js` (nuevo) | 🔲 |
-
----
-
-### 🟢 BLOQUE 3 — Infraestructura y Test (SHARED — coordinar)
-
-| # | Tarea | Archivos | Estado |
-|---|-------|----------|--------|
-| C1 | Copiar `android/` y `ios/` de GeoC y adaptar package name | `android/`, `ios/` | 🔲 |
-| C2 | Actualizar `android/app/build.gradle` (applicationId, app name) | `android/app/build.gradle` | 🔲 |
-| C3 | Actualizar `ios/Runner/Info.plist` (bundle name) | `ios/Runner/Info.plist` | 🔲 |
-| C4 | Renombrar archivos con "geoc" en el nombre: `geoc_page_transitions.dart` | Varios | 🔲 |
-| C5 | Verificar que `build_runner` no da errores (ejecutar localmente con Flutter) | Todo el proyecto | 🔲 |
-| C6 | Test de compilación: `flutter build apk --debug` | — | 🔲 |
-| C7 | Primera versión funcional en dispositivo real | — | 🔲 |
+| Aspecto | Estado | Prioridad |
+|---------|--------|-----------|
+| Clean Architecture (domain/data/presentation) | ✅ Implementada | — |
+| Riverpod + State Management | ✅ Implementado | — |
+| Go Router (navegación) | ✅ Implementado | — |
+| Material 3 + Stadium Theme | ✅ Implementado | — |
+| Generación de código (`build_runner`) | ✅ Funcionando | `.g.dart` y `.freezed.dart` generados |
+| Localización (ES/EN) | ✅ Implementada | `flutter gen-l10n` funciona |
+| `pubspec.yaml` | ✅ Reparado | Tenía corrupción de líneas, ya arreglado |
+| `question_card.dart` | ✅ Reparado | Tenía corrupción de líneas, ya arreglado |
+| `futko_page_transitions.dart` | ✅ Renombrado | Archivo estaba como `geoc_page_transitions.dart` |
 
 ---
 
-## 🎨 Paleta de Colores FutKO
+## 3. Firebase y Backend
 
+### 3.1 Configuración Firebase
+
+| Componente | Estado | Bloqueo |
+|------------|--------|---------|
+| `firebase_core` | ✅ En `pubspec.yaml` | — |
+| `firebase_auth` | ✅ En `pubspec.yaml` | — |
+| `cloud_firestore` | ✅ En `pubspec.yaml` | — |
+| `firebase_database` | ✅ En `pubspec.yaml` | — |
+| `firebase_analytics` | ✅ En `pubspec.yaml` | — |
+| **`lib/firebase_options.dart`** | ❌ **NO EXISTE** | 🔴 **Bloquea el arranque de la app** |
+| `android/app/google-services.json` | ❌ No verificado | Necesario para Android |
+| `ios/Runner/GoogleService-Info.plist` | ❌ No verificado | Necesario para iOS |
+| `firebase.json` | ✅ Existe | Verificar configuración |
+| `firestore.rules` | ✅ Existe | Verificar reglas de seguridad |
+| Firebase Storage | ⏸️ Comentado en pubspec | Se necesitará para imágenes de preguntas |
+
+### 3.2 Firestore — Estructura de Datos
+
+| Colección | Estado | Notas |
+|-----------|--------|-------|
+| `users` | ✅ Definida | Perfil, ELO, stats, suscripción, dailyGames |
+| `matches` | ✅ Definida | Partidas multijugador, respuestas, resultados |
+| `questions` | ✅ Definida | Preguntas con tipos, dificultad, imágenes, opciones |
+| `ghostRuns` | ✅ Definida | Partidas fantasma para entrenamiento |
+| `questionReports` | ✅ Definida | Reportes de preguntas erróneas |
+| `quizAttempts` | ✅ Definida | Intentos de quiz individuales |
+| **Población de preguntas** | ❌ **Vacía / No seedeada** | 🔴 **Bloquea el juego** |
+
+### 3.3 Funciones Backend
+
+| Función | Estado | Notas |
+|---------|--------|-------|
+| Auth (email, Google, Apple) | ✅ Implementado | Incluye creación de perfil en Firestore |
+| Sistema ELO | ✅ Implementado | Cálculo con K-factor, rangos Bronze→Diamond |
+| Presence / Jugadores activos | ✅ Implementado | Actualiza `lastLoginAt` cada 5 min |
+| Matchmaking | ✅ Implementado | Cola en Realtime Database, timeout 60s |
+| Multijugador en tiempo real | ✅ Implementado | Provider + pantalla de juego |
+| Ghost Runs | ✅ Implementado | Entrenamiento contra mejores partidas |
+| Sistema de amigos | ✅ Implementado | Requests, lista, provider |
+| Leaderboard global | ✅ Implementado | Pantalla + provider |
+| Historial de partidas | ✅ Implementado | Match cards, stats resumen |
+| Reporte de preguntas | ✅ Implementado | Dialog UI + service |
+
+---
+
+## 4. Base de Datos de Preguntas
+
+Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions` collection).
+
+### Tipos de preguntas soportados
+
+1. `player` — ¿Qué jugador es este?
+2. `team` — ¿De qué equipo se trata?
+3. `competition` — ¿Qué competición es esta?
+4. `history` — Preguntas históricas
+5. `rules` — Reglamento
+6. `stadium` — ¿Qué estadio es este?
+7. `badge` — Escudos de equipos
+8. `playerImage` — Siluetas/imágenes de jugadores
+9. `statistic` — Estadísticas
+10. `transfer` — Transferencias
+
+### Requisitos para completar
+
+| Tarea | Prioridad | Notas |
+|-------|-----------|-------|
+| **Seed de preguntas iniciales** | 🔴 **Crítica** | Mínimo 200-500 preguntas para lanzar |
+| Imágenes de escudos | 🔴 Crítica | Necesitan alojarse en Firebase Storage o CDN |
+| Imágenes de estadios | 🔴 Crítica | — |
+| Siluetas de jugadores | 🔴 Crítica | Carpeta `assets/silhouettes/` referenciada pero vacía |
+| Imágenes de competiciones | 🟡 Media | — |
+| Sistema de moderación de preguntas | 🟡 Media | Revisar reportes desde panel admin |
+| Importador CSV/JSON de preguntas | 🟡 Media | Facilita añadir preguntas en batch |
+
+---
+
+## 5. Monetización y Suscripciones
+
+| Componente | Estado | Notas |
+|------------|--------|-------|
+| `purchases_flutter` (RevenueCat) | ✅ En `pubspec.yaml` | SDK instalado |
+| UI de suscripción (modal) | ✅ Implementada | Botón premium en Home |
+| Configuración RevenueCat | ❌ No implementada | Falta API key, product IDs, entitlements |
+| Lógica de límites free/premium | ✅ Implementada | `GameConstants`: 1 casual + 1 ranked/día gratis, 5 ranked premium |
+| Restricción de modos por plan | ⚠️ Parcial | UI muestra modos pero no bloquea sin suscripción |
+
+---
+
+## 6. Multijugador
+
+| Funcionalidad | Estado | Notas |
+|---------------|--------|-------|
+| Matchmaking (casual, ranked, ghostRun, friendChallenge) | ✅ Implementado | 4 modos soportados |
+| Sincronización de preguntas | ✅ Implementado | Mismo set para ambos jugadores |
+| Sistema de respuestas en tiempo real | ✅ Implementado | Comparativa post-partida |
+| Chat / Emotes durante partida | ❌ No implementado | Mejora UX pero no es crítico |
+| Reconexión si se cae la conexión | ⚠️ Básica | Firebase RTDB maneja esto parcialmente |
+| Emparejamiento por rango ELO | ✅ Implementado | `matchmakingEloRange = 200` |
+| Sistema de revancha | ✅ Implementado | Botón en GameResultWidget |
+| Agregar oponente como amigo | ✅ Implementado | Botón post-partida |
+
+---
+
+## 7. Assets y Recursos
+
+| Recurso | Estado | Prioridad |
+|---------|--------|-----------|
+| `assets/images/` | ❌ Vacío o no existe | 🟡 Media — fondos, branding |
+| `assets/silhouettes/` | ❌ Vacío | 🔴 Crítica — para preguntas tipo `playerImage` |
+| `assets/audio/` | ❌ Vacío | 🟡 Media — sonidos de gol, tarjeta, ambiente |
+| `assets/lottie/` | ❌ Vacío | 🟢 Baja — animaciones opcionales |
+| Icono de app (launcher) | ❌ No verificado | 🟡 Media |
+| Splash nativo (Android/iOS) | ❌ No verificado | 🟡 Media |
+
+---
+
+## 8. Testing y Calidad
+
+| Tipo | Estado | Notas |
+|------|--------|-------|
+| Tests unitarios | ❌ 0 tests | Carpeta `test/` no existe |
+| Tests de integración | ❌ 0 tests | Carpeta `integration_test/` no existe |
+| Tests de widgets | ❌ 0 tests | — |
+| Golden tests (UI) | ❌ 0 tests | — |
+| CI/CD (GitHub Actions) | ❌ No configurado | — |
+| Firebase Crashlytics | ❌ No integrado | Recomendado para producción |
+| Firebase Performance | ❌ No integrado | Opcional |
+
+---
+
+## 9. Plataformas y Despliegue
+
+| Plataforma | Estado | Bloqueos |
+|------------|--------|----------|
+| Android | ⚠️ Configuración incompleta | Falta `google-services.json`, launcher icons, splash |
+| iOS | ⚠️ Configuración incompleta | Falta `GoogleService-Info.plist`, configuración Xcode |
+| Web | ⚠️ Configurada parcialmente | `main.dart` usa `DefaultFirebaseOptions.web` pero no existe `firebase_options.dart` |
+| macOS | ❌ No configurado | — |
+| Windows | ❌ No configurado | — |
+
+---
+
+## 10. Roadmap Recomendado
+
+### Fase 1: Fundamentos (Bloqueantes para MVP)
+
+1. **Generar `firebase_options.dart`**
+   ```bash
+   flutterfire configure
+   ```
+   Esto desbloquea el arranque de la app.
+
+2. **Seed de preguntas**
+   - Crear script para importar 500+ preguntas a Firestore.
+   - Mínimo: 50 por tipo de pregunta.
+   - Incluir URLs de imágenes (alojar en Storage o usar imágenes públicas).
+
+3. **Configurar Firebase Storage**
+   - Descomentar en `pubspec.yaml`.
+   - Subir escudos, estadios, siluetas.
+   - Actualizar URLs en documentos de preguntas.
+
+4. **Configurar RevenueCat**
+   - Crear cuenta/app en RevenueCat.
+   - Configurar productos (App Store / Play Store).
+   - Añadir API key al código.
+   - Implementar lógica de purchase/restore.
+
+### Fase 2: Calidad y Experiencia
+
+5. **Aplicar tema Stadium Arena a pantallas restantes**
+   - MultiplayerGameScreen (fondo hardcodeado)
+   - MatchmakingScreen
+   - LeaderboardScreen
+   - FriendsScreen
+   - MatchHistoryScreen
+   - SubscriptionModal (quitar referencias "vintage")
+
+6. **Tests mínimos**
+   - Tests unitarios para `EloCalculator`, `ScoreCalculator`.
+   - Tests de widgets para Login y Home.
+   - 1 test de integración: flujo completo de partida rápida.
+
+7. **Assets**
+   - Icono launcher (Android/iOS).
+   - Splash nativo.
+   - Audio: sonido de gol, tarjeta roja, countdown.
+
+### Fase 3: Features Avanzados
+
+8. **Push Notifications**
+   - `firebase_messaging` para invitaciones de amigos.
+   - Notificaciones cuando un oponente responde en partidas asíncronas.
+
+9. **Firebase Crashlytics + Analytics**
+   - Trackear eventos: `game_started`, `question_answered`, `purchase_initiated`.
+   - Crashlytics para errores en producción.
+
+10. **Panel de Administración Web**
+    - Ver reportes de preguntas.
+    - Añadir/Editar preguntas.
+    - Ver estadísticas de uso.
+
+11. **Modo Asíncrono (Play-by-Mail)**
+    - Jugar contra oponentes sin estar online al mismo tiempo.
+
+12. **Temporadas y Torneos**
+    - Reseteo de ELO cada temporada.
+    - Torneos bracket-style.
+
+---
+
+## Checklist de Lanzamiento (MVP)
+
+- [ ] `firebase_options.dart` generado
+- [ ] `google-services.json` en Android
+- [ ] `GoogleService-Info.plist` en iOS
+- [ ] 500+ preguntas en Firestore
+- [ ] Imágenes de preguntas en Firebase Storage
+- [ ] RevenueCat configurado y funcionando
+- [ ] Tests unitarios básicos
+- [ ] Icono launcher y splash
+- [ ] Política de privacidad + Términos
+- [ ] Cuentas de desarrollador (App Store + Play Store)
+- [ ] Beta cerrada con 20-50 usuarios
+
+---
+
+## Notas Técnicas
+
+### Errores conocidos previos (ya resueltos)
+- `pubspec.yaml` corrupto → Resuelto
+- `question_card.dart` corrupto → Resuelto
+- `futko_page_transitions.dart` no encontrado → Resuelto (renombrado)
+
+### Generación de código
+Si se modifica un provider o modelo con `@riverpod` / `@freezed`:
+```bash
+dart run build_runner build --delete-conflicting-outputs
 ```
-Primary:      #1B5E20 (Pitch Green)
-Primary Var:  #2E7D32 (Lighter Green)
-Secondary:    #C6A54E (Gold)
-Tertiary:     #1A237E (Deep Navy)
-Background:   #F8FAF8
-Surface:      #FFFFFF
-On Surface:   #1A1C1B
+
+### Localizaciones
+```bash
+flutter gen-l10n
 ```
 
 ---
 
-## 📂 Categorías de Preguntas (QuestionType)
-
-| Tipo | Descripción | Ejemplo pregunta | ¿Imagen? |
-|------|-------------|------------------|----------|
-| `player` | Datos de jugadores | "¿En qué equipo jugaba Messi en 2012?" | No |
-| `team` | Equipos | "¿Qué equipo ha ganado más Champions?" | No |
-| `competition` | Competiciones | "¿En qué año se jugó el primer Mundial?" | No |
-| `history` | Historia del fútbol | "¿Quién marcó el gol de la mano de Dios?" | No |
-| `rules` | Reglas | "¿Cuántos jugadores expulsados hacen que se suspenda?" | No |
-| `stadium` | Estadios | "¿Cómo se llama el estadio del Real Madrid?" | Sí |
-| `badge` | Escudos | "¿De qué equipo es este escudo?" | Sí |
-| `playerImage` | Fotos de jugadores | "¿Quién es este jugador?" | Sí |
-| `statistic` | Estadísticas | "¿Quién es el máximo goleador de la Champions?" | No |
-| `transfer` | Traspasos | "¿En qué año fichó Cristiano por la Juve?" | No |
-
----
-
-## 📝 Convenciones
-
-- **Commits en español** (ej: "Fix: textos en login screen")
-- **Push después de cada commit** — si falla, `git pull --rebase && git push`
-- **Actualizar este documento** al finalizar cada tarea
-- **Marcar con emoji** el estado: ✅ → 🔄 → 🔲
-
----
-
-## 📊 Log de Cambios
-
-| Fecha | Commit | Descripción |
-|-------|--------|-------------|
-| 2026-05-02 | — | Clonado GeoC, adaptación base FutKO (colores, tipos, iconos, branding) |
+*Documento vivo — actualizar tras cada milestone.*

@@ -16,17 +16,26 @@ class AnswerOptionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final options = question.options;
-    return Column(
-      children: options.asMap().entries.map((entry) {
+    // Ensure we have exactly 4 options for 2x2 grid, pad if necessary
+    final displayOptions = options.length >= 4 
+        ? options.sublist(0, 4) 
+        : [...options, ...List.filled(4 - options.length, '')];
+    
+    return GridView.count(
+      crossAxisCount: 2,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.6,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: displayOptions.asMap().entries.map((entry) {
         final index = entry.key;
         final option = entry.value;
-        return Padding(
-          padding: EdgeInsets.only(bottom: index < options.length - 1 ? 16 : 0),
-          child: _AnswerOptionButton(
-            option: option,
-            index: index,
-            onPressed: () => onAnswerSelected(option),
-          ),
+        if (option.isEmpty) return const SizedBox.shrink();
+        return _AnswerOptionButton(
+          option: option,
+          index: index,
+          onPressed: () => onAnswerSelected(option),
         );
       }).toList(),
     );
@@ -53,6 +62,7 @@ class _AnswerOptionButtonState extends State<_AnswerOptionButton>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   bool _isPressed = false;
+  bool _isHovered = false;
 
   @override
   void initState() {
@@ -61,7 +71,7 @@ class _AnswerOptionButtonState extends State<_AnswerOptionButton>
       duration: const Duration(milliseconds: 120),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -74,6 +84,9 @@ class _AnswerOptionButtonState extends State<_AnswerOptionButton>
 
   @override
   Widget build(BuildContext context) {
+    final letter = ['A', 'B', 'C', 'D'][widget.index];
+    final isActive = _isPressed || _isHovered;
+
     return GestureDetector(
       onTapDown: (_) {
         setState(() => _isPressed = true);
@@ -90,61 +103,81 @@ class _AnswerOptionButtonState extends State<_AnswerOptionButton>
       onTap: widget.onPressed,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          decoration: BoxDecoration(
-            color: _isPressed
-                ? AppColors.surfaceDim
-                : AppColors.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.outlineVariant.withOpacity(0.10),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1A1C1B).withOpacity(0.02),
-                blurRadius: 24,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Letter circle — clean, small, "surface" bg
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  shape: BoxShape.circle,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? Colors.white.withOpacity(0.05)
+                  : AppColors.surfaceContainerLow.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(16),
+              border: Border(
+                left: BorderSide(
+                  color: isActive ? AppColors.yellow500 : Colors.transparent,
+                  width: 4,
                 ),
-                child: Center(
-                  child: Text(
-                    ['A', 'B', 'C', 'D'].elementAt(widget.index),
-                    style: GoogleFonts.plusJakartaSans(
-                      color: _isPressed
-                          ? AppColors.primary
-                          : AppColors.onSurfaceVariant,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                top: BorderSide(
+                  color: Colors.white.withOpacity(0.06),
+                ),
+                right: BorderSide(
+                  color: Colors.white.withOpacity(0.06),
+                ),
+                bottom: BorderSide(
+                  color: Colors.white.withOpacity(0.06),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Letter badge
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? AppColors.yellow500
+                        : AppColors.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      letter,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: isActive
+                            ? AppColors.emerald950
+                            : AppColors.onSurfaceVariant,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              // Answer text — Work Sans, editorial body voice
-              Expanded(
-                child: Text(
-                  widget.option,
-                  style: GoogleFonts.workSans(
-                    color: AppColors.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(width: 12),
+                // Answer text
+                Expanded(
+                  child: Text(
+                    widget.option,
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppColors.onSurface,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ],
+                // Bolt icon on hover
+                if (isActive)
+                  Icon(
+                    Icons.bolt,
+                    color: AppColors.yellow500,
+                    size: 20,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
