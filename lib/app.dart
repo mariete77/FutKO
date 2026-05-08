@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:futko/presentation/screens/achievements/achievements_screen.dart';
 import 'package:futko/presentation/screens/splash/splash_screen.dart';
 import 'package:futko/presentation/screens/auth/login_screen.dart';
 import 'package:futko/presentation/screens/home/home_screen.dart';
@@ -110,6 +111,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/friends',
         pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const FriendsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/achievements',
+        pageBuilder: (context, state) => FutKOTransitions.enterFadeScale(
+          child: const AchievementsScreen(),
         ),
       ),
     ],

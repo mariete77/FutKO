@@ -870,6 +870,11 @@ class HomeScreen extends ConsumerWidget {
                 label: 'Profile',
                 onTap: () {},
               ),
+              _buildNavItem(
+                icon: Icons.emoji_events,
+                label: 'Logros',
+                onTap: () => context.go('/achievements'),
+              ),
             ],
           ),
         ),

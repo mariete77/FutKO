@@ -460,13 +460,10 @@ class GameNotifier extends _$GameNotifier {
     // Question types that should NEVER be converted to type-answer
     // because they are comparison questions that need options to be meaningful
     const neverConvertTypes = {
-      QuestionType.area,       // "¿Qué país es más extenso?" - needs country options
-      QuestionType.population, // "¿Qué país tiene más población?" - needs country options
-      QuestionType.border,     // "¿Qué países comparten frontera?" - needs options
-      QuestionType.river,      // "¿Por qué país pasa este río?" - needs options
-      QuestionType.region,     // "¿En qué región se encuentra?" - needs options
-      QuestionType.lake,       // "¿En qué país se encuentra este lago?" - needs options
-      QuestionType.mountain,   // "¿En qué país se encuentra esta montaña?" - needs options
+      QuestionType.badge,       // "¿De qué equipo es este escudo?" - needs badge options
+      QuestionType.playerImage, // "¿Quién es este jugador?" - needs player options
+      QuestionType.stadium,     // "¿Qué estadio es este?" - needs stadium options
+      QuestionType.transfer,    // "¿A qué equipo fue transferido?" - needs team options
     };
 
     return questions.map((q) {
