@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/achievement.dart';
 import '../../providers/achievements_provider.dart';
@@ -217,7 +218,7 @@ class _AchievementCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icon
+                // Icon or Lottie animation
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -226,10 +227,27 @@ class _AchievementCard extends StatelessWidget {
                         : Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    achievement.icon,
-                    style: const TextStyle(fontSize: 32),
-                  ),
+                  child: isUnlocked
+                      ? SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: Lottie.asset(
+                            AchievementLottieAnimations.getAnimationForType(achievement.type),
+                            repeat: true,
+                            animate: true,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Fallback to emoji if Lottie fails
+                              return Text(
+                                achievement.icon,
+                                style: const TextStyle(fontSize: 32),
+                              );
+                            },
+                          ),
+                        )
+                      : Text(
+                          achievement.icon,
+                          style: const TextStyle(fontSize: 32),
+                        ),
                 ),
                 const SizedBox(height: 12),
                 // Title

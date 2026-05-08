@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/achievement.dart';
 import '../../domain/entities/question.dart';
+import '../../core/services/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -240,6 +241,8 @@ class AchievementsNotifier extends StateNotifier<AchievementsState> {
         updatedAchievements.add(updated);
         if (updated.isUnlocked && !achievement.isUnlocked) {
           newlyUnlocked = updated;
+          // Play achievement unlock sound
+          audioService.playAchievementUnlocked();
         }
       } else {
         updatedAchievements.add(achievement);

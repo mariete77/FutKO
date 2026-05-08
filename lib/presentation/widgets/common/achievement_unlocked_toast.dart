@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/achievement.dart';
 
@@ -53,16 +54,27 @@ class AchievementUnlockedToast extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Achievement icon
+            // Achievement Lottie animation
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppColors.yellow500.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                achievement.icon,
-                style: const TextStyle(fontSize: 32),
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: Lottie.asset(
+                  AchievementLottieAnimations.getAnimationForType(achievement.type),
+                  repeat: true,
+                  animate: true,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Text(
+                      achievement.icon,
+                      style: const TextStyle(fontSize: 40),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(width: 16),

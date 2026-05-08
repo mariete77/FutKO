@@ -14,6 +14,43 @@ enum AchievementType {
   collector,
 }
 
+/// Lottie animation paths for achievements
+class AchievementLottieAnimations {
+  static const String trophy = 'assets/lottie/trophy.json';
+  static const String fire = 'assets/lottie/fire.json';
+  static const String lightning = 'assets/lottie/lightning.json';
+  static const String crown = 'assets/lottie/crown.json';
+  static const String diamond = 'assets/lottie/diamond.json';
+  static const String rocket = 'assets/lottie/rocket.json';
+  static const String medal = 'assets/lottie/medal.json';
+  static const String star = 'assets/lottie/star.json';
+  static const String target = 'assets/lottie/target.json';
+
+  /// Get the appropriate Lottie animation for an achievement type
+  static String getAnimationForType(AchievementType type) {
+    switch (type) {
+      case AchievementType.firstWin:
+        return trophy;
+      case AchievementType.streak3:
+      case AchievementType.streak5:
+      case AchievementType.streak10:
+        return fire;
+      case AchievementType.perfectGame:
+        return diamond;
+      case AchievementType.speedDemon:
+        return lightning;
+      case AchievementType.comeback:
+        return rocket;
+      case AchievementType.champion:
+        return medal;
+      case AchievementType.legendary:
+        return crown;
+      case AchievementType.collector:
+        return target;
+    }
+  }
+}
+
 /// Achievement entity
 class Achievement extends Equatable {
   final String id;
