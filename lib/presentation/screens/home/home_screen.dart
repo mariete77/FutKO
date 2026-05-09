@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -874,6 +875,11 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.emoji_events,
                 label: 'Logros',
                 onTap: () => context.go('/achievements'),
+              ),
+              _buildNavItem(
+                icon: Icons.settings,
+                label: 'Ajustes',
+                onTap: () => context.go('/settings'),
               ),
             ],
           ),
