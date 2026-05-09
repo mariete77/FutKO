@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:futko/presentation/screens/settings/settings_screen.dart';
 import 'package:futko/presentation/screens/achievements/achievements_screen.dart';
+import 'package:futko/presentation/screens/profile/profile_screen.dart';
+import 'package:futko/presentation/screens/rules/rules_screen.dart';
 import 'package:futko/presentation/screens/splash/splash_screen.dart';
 import 'package:futko/presentation/screens/auth/login_screen.dart';
 import 'package:futko/presentation/screens/home/home_screen.dart';
@@ -124,6 +126,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const SettingsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/profile',
+        pageBuilder: (context, state) => FutKOTransitions.enterFadeScale(
+          child: const ProfileScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/rules',
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
+          child: const RulesScreen(),
         ),
       ),
     ],

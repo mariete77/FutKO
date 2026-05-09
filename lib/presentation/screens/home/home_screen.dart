@@ -10,6 +10,7 @@ import '../../providers/elo_history_provider.dart';
 import '../../providers/match_history_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user.dart';
+import '../../widgets/common/skeleton_loaders.dart';
 import 'package:intl/intl.dart';
 
 /// Home screen — "PantallaPrincipal" mockup.
@@ -43,9 +44,7 @@ class HomeScreen extends ConsumerWidget {
     if (displayUser == null) {
       return const Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: CircularProgressIndicator(color: AppColors.secondaryFixed),
-        ),
+        body: HomeScreenSkeleton(),
       );
     }
 
@@ -268,9 +267,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               // Profile avatar with jersey icon
               GestureDetector(
-                onTap: () {
-                  // TODO: Profile
-                },
+                onTap: () => context.go('/profile'),
                 child: Container(
                   width: 38,
                   height: 38,
@@ -864,12 +861,12 @@ class HomeScreen extends ConsumerWidget {
               _buildNavItem(
                 icon: Icons.stadium,
                 label: 'Rules',
-                onTap: () {},
+                onTap: () => context.go('/rules'),
               ),
               _buildNavItem(
                 icon: Icons.style,
                 label: 'Profile',
-                onTap: () {},
+                onTap: () => context.go('/profile'),
               ),
               _buildNavItem(
                 icon: Icons.emoji_events,
