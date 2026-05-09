@@ -52,6 +52,12 @@ class QuestionCard extends StatelessWidget {
         return _buildStatisticQuestion();
       case QuestionType.transfer:
         return _buildTransferQuestion();
+      case QuestionType.manager:
+        return _buildManagerQuestion();
+      case QuestionType.derby:
+        return _buildDerbyQuestion();
+      case QuestionType.kit:
+        return _buildKitQuestion();
     }
   }
 
@@ -201,6 +207,31 @@ class QuestionCard extends StatelessWidget {
       icon: Icons.swap_horiz,
       defaultQuestion: '¿A qué equipo fue transferido?',
       iconColor: AppColors.secondary,
+    );
+  }
+
+  Widget _buildManagerQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.sports,
+      defaultQuestion: '¿Qué entrenador es este?',
+      iconColor: AppColors.tertiary,
+    );
+  }
+
+  Widget _buildDerbyQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.local_fire_department,
+      defaultQuestion: '¿Qué derbi es este?',
+      iconColor: AppColors.error,
+    );
+  }
+
+  Widget _buildKitQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.checkroom,
+      defaultQuestion: '¿De qué equipo es este uniforme?',
+      iconColor: AppColors.primary,
+      hasImage: true,
     );
   }
 

@@ -464,6 +464,7 @@ class GameNotifier extends _$GameNotifier {
       QuestionType.playerImage, // "¿Quién es este jugador?" - needs player options
       QuestionType.stadium,     // "¿Qué estadio es este?" - needs stadium options
       QuestionType.transfer,    // "¿A qué equipo fue transferido?" - needs team options
+      QuestionType.kit,         // "¿De qué equipo es este uniforme?" - needs kit options
     };
 
     return questions.map((q) {

@@ -180,8 +180,12 @@ class _TypeAnswerWidgetState extends State<TypeAnswerWidget> {
         return 'Escribe tu respuesta';
       case QuestionType.transfer:
         return 'Escribe el nombre del equipo';
-      default:
-        return 'Escribe tu respuesta';
+      case QuestionType.manager:
+        return 'Escribe el nombre del entrenador';
+      case QuestionType.derby:
+        return 'Escribe el nombre del derbi';
+      case QuestionType.kit:
+        return 'Escribe el nombre del equipo';
     }
   }
 }

@@ -12,6 +12,9 @@ enum QuestionType {
   playerImage,  // Identify player from photo
   statistic,    // Statistical records (top scorers, appearances)
   transfer,     // Transfer history questions
+  manager,      // Managers and coaches
+  derby,        // Derbies and classics
+  kit,          // Uniforms and colors
 }
 
 /// Question difficulty
