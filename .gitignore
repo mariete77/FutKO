@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# --- Junk / herramientas externas (no forman parte del proyecto FutKO) ---
+.cursor/
+.cline/
+.opencode/
+/app.py
+/requirements.txt
+/__pycache__/
+/index.html
+/jpeg_analyzer.html
+/AlwaysOnTop.bas
+/ThisWorkbook.cls
