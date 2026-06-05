@@ -244,12 +244,30 @@ class QuestionRepositoryImpl implements QuestionRepository {
         ? <String>[]
         : List<String>.from(question.options);
 
-    // Collect all possible distractors from other questions' correct answers
-    final allAnswers = allQuestions
+    // Collect distractors only from questions of the SAME type to avoid
+    // incoherent options (e.g. a player name in a stadium question).
+    final sameTypeQuestions = allQuestions
+        .where((q) => q.type == question.type)
+        .toList();
+
+    var allAnswers = sameTypeQuestions
         .map((q) => q.correctAnswer)
         .where((a) => a.isNotEmpty && a != question.correctAnswer)
         .toSet()
         .toList();
+
+    // If not enough same-type distractors, fall back to any type
+    if (allAnswers.length < 3) {
+      final fallbackAnswers = allQuestions
+          .map((q) => q.correctAnswer)
+          .where((a) =>
+              a.isNotEmpty &&
+              a != question.correctAnswer &&
+              !allAnswers.contains(a))
+          .toSet()
+          .toList();
+      allAnswers = [...allAnswers, ...fallbackAnswers];
+    }
 
     // Remove correct answer from distractor pool if present
     allAnswers.removeWhere((a) => enrichedOptions.contains(a));

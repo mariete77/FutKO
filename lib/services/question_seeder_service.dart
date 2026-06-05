@@ -90,6 +90,8 @@ class QuestionSeederService {
       ..._generateRulesQuestions(),
       ..._generateStatisticQuestions(),
       ..._generateTransferQuestions(),
+      ..._generateBadgeQuestions(),
+      ..._generatePlayerImageQuestions(),
     ];
     return questions;
   }
@@ -248,6 +250,8 @@ class QuestionSeederService {
     final data = FootballData.stadiums;
 
     for (final stadium in data) {
+      final slug = _slugify(stadium.name);
+      final imgUrl = '/stadiums/$slug.jpg';
       final type = _random.nextInt(3);
       switch (type) {
         case 0:
@@ -257,6 +261,7 @@ class QuestionSeederService {
             correctAnswer: stadium.name,
             questionText: '¿Qué estadio tiene capacidad para ${stadium.capacity} espectadores?',
             options: [],
+            imageUrl: imgUrl,
           ));
           break;
         case 1:
@@ -266,6 +271,7 @@ class QuestionSeederService {
             correctAnswer: stadium.name,
             questionText: '¿En qué estadio juega como local ${stadium.homeTeam}?',
             options: [],
+            imageUrl: imgUrl,
           ));
           break;
         case 2:
@@ -275,6 +281,7 @@ class QuestionSeederService {
             correctAnswer: stadium.name,
             questionText: '¿Qué estadio está ubicado en ${stadium.city}?',
             options: [],
+            imageUrl: imgUrl,
           ));
           break;
       }
@@ -419,6 +426,57 @@ class QuestionSeederService {
   }
 
   int _randomYear() => 2010 + _random.nextInt(15);
+
+  /// Generate badge/crest identification questions.
+  /// imageUrl follows the Storage bucket structure: /badges/{teamId}.png
+  List<Question> _generateBadgeQuestions() {
+    final questions = <Question>[];
+    final data = FootballData.teams;
+
+    for (final team in data) {
+      final slug = _slugify(team.name);
+      questions.add(_q(
+        type: QuestionType.badge,
+        difficulty: Difficulty.easy,
+        correctAnswer: team.name,
+        questionText: '¿De qué equipo es este escudo?',
+        options: [],
+        imageUrl: '/badges/$slug.png',
+      ));
+    }
+
+    return questions;
+  }
+
+  /// Generate player silhouette/image identification questions.
+  /// imageUrl follows the Storage bucket structure: /silhouettes/{playerId}.png
+  List<Question> _generatePlayerImageQuestions() {
+    final questions = <Question>[];
+    final data = FootballData.players;
+
+    for (final player in data) {
+      final slug = _slugify(player.name);
+      questions.add(_q(
+        type: QuestionType.playerImage,
+        difficulty: _randomDifficulty(),
+        correctAnswer: player.name,
+        questionText: '¿Qué jugador es este?',
+        options: [],
+        imageUrl: '/silhouettes/$slug.png',
+      ));
+    }
+
+    return questions;
+  }
+
+  /// Convert a name to a filesystem-friendly slug.
+  /// e.g. "Real Madrid" -> "real_madrid", "FC Barcelona" -> "fc_barcelona"
+  static String _slugify(String name) {
+    return name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9\u00f1\u00e1\u00e9\u00ed\u00f3\u00fa]+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+  }
 }
 
 class _TransferData {
