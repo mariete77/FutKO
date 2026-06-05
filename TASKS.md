@@ -18,15 +18,15 @@
 
 ## Carriles
 
-### 🔲 C1 — Backend & Seguridad · 🔴 P0 · Estado: 🔄 OpenCode
+### ✅ C1 — Backend & Seguridad · 🔴 P0 · Estado: ✅ OpenCode
 **Por qué:** la app escribe en colecciones sin reglas → fallan en silencio; ELO/matchmaking son client-side (manipulables).
 **Alcance (archivos):** `firestore.rules`, `storage.rules`, `firestore.indexes.json` (nuevo), `functions/` (Node 18 + TS, nuevo).
 **Tareas:**
-- [ ] Reglas para **`quizAttempts`** (hoy SIN regla → denegado). La app escribe en `game_provider.dart:315`. `create: if isAuth()`, `read: owner`.
-- [ ] Reglas para **`questionReports`** (hoy SIN regla → denegado). Escribe `report_question_dialog`. `create: if isAuth()`.
-- [ ] **Endurecer `matches`**: hoy `create/update: if isAuth()` permite a cualquiera editar cualquier partida. Exigir que `request.auth.uid` esté en `players`.
-- [ ] Crear **`firestore.indexes.json`** con los índices compuestos que usan las queries (revisar `question_repository_impl.dart`, `multiplayer_provider.dart`, `match_repository_impl.dart`).
-- [ ] (Alto valor) **Cloud Functions** en `functions/` (ya declarado en `firebase.json`): ELO autoritativo al cerrar match, reset diario de `dailyGames`, validación de respuestas. Referencia de ELO: `core/utils/elo_calculator.dart`.
+- [x] Reglas para **`quizAttempts`** (hoy SIN regla → denegado). La app escribe en `game_provider.dart:315`. `create: if isAuth()`, `read: owner`.
+- [x] Reglas para **`questionReports`** (hoy SIN regla → denegado). Escribe `report_question_dialog`. `create: if isAuth()`.
+- [x] **Endurecer `matches`**: hoy `create/update: if isAuth()` permite a cualquiera editar cualquier partida. Exigir que `request.auth.uid` esté en `players`.
+- [x] Crear **`firestore.indexes.json`** con los índices compuestos que usan las queries (revisar `question_repository_impl.dart`, `multiplayer_provider.dart`, `match_repository_impl.dart`).
+- [x] (Alto valor) **Cloud Functions** en `functions/` (ya declarado en `firebase.json`): ELO autoritativo al cerrar match, reset diario de `dailyGames`, validación de respuestas. Referencia de ELO: `core/utils/elo_calculator.dart`.
 **Aceptación:** `firebase deploy --only firestore:rules,storage` OK; el tracking de `quizAttempts` y los reportes ya no fallan; un no-participante no puede editar un match.
 **Dependencias:** ninguna — puede empezar ya.
 
