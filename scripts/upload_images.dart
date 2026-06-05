@@ -24,19 +24,33 @@
 //
 // Prerequisites:
 //   1. Firebase Storage activated in Firebase Console.
-//   2. Firebase Admin SDK credentials (service account JSON).
-//   3. The storage.rules allow NO client writes — use this script or
+//   2. The storage.rules allow NO client writes — use this script or
 //      Firebase Console to upload.
 //
-// Alternatively, use `firebase storage:upload` or gsutil:
-//   gsutil -m cp -r assets/images/badges/* gs://geoquiz-7790d.appspot.com/badges/
-//   gsutil -m cp -r assets/images/stadiums/* gs://geoquiz-7790d.appspot.com/stadiums/
-//   gsutil -m cp -r assets/images/silhouettes/* gs://geoquiz-7790d.appspot.com/silhouettes/
-//   gsutil -m cp -r assets/images/competitions/* gs://geoquiz-7790d.appspot.com/competitions/
+// The script reads the storageBucket from lib/firebase_options.dart
+// so it always targets the correct Firebase project.
 
 import 'dart:io';
 
-const _bucket = 'geoquiz-7790d.appspot.com';
+/// Reads the storage bucket from lib/firebase_options.dart so we always
+/// target the correct Firebase project.
+String _readBucket() {
+  final optionsFile = File('lib/firebase_options.dart');
+  if (!optionsFile.existsSync()) {
+    print('No se encuentra lib/firebase_options.dart');
+    print('Ejecuta: flutterfire configure');
+    exit(1);
+  }
+  final content = optionsFile.readAsStringSync();
+  // Match: storageBucket: 'some-bucket'  or  storageBucket: "some-bucket"
+  final match = RegExp(r"""storageBucket\s*:\s*['"]([^'"]+)['"]""")
+      .firstMatch(content);
+  if (match == null) {
+    print('No se encontro storageBucket en firebase_options.dart');
+    exit(1);
+  }
+  return match.group(1)!;
+}
 
 const _categories = {
   'badges': '.png',
@@ -59,22 +73,22 @@ void main(List<String> args) async {
   }
 
   if (inputDir == null) {
-    print('❌ Falta --input <directorio>');
+    print('Falta --input <directorio>');
     _printHelp();
     exit(1);
   }
 
   final input = Directory(inputDir);
   if (!await input.exists()) {
-    print('❌ Directorio no encontrado: $inputDir');
+    print('Directorio no encontrado: $inputDir');
     exit(1);
   }
 
+  final bucket = _readBucket();
+
   print('''
-╔══════════════════════════════════════════════╗
-║  FutKO — Upload de Imágenes a Storage       ║
-║  Bucket: $_bucket     ║
-╚══════════════════════════════════════════════╝
+FutKO - Upload de Imagenes a Storage
+Bucket: $bucket
 ''');
 
   // Check what we have
@@ -84,8 +98,8 @@ void main(List<String> args) async {
     final categoryDir = Directory('$inputDir/$category');
 
     if (!await categoryDir.exists()) {
-      print('⚠️  Directorio no encontrado: $categoryDir');
-      print('   Créalo y coloca archivos *$extension dentro.');
+      print('  Directorio no encontrado: $categoryDir');
+      print('  Crealo y coloca archivos *$extension dentro.');
       continue;
     }
 
@@ -95,23 +109,22 @@ void main(List<String> args) async {
         .toList();
 
     if (files.isEmpty) {
-      print('⚠️  Sin archivos *$extension en $categoryDir');
+      print('  Sin archivos *$extension en $categoryDir');
       continue;
     }
 
-    print('📁 $category/: ${files.length} archivos');
+    print('  $category/: ${files.length} archivos');
 
     // Print gsutil commands for upload
     for (final file in files) {
       final fileName = file.uri.pathSegments.last;
-      final dest = 'gs://$_bucket/$category/$fileName';
-      print('   gsutil cp ${file.path} $dest');
+      final dest = 'gs://$bucket/$category/$fileName';
+      print('    gsutil cp ${file.path} $dest');
     }
   }
 
   print('''
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Para subir con gsutil (recomendado):
 ''');
 
@@ -119,42 +132,41 @@ Para subir con gsutil (recomendado):
     final category = entry.key;
     final extension = entry.value;
     final categoryDir = '$inputDir/$category';
-    print(
-        '  gsutil -m cp $categoryDir/*$extension gs://$_bucket/$category/');
+    print('  gsutil -m cp $categoryDir/*$extension gs://$bucket/$category/');
   }
 
   print('''
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Para subir desde Firebase Console:
   1. Ir a Storage en Firebase Console
   2. Crear las carpetas: badges/, stadiums/, silhouettes/, competitions/
   3. Subir archivos manualmente
 
-⚠️  IMPORTANTE: Las storage.rules deniegan escritura desde el cliente.
-    Solo el Admin SDK o gsutil pueden subir archivos.
+IMPORTANTE: Las storage.rules deniegan escritura desde el cliente.
+Solo el Admin SDK o gsutil pueden subir archivos.
 ''');
 }
 
 void _printHelp() {
+  final bucket = _readBucket();
   print('''
-FutKO — Upload de Imágenes a Firebase Storage
+FutKO - Upload de Imagenes a Firebase Storage
 
 Uso:
   dart run scripts/upload_images.dart --input <directorio>
 
 Opciones:
-  --input <dir>   Directorio base con las imágenes (default: ./assets/images)
+  --input <dir>   Directorio base con las imagenes (default: ./assets/images)
   --help          Mostrar esta ayuda
 
 Estructura esperada:
   <input>/
-    badges/*.png          → /badges/{slug}.png
-    stadiums/*.jpg        → /stadiums/{slug}.jpg
-    silhouettes/*.png     → /silhouettes/{slug}.png
-    competitions/*.png    → /competitions/{slug}.png
+    badges/*.png          -> /badges/{slug}.png
+    stadiums/*.jpg        -> /stadiums/{slug}.jpg
+    silhouettes/*.png     -> /silhouettes/{slug}.png
+    competitions/*.png    -> /competitions/{slug}.png
 
 Ejemplo con gsutil:
-  gsutil -m cp -r assets/images/badges/* gs://$_bucket/badges/
+  gsutil -m cp -r assets/images/badges/* gs://$bucket/badges/
 ''');
 }
