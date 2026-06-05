@@ -50,10 +50,10 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyCFOIzMkKStbRpsM2dtNoLJcTbWp83xe9w',
     appId: '1:475890223603:web:df216926b600644c2f6a86',
     messagingSenderId: '475890223603',
-    projectId: 'geoquiz-7790d',
-    authDomain: 'geoquiz-7790d.firebaseapp.com',
-    databaseURL: 'https://geoquiz-7790d-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'geoquiz-7790d.firebasestorage.app',
+    projectId: 'futko-battle',
+    authDomain: 'futko-battle.firebaseapp.com',
+    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'futko-battle.firebasestorage.app',
     measurementId: 'G-93XEQYKCFM',
   );
 
@@ -61,18 +61,18 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyCD6CQT1bx__NH8figYqT57RMwZW-xKTzA',
     appId: '1:475890223603:android:738e8f34a1fa4fc32f6a86',
     messagingSenderId: '475890223603',
-    projectId: 'geoquiz-7790d',
-    databaseURL: 'https://geoquiz-7790d-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'geoquiz-7790d.firebasestorage.app',
+    projectId: 'futko-battle',
+    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'futko-battle.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyC7g2ZJ519gaAtE_t3rhNkPANUTtM3T0U0',
     appId: '1:475890223603:ios:df442053dec5eb692f6a86',
     messagingSenderId: '475890223603',
-    projectId: 'geoquiz-7790d',
-    databaseURL: 'https://geoquiz-7790d-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'geoquiz-7790d.firebasestorage.app',
+    projectId: 'futko-battle',
+    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'futko-battle.firebasestorage.app',
     iosClientId: '475890223603-3nvhvvb16b5f6dee1qufv4vnvb8sv79c.apps.googleusercontent.com',
     iosBundleId: 'com.example.futko',
   );
