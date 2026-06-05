@@ -14,6 +14,7 @@ import '../../core/constants/game_constants.dart';
 import '../../core/utils/score_calculator.dart';
 import '../../core/utils/fuzzy_matcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/analytics_service.dart';
 
 part 'game_provider.freezed.dart';
 part 'game_provider.g.dart';
@@ -105,13 +106,18 @@ class GameNotifier extends _$GameNotifier {
         },
         (questions) {
           if (questions.isEmpty) {
-            state = const GameState.error(message: 'No questions available');
+            state = const GameState.error(message: 'No hay preguntas disponibles');
             return;
           }
 
           // Convert some questions to type-answer mode (strip options)
           _questions = _convertToTypeAnswer(questions);
           _currentQuestionIndex = 0;
+
+          AnalyticsService.instance.logGameStarted(
+            mode: 'practice',
+            difficulty: difficulty.name,
+          );
 
           // Auto-detect time based on first question type
           final secondsPerQuestion = _getTimeForQuestion(_questions.first);
@@ -130,7 +136,7 @@ class GameNotifier extends _$GameNotifier {
         },
       );
     } catch (e) {
-      state = GameState.error(message: 'Failed to start game: $e');
+      state = GameState.error(message: 'Error al iniciar partida: $e');
     }
   }
 
@@ -249,6 +255,11 @@ class GameNotifier extends _$GameNotifier {
       answeredAt: DateTime.now(),
     );
 
+    AnalyticsService.instance.logQuestionAnswered(
+      type: question.type.name,
+      correct: isCorrect,
+    );
+
     // Track quiz attempt for analytics (fire and forget, don't block gameplay)
     _trackQuizAttempt(
       question: question,
@@ -335,7 +346,7 @@ class GameNotifier extends _$GameNotifier {
     required int newCorrectAnswers,
     required int newStreak,
   }) {
-    final displayAnswer = isTimeout ? "Time's up!" : selectedAnswer;
+    final displayAnswer = isTimeout ? "¡Se acabó el tiempo!" : selectedAnswer;
 
     // Store pending values for manual next-question flow
     _pendingScore = newScore;
@@ -429,6 +440,11 @@ class GameNotifier extends _$GameNotifier {
       userAnswers: userAnswers,
       averageTime: averageTime,
     );
+
+    AnalyticsService.instance.logMatchFinished(
+      score: score,
+      correctAnswers: correctAnswers,
+    );
   }
 
   /// Cancel game
@@ -457,17 +473,10 @@ class GameNotifier extends _$GameNotifier {
   List<Question> _convertToTypeAnswer(List<Question> questions) {
     final random = Random();
 
-    // Question types that should NEVER be converted to type-answer
-    // because they are comparison questions that need options to be meaningful
-    const neverConvertTypes = {
-      QuestionType.area,       // "¿Qué país es más extenso?" - needs country options
-      QuestionType.population, // "¿Qué país tiene más población?" - needs country options
-      QuestionType.border,     // "¿Qué países comparten frontera?" - needs options
-      QuestionType.river,      // "¿Por qué país pasa este río?" - needs options
-      QuestionType.region,     // "¿En qué región se encuentra?" - needs options
-      QuestionType.lake,       // "¿En qué país se encuentra este lago?" - needs options
-      QuestionType.mountain,   // "¿En qué país se encuentra esta montaña?" - needs options
-    };
+    // Tipos que NUNCA deben convertirse a type-answer porque necesitan opciones
+    // para tener sentido. Los tipos comparativos geográficos del fork se
+    // eliminaron; añade aquí tipos de fútbol que requieran opciones si hace falta.
+    const neverConvertTypes = <QuestionType>{};
 
     return questions.map((q) {
       // Skip conversion for comparison/selection types

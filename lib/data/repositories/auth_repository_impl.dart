@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -7,19 +9,29 @@ import 'package:futko/core/errors/failures.dart';
 import 'package:futko/domain/entities/user.dart';
 import 'package:futko/domain/repositories/auth_repository.dart';
 import 'package:futko/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:futko/data/datasources/remote/gitea_oauth_datasource.dart';
+import 'package:futko/core/constants/gitea_constants.dart';
 
 /// Authentication repository implementation
+///
+/// Supports both Firebase (Google, Apple, Email) and Gitea OAuth2 / OIDC.
 class AuthRepositoryImpl implements AuthRepository {
   final firebase.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore _firestore;
   final AuthRemoteDataSource? _authRemoteDataSource;
+  final GiteaOAuthDataSource _giteaDataSource;
+
+  // ── Combined auth state ───────────────────────────────────
+  final StreamController<User?> _authStateController;
+  User? _giteaUser;
 
   AuthRepositoryImpl({
     firebase.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
     AuthRemoteDataSource? authRemoteDataSource,
+    GiteaOAuthDataSource? giteaDataSource,
   })  : _firebaseAuth = firebaseAuth ?? firebase.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn(),
         _firestore = firestore ?? FirebaseFirestore.instance,
@@ -27,14 +39,25 @@ class AuthRepositoryImpl implements AuthRepository {
             AuthRemoteDataSource(
               firebaseAuth: firebaseAuth,
               googleSignIn: googleSignIn,
-            );
-
-  @override
-  Stream<User?> get authStateChanges {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      return firebaseUser != null ? User.fromFirebaseUser(firebaseUser) : null;
+            ),
+        _giteaDataSource = giteaDataSource ?? GiteaOAuthDataSource(),
+        _authStateController = StreamController<User?>.broadcast() {
+    // Listen to Firebase auth state and forward through our combined controller.
+    _firebaseAuth.authStateChanges().listen((firebaseUser) {
+      if (firebaseUser != null) {
+        _authStateController.add(User.fromFirebaseUser(firebaseUser));
+      } else if (_giteaUser == null) {
+        _authStateController.add(null);
+      }
     });
   }
+
+  @override
+  Stream<User?> get authStateChanges => _authStateController.stream;
+
+  // ═══════════════════════════════════════════════════════════
+  //  Firebase methods
+  // ═══════════════════════════════════════════════════════════
 
   @override
   Future<Either<Failure, User>> signInWithGoogle() async {
@@ -133,13 +156,46 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════
+  //  Gitea OAuth2 / OIDC
+  // ═══════════════════════════════════════════════════════════
+
+  @override
+  Future<Either<Failure, User>> signInWithGitea(GiteaAppContext context) async {
+    try {
+      final token = await _giteaDataSource.signInWithAuthorizationCode(context);
+      final profile = await _giteaDataSource.fetchUserProfile(token.accessToken);
+
+      final user = User.fromGiteaProfile(profile);
+      _giteaUser = user;
+      _authStateController.add(user);
+
+      // Create or update user document in Firestore
+      await _createOrUpdateGiteaUser(user);
+
+      return Right(user);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  Shared
+  // ═══════════════════════════════════════════════════════════
+
   @override
   Future<Either<Failure, void>> signOut() async {
     try {
+      _giteaUser = null;
       await Future.wait([
         _firebaseAuth.signOut(),
         _googleSignIn.signOut(),
       ]);
+      _authStateController.add(null);
       return const Right(null);
     } catch (e) {
       return Left(AuthFailure(e.toString()));
@@ -149,10 +205,13 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   User? get currentUser {
     final firebaseUser = _firebaseAuth.currentUser;
-    return firebaseUser != null ? User.fromFirebaseUser(firebaseUser) : null;
+    if (firebaseUser != null) return User.fromFirebaseUser(firebaseUser);
+    return _giteaUser;
   }
 
-  /// Create or update user in Firestore
+  // ── Firestore helpers ─────────────────────────────────────
+
+  /// Create or update Firebase-authenticated user in Firestore
   Future<void> _createOrUpdateUser(firebase.User firebaseUser) async {
     final userDoc = _firestore.collection('users').doc(firebaseUser.uid);
     final docSnapshot = await userDoc.get();
@@ -189,6 +248,48 @@ class AuthRepositoryImpl implements AuthRepository {
       // Existing user - update last login
       await userDoc.update({
         'lastLoginAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  /// Create or update Gitea-authenticated user in Firestore
+  Future<void> _createOrUpdateGiteaUser(User user) async {
+    final userDoc = _firestore.collection('users').doc(user.userId);
+    final docSnapshot = await userDoc.get();
+
+    if (!docSnapshot.exists) {
+      await userDoc.set({
+        'displayName': user.displayName,
+        'email': user.email,
+        'photoUrl': user.photoUrl,
+        'elo': user.elo,
+        'stats': {
+          'totalGames': 0,
+          'wins': 0,
+          'losses': 0,
+          'draws': 0,
+          'totalCorrectAnswers': 0,
+          'currentWinStreak': 0,
+          'bestWinStreak': 0,
+        },
+        'subscription': {
+          'type': 'free',
+          'isActive': false,
+        },
+        'dailyGames': {
+          'casualPlayed': 0,
+          'rankedPlayed': 0,
+          'date': FieldValue.serverTimestamp(),
+        },
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastLoginAt': FieldValue.serverTimestamp(),
+        'authProvider': 'gitea',
+      });
+    } else {
+      await userDoc.update({
+        'lastLoginAt': FieldValue.serverTimestamp(),
+        'displayName': user.displayName,
+        'photoUrl': user.photoUrl,
       });
     }
   }

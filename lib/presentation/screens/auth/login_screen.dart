@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/common/background_video.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/gitea_constants.dart';
 
 /// Login screen — "PantallaLogin" mockup.
 /// Stadium atmosphere with grass texture, glassmorphism card, gradient CTA.
@@ -61,28 +63,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // ── Background stadium atmosphere ───────────────
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0, 0.8),
-                  radius: 1.2,
-                  colors: [
-                    AppColors.yellow500.withOpacity(0.05),
-                    AppColors.background,
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // ── Grass texture ───────────────────────────────
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _LoginGrassPainter(),
-            ),
-          ),
+          // ── Background stadium video ────────────────────
+          const BackgroundVideo(overlayOpacity: 0.55),
 
           // ── Bottom glow ─────────────────────────────────
           Positioned(
@@ -161,7 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'WHERE CHAMPIONS ENTER THE FIELD',
+                            'DONDE LOS CAMPEONES ENTRAN AL CAMPO',
                             style: GoogleFonts.lexend(
                               fontSize: 12,
                               color: AppColors.onSurfaceVariant.withOpacity(0.8),
@@ -234,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     // Email
                                     _buildTextField(
                                       controller: _emailController,
-                                      label: 'EMAIL ADDRESS',
+                                      label: 'CORREO ELECTRÓNICO',
                                       icon: Icons.alternate_email,
                                       keyboardType: TextInputType.emailAddress,
                                       validator: (v) {
@@ -250,7 +232,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     // Password
                                     _buildTextField(
                                       controller: _passwordController,
-                                      label: 'PASSWORD',
+                                      label: 'CONTRASEÑA',
                                       icon: Icons.lock_outline,
                                       obscureText: _obscurePassword,
                                       suffixIcon: IconButton(
@@ -293,12 +275,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                             TextSpan(
                                               text: _isSignUp
                                                   ? '¿Ya tienes cuenta? '
-                                                  : 'New to the stadium? ',
+                                                  : '¿Nuevo en el estadio? ',
                                             ),
                                             TextSpan(
                                               text: _isSignUp
                                                   ? 'Inicia sesión'
-                                                  : 'CREATE SQUAD',
+                                                  : 'CREAR EQUIPO',
                                               style: TextStyle(
                                                 color: AppColors.secondaryFixed,
                                                 fontWeight: FontWeight.w700,
@@ -345,6 +327,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        _buildSocialButton(
+                          icon: Icons.code,
+                          label: 'GITEA',
+                          onTap: () => ref
+                              .read(authNotifierProvider.notifier)
+                              .signInWithGitea(GiteaAppContext.mobile),
+                        ),
                         const SizedBox(height: 24),
                       ],
 
@@ -380,7 +370,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'PRO TIP',
+                                    'CONSEJO PRO',
                                     style: GoogleFonts.lexend(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
@@ -389,7 +379,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Ensure your squad credentials are secure. Champions never leave their goal undefended.',
+                                    'Asegura las credenciales de tu equipo. Los campeones nunca dejan su portería indefensa.',
                                     style: GoogleFonts.lexend(
                                       fontSize: 12,
                                       color: AppColors.onPrimaryContainer,
@@ -455,7 +445,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(
-                  'FORGOT?',
+                  '¿OLVIDASTE?',
                   style: GoogleFonts.lexend(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -477,9 +467,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             color: AppColors.onSurface,
           ),
           decoration: InputDecoration(
-            hintText: label == 'EMAIL ADDRESS'
+            hintText: label == 'CORREO ELECTRÓNICO'
                 ? 'manager@futko.com'
-                : label == 'PASSWORD'
+                : label == 'CONTRASEÑA'
                     ? '••••••••'
                     : null,
             suffixIcon: suffixIcon,
@@ -563,7 +553,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          _isSignUp ? 'CREATE SQUAD' : 'KICK OFF',
+                          _isSignUp ? 'CREAR EQUIPO' : 'JUGAR',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -651,20 +641,3 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-// ── Grass Painter ─────────────────────────────────────────
-class _LoginGrassPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final dotPaint = Paint()
-      ..color = Colors.white.withOpacity(0.02);
-    const spacing = 20.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 0.8, dotPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

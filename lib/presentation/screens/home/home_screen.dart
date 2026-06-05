@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/elo_history_provider.dart';
 import '../../providers/match_history_provider.dart';
+import '../../widgets/common/background_video.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/user.dart';
 import 'package:intl/intl.dart';
@@ -52,12 +53,8 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Grass texture background
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _HomeGrassPainter(),
-            ),
-          ),
+          // Background stadium video
+          const BackgroundVideo(overlayOpacity: 0.6),
 
           // Main content
           SafeArea(
@@ -267,9 +264,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               // Profile avatar with jersey icon
               GestureDetector(
-                onTap: () {
-                  // TODO: Profile
-                },
+                onTap: () => context.push('/profile/${user.userId}'),
                 child: Container(
                   width: 38,
                   height: 38,
@@ -413,7 +408,7 @@ class HomeScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(9999),
                             ),
                             child: Text(
-                              'Pro League'.toUpperCase(),
+                               'Liga Pro'.toUpperCase(),
                               style: GoogleFonts.lexend(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
@@ -428,7 +423,7 @@ class HomeScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'GLOBAL ELO',
+                            'ELO GLOBAL',
                             style: GoogleFonts.lexend(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -456,7 +451,7 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _buildStatBox(
-                          label: 'Win Streak',
+                          label: 'Racha',
                           value: '$winStreak',
                           icon: Icons.local_fire_department,
                           iconColor: AppColors.yellow500,
@@ -465,7 +460,7 @@ class HomeScreen extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatBox(
-                          label: 'Win Rate',
+                          label: '% Victoria',
                           value: '$winRate%',
                           icon: Icons.emoji_events,
                           iconColor: AppColors.primary,
@@ -553,7 +548,7 @@ class HomeScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         _buildModeCard(
           context,
-          title: 'Ranked',
+          title: 'Clasificatoria',
           subtitle: 'Escala en la tabla y conviértete en leyenda.',
           icon: Icons.emoji_events,
           iconBgColor: AppColors.surfaceContainerHighest,
@@ -817,8 +812,8 @@ class HomeScreen extends ConsumerWidget {
     final now = DateTime.now();
     final diff = now.difference(date);
     if (diff.inMinutes < 1) return 'ahora';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes}m';
+    if (diff.inHours < 24) return 'hace ${diff.inHours}h';
     if (diff.inDays == 1) return 'ayer';
     return DateFormat('dd MMM', 'es_ES').format(date);
   }
@@ -851,7 +846,7 @@ class HomeScreen extends ConsumerWidget {
             children: [
               _buildNavItem(
                 icon: Icons.sports_soccer,
-                label: 'Play',
+                label: 'Jugar',
                 isActive: true,
                 onTap: () {},
               ),
@@ -862,13 +857,13 @@ class HomeScreen extends ConsumerWidget {
               ),
               _buildNavItem(
                 icon: Icons.stadium,
-                label: 'Rules',
+                label: 'Reglas',
                 onTap: () {},
               ),
               _buildNavItem(
                 icon: Icons.style,
-                label: 'Profile',
-                onTap: () {},
+                label: 'Perfil',
+                onTap: () => context.push('/profile/me'),
               ),
             ],
           ),
@@ -925,20 +920,3 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-// ── Home Grass Painter ────────────────────────────────────
-class _HomeGrassPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final dotPaint = Paint()
-      ..color = Colors.white.withOpacity(0.02);
-    const spacing = 24.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1, dotPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

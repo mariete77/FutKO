@@ -83,7 +83,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTopBar(BuildContext context, WidgetRef ref, AsyncValue<GameState> gameState) {
+  Widget _buildTopBar(BuildContext context, WidgetRef ref, GameState gameState) {
     final score = gameState.maybeWhen(
       playing: (_, __, ___, score, _____, ______, _______) => score,
       answered: (_, __, ___, score) => score,
@@ -227,7 +227,7 @@ class GameScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Difficulty: ${difficulty.name.toUpperCase()}',
+              'Dificultad: ${difficulty.name.toUpperCase()}',
               style: GoogleFonts.lexend(
                 fontSize: 16,
                 color: AppColors.onSurfaceVariant,
@@ -404,7 +404,7 @@ class GameScreen extends ConsumerWidget {
                     Column(
                       children: [
                         Text(
-                          'Global Rank',
+                          'Ranking Global',
                           style: GoogleFonts.lexend(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -457,7 +457,7 @@ class GameScreen extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              'Seconds',
+                              'Segundos',
                               style: GoogleFonts.lexend(
                                 fontSize: 8,
                                 fontWeight: FontWeight.w600,
@@ -474,7 +474,7 @@ class GameScreen extends ConsumerWidget {
                     Column(
                       children: [
                         Text(
-                          'Match Score',
+                          'Puntuación',
                           style: GoogleFonts.lexend(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -542,7 +542,7 @@ class GameScreen extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                'QUESTION ${currentQuestionIndex + 1}/10',
+                'PREGUNTA ${currentQuestionIndex + 1}/10',
                 style: GoogleFonts.lexend(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -562,7 +562,7 @@ class GameScreen extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                'LIVE EVENT',
+                'EN DIRECTO',
                 style: GoogleFonts.lexend(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -667,7 +667,7 @@ class GameScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'HINT',
+                    'PISTA',
                     style: GoogleFonts.lexend(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -809,7 +809,7 @@ class GameScreen extends ConsumerWidget {
             children: [
               _buildNavItem(
                 icon: Icons.sports_soccer,
-                label: 'Play',
+                label: 'Jugar',
                 isActive: true,
               ),
               _buildNavItem(
@@ -818,11 +818,11 @@ class GameScreen extends ConsumerWidget {
               ),
               _buildNavItem(
                 icon: Icons.fitness_center,
-                label: 'Rules',
+                label: 'Reglas',
               ),
               _buildNavItem(
                 icon: Icons.person,
-                label: 'Profile',
+                label: 'Perfil',
               ),
             ],
           ),

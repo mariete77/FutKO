@@ -683,7 +683,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                 context.go('/history');
                 break;
               case 4:
-                // TODO: Navigate to profile
+                context.push('/profile/me');
                 break;
             }
           },
@@ -702,11 +702,11 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.history_edu),
-              label: 'JOURNAL',
+              label: 'DIARIO',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'PROFILE',
+              label: 'PERFIL',
             ),
           ],
         ),
@@ -775,12 +775,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
         NavigationRailDestination(
           icon: Icon(Icons.history_edu),
           selectedIcon: Icon(Icons.history_edu),
-          label: Text('JOURNAL'),
+          label: Text('DIARIO'),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.person),
           selectedIcon: Icon(Icons.person),
-          label: Text('PROFILE'),
+          label: Text('PERFIL'),
         ),
       ],
     );

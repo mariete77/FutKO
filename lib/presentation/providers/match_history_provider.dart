@@ -43,7 +43,7 @@ class MatchHistoryNotifier extends StateNotifier<MatchHistoryState> {
 
   Future<void> fetchMatchHistory() async {
     if (_currentUserId == null) {
-      state = state.copyWith(failure: AuthFailure('User not logged in'));
+      state = state.copyWith(failure: AuthFailure('Usuario no conectado'));
       return;
     }
 

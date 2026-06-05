@@ -458,7 +458,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
   }
 
   String _formatTime(double ms) {
-    if (!ms.isFinite || ms <= 0) return '0.0s';
+    if (!ms.isFinite || ms <= 0) return '0,0s';
     final seconds = ms / 1000;
     return '${seconds.toStringAsFixed(1)}s';
   }

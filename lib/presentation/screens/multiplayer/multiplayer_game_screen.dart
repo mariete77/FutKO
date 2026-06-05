@@ -91,7 +91,7 @@ class MultiplayerGameScreen extends ConsumerWidget {
       case MultiplayerStatus.finished:
         return _buildFinished(context, ref, state);
       case MultiplayerStatus.error:
-        return _buildError(context, state.errorMessage ?? 'Unknown error');
+        return _buildError(context, state.errorMessage ?? 'Error desconocido');
       default:
         return _buildLoading();
     }

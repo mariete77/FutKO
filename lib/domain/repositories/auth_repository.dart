@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../core/errors/failures.dart';
+import '../../core/constants/gitea_constants.dart';
 import '../entities/user.dart';
 
 /// Authentication repository interface
@@ -18,6 +19,9 @@ abstract class AuthRepository {
 
   /// Sign up with email and password
   Future<Either<Failure, User>> signUpWithEmail(String email, String password, String displayName);
+
+  /// Sign in with Gitea OAuth2 / OIDC
+  Future<Either<Failure, User>> signInWithGitea(GiteaAppContext context);
 
   /// Sign out
   Future<Either<Failure, void>> signOut();

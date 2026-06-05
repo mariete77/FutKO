@@ -135,19 +135,19 @@ class FriendsNotifier extends StateNotifier<FriendsState> {
 
   Future<void> sendFriendRequest(String targetUserId) async {
     if (_currentUserId == null) {
-      state = state.copyWith(errorMessage: 'User not logged in');
+      state = state.copyWith(errorMessage: 'Usuario no conectado');
       return;
     }
 
     // Guard: can't add yourself
     if (targetUserId == _currentUserId) {
-      state = state.copyWith(errorMessage: 'You cannot add yourself');
+      state = state.copyWith(errorMessage: 'No puedes añadirte a ti mismo');
       return;
     }
 
     // Guard: already sent
     if (state.sentRequests.contains(targetUserId)) {
-      state = state.copyWith(errorMessage: 'Friend request already sent');
+      state = state.copyWith(errorMessage: 'Solicitud de amistad ya enviada');
       return;
     }
 

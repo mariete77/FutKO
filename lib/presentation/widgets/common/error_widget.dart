@@ -28,7 +28,7 @@ class CustomErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Oops! Something went wrong',
+              '¡Ups! Algo salió mal',
               style: AppTextStyles.h3,
               textAlign: TextAlign.center,
             ),
@@ -36,7 +36,7 @@ class CustomErrorWidget extends StatelessWidget {
             Text(
               message,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -45,7 +45,7 @@ class CustomErrorWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: const Text('Reintentar'),
               ),
             ],
           ],

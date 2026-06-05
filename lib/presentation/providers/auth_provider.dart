@@ -4,6 +4,7 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../core/errors/failures.dart';
+import '../../core/constants/gitea_constants.dart';
 
 part 'auth_provider.g.dart';
 
@@ -68,6 +69,20 @@ class AuthNotifier extends _$AuthNotifier {
     );
   }
 
+  /// Sign in with Gitea OAuth2 / OIDC
+  ///
+  /// [context] determines which Gitea OAuth2 application to use:
+  ///   • [GiteaAppContext.web]    – Web Frontend (PKCE)
+  ///   • [GiteaAppContext.mobile] – Mobile App (PKCE)
+  Future<void> signInWithGitea(GiteaAppContext context) async {
+    state = const AsyncValue.loading();
+    final result = await ref.read(authRepositoryProvider).signInWithGitea(context);
+    state = result.fold(
+      (failure) => AsyncValue.error(failure, StackTrace.current),
+      (user) => AsyncValue.data(user),
+    );
+  }
+
   /// Sign out
   Future<void> signOut() async {
     state = const AsyncValue.loading();
@@ -83,7 +98,7 @@ class AuthNotifier extends _$AuthNotifier {
     if (error is Failure) {
       return error.message;
     }
-    return 'An unknown error occurred';
+    return 'Ha ocurrido un error desconocido';
   }
 }
 

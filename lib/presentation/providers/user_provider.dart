@@ -75,7 +75,7 @@ class UserNotifier extends _$UserNotifier {
     if (error is Failure) {
       return error.message;
     }
-    return 'An unknown error occurred';
+    return 'Ha ocurrido un error desconocido';
   }
 }
 

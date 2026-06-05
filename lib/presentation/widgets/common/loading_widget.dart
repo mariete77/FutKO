@@ -34,7 +34,7 @@ class LoadingWidget extends StatelessWidget {
             Text(
               message!,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.onSurfaceVariant,
               ),
             ),
           ],

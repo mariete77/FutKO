@@ -118,13 +118,12 @@ class QuestionCard extends StatelessWidget {
     );
   }
 
-
-  // â”€â”€ Football Question Builders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Football Question Builders ───────────────────────────
 
   Widget _buildPlayerQuestion() {
     return _buildGenericQuestion(
       icon: Icons.person,
-      defaultQuestion: 'Â¿QuÃ© jugador es este?',
+      defaultQuestion: '¿Qué jugador es este?',
       iconColor: AppColors.primary,
     );
   }
@@ -132,7 +131,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildTeamQuestion() {
     return _buildGenericQuestion(
       icon: Icons.shield,
-      defaultQuestion: 'Â¿De quÃ© equipo se trata?',
+      defaultQuestion: '¿De qué equipo se trata?',
       iconColor: AppColors.primary,
     );
   }
@@ -140,7 +139,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildCompetitionQuestion() {
     return _buildGenericQuestion(
       icon: Icons.emoji_events,
-      defaultQuestion: 'Â¿QuÃ© competiciÃ³n es esta?',
+      defaultQuestion: '¿Qué competición es esta?',
       iconColor: AppColors.secondary,
     );
   }
@@ -148,7 +147,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildHistoryQuestion() {
     return _buildGenericQuestion(
       icon: Icons.history,
-      defaultQuestion: 'Â¿Sabes la respuesta?',
+      defaultQuestion: '¿Sabes la respuesta?',
       iconColor: AppColors.tertiary,
     );
   }
@@ -156,7 +155,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildRulesQuestion() {
     return _buildGenericQuestion(
       icon: Icons.gavel,
-      defaultQuestion: 'Â¿QuÃ© dice el reglamento?',
+      defaultQuestion: '¿Qué dice el reglamento?',
       iconColor: AppColors.tertiary,
     );
   }
@@ -164,7 +163,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildStadiumQuestion() {
     return _buildGenericQuestion(
       icon: Icons.stadium,
-      defaultQuestion: 'Â¿QuÃ© estadio es este?',
+      defaultQuestion: '¿Qué estadio es este?',
       iconColor: AppColors.primary,
       hasImage: true,
     );
@@ -173,7 +172,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildBadgeQuestion() {
     return _buildGenericQuestion(
       icon: Icons.shield,
-      defaultQuestion: 'Â¿De quÃ© equipo es este escudo?',
+      defaultQuestion: '¿De qué equipo es este escudo?',
       iconColor: AppColors.primary,
       hasImage: true,
     );
@@ -182,7 +181,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildPlayerImageQuestion() {
     return _buildGenericQuestion(
       icon: Icons.person,
-      defaultQuestion: 'Â¿QuiÃ©n es este jugador?',
+      defaultQuestion: '¿Quién es este jugador?',
       iconColor: AppColors.primary,
       hasImage: true,
     );
@@ -191,7 +190,7 @@ class QuestionCard extends StatelessWidget {
   Widget _buildStatisticQuestion() {
     return _buildGenericQuestion(
       icon: Icons.bar_chart,
-      defaultQuestion: 'Â¿CuÃ¡l es la respuesta correcta?',
+      defaultQuestion: '¿Cuál es la respuesta correcta?',
       iconColor: AppColors.tertiary,
     );
   }
@@ -199,12 +198,41 @@ class QuestionCard extends StatelessWidget {
   Widget _buildTransferQuestion() {
     return _buildGenericQuestion(
       icon: Icons.swap_horiz,
-      defaultQuestion: 'Â¿A quÃ© equipo fue transferido?',
+      defaultQuestion: '¿A qué equipo fue transferido?',
       iconColor: AppColors.secondary,
     );
   }
 
-  /// Generic question builder â€” handles both text-only and image questions.
+  Widget _buildDifficultyBadge() {
+    final color = switch (question.difficulty) {
+      Difficulty.easy => Colors.green,
+      Difficulty.medium => Colors.orange,
+      Difficulty.hard => Colors.red,
+    };
+    final label = switch (question.difficulty) {
+      Difficulty.easy => 'Fácil',
+      Difficulty.medium => 'Media',
+      Difficulty.hard => 'Difícil',
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  /// Generic question builder — handles both text-only and image questions.
   Widget _buildGenericQuestion({
     required IconData icon,
     required String defaultQuestion,

@@ -228,7 +228,7 @@ class MatchHistoryScreen extends ConsumerWidget {
                 // Already on history
                 break;
               case 4:
-                // TODO: Navigate to profile
+                context.push('/profile/me');
                 break;
             }
           },

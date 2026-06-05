@@ -196,12 +196,15 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
   /// Get current user ID
   String? get _currentUserId => FirebaseAuth.instance.currentUser?.uid;
 
+  /// Get current user ELO (defaults to 1000 if profile not loaded)
+  int get _userElo => _ref.read(userNotifierProvider).valueOrNull?.elo ?? 1000;
+
   /// Start searching for a match
   Future<void> startMatchmaking(MultiplayerMode mode) async {
     if (_currentUserId == null) {
       state = state.copyWith(
         status: MultiplayerStatus.error,
-        errorMessage: 'Not authenticated',
+        errorMessage: 'No autenticado',
       );
       return;
     }
@@ -221,7 +224,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     } catch (e) {
       state = state.copyWith(
         status: MultiplayerStatus.error,
-        errorMessage: 'Failed to start matchmaking: $e',
+        errorMessage: 'Error al iniciar búsqueda: $e',
       );
     }
   }
@@ -265,7 +268,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
             state = state.copyWith(
               status: MultiplayerStatus.found,
               ghostRun: ghostRun,
-              opponentName: 'Ghost Runner',
+              opponentName: 'Corredor Fantasma',
               opponentElo: ghostRun.elo,
             );
 
@@ -288,14 +291,14 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
       (failure) {
         state = state.copyWith(
           status: MultiplayerStatus.error,
-          errorMessage: 'Failed to load questions',
+          errorMessage: 'Error al cargar preguntas',
         );
       },
       (questions) {
         _questions = questions;
         state = state.copyWith(
           status: MultiplayerStatus.found,
-          opponentName: 'Solo Practice',
+          opponentName: 'Oponente',
         );
 
         Future.delayed(const Duration(seconds: 2), () {
@@ -305,45 +308,29 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     );
   }
 
-  /// Get current user ELO from user provider
-  int get _userElo {
-    final userState = _ref.read(userNotifierProvider);
-    return userState.when(
-      data: (user) => user?.elo ?? 1000,
-      loading: () => 1000,
-      error: (_, __) => 1000,
-    );
-  }
-
-  /// Start a PvP match with expanding ELO range
+  /// Start a PvP match: try to join an existing waiting match, otherwise create one
   Future<void> _startPvPMatch(MultiplayerMode mode) async {
-    final matchType = mode == MultiplayerMode.ranked ? MatchType.ranked : MatchType.casual;
-    int baseElo = _userElo;
-    
-    // We will use a matchmaking loop that expands the range
-    int searchRange = 100; // Start strict
-    int timeElapsed = 0;
+    final matchType =
+        mode == MultiplayerMode.ranked ? MatchType.ranked : MatchType.casual;
+    final baseElo = _userElo;
 
-    // Reset/clear any existing search timer
     _matchmakingTimer?.cancel();
 
-    // Initial search
     final findResult = await _ref.read(matchRepositoryProvider).findWaitingMatch(
           mode: mode.name,
           playerElo: baseElo,
           userId: _currentUserId!,
         );
 
-    final foundMatch = await findResult.fold(
-      (failure) async => null,
-      (match) async => match,
+    final foundMatch = findResult.fold<GameMatch?>(
+      (failure) => null,
+      (match) => match,
     );
 
     if (foundMatch != null) {
       await _joinExistingMatch(foundMatch);
     } else {
-      // No existing match found - create our own
-      _createAndWaitForOpponent(matchType, baseElo);
+      await _createAndWaitForOpponent(matchType, baseElo);
     }
   }
 
@@ -359,7 +346,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     );
   }
 
-  /// Load questions by IDs from the match (so both players get same questions)
+  /// Load questions by IDs (so both players get the same set)
   Future<List<Question>?> _loadQuestionsByIds(List<String> questionIds) async {
     if (questionIds.isEmpty) return null;
 
@@ -380,22 +367,20 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           userId: _currentUserId!,
         );
 
-    joinResult.fold(
-      (failure) {
-        // Join failed (someone else joined first) - create new match
-        _createAndWaitForOpponent(existingMatch.type, _userElo);
+    await joinResult.fold(
+      (failure) async {
+        // Join failed (someone else joined first) — create our own match
+        await _createAndWaitForOpponent(existingMatch.type, _userElo);
       },
       (joinedMatch) async {
-        // Load the SAME questions that the creator stored in the match
         final questions = await _loadQuestionsByIds(joinedMatch.questionIds);
 
         if (questions == null) {
-          // Fallback: couldn't load shared questions, generate random (not ideal)
           final fallbackQuestions = await _generateQuestions();
           if (fallbackQuestions == null) {
             state = state.copyWith(
               status: MultiplayerStatus.error,
-              errorMessage: 'Failed to load questions',
+              errorMessage: 'Error al cargar preguntas',
             );
             return;
           }
@@ -407,7 +392,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
         state = state.copyWith(
           status: MultiplayerStatus.found,
           currentMatch: joinedMatch,
-          opponentName: 'Opponent',
+          opponentName: 'Oponente',
         );
 
         Future.delayed(const Duration(seconds: 2), () {
@@ -424,7 +409,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     if (questions == null) {
       state = state.copyWith(
         status: MultiplayerStatus.error,
-        errorMessage: 'Failed to generate questions',
+          errorMessage: 'Error al generar preguntas',
       );
       return;
     }
@@ -449,7 +434,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
       (failure) {
         state = state.copyWith(
           status: MultiplayerStatus.error,
-          errorMessage: 'Failed to create match: ${failure.message}',
+          errorMessage: 'Error al crear partida: ${failure.message}',
         );
       },
       (matchId) {
@@ -541,7 +526,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     state = state.copyWith(
       status: MultiplayerStatus.found,
       currentMatch: updatedMatch,
-      opponentName: 'Opponent',
+      opponentName: 'Oponente',
     );
 
     // Auto-start after short delay

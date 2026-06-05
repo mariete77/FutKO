@@ -47,6 +47,54 @@ class User extends Equatable {
     );
   }
 
+  /// Create User from Gitea profile
+  factory User.fromGiteaProfile(dynamic giteaProfile) {
+    return User(
+      userId: 'gitea_${giteaProfile.id}',
+      displayName: giteaProfile.fullName ?? giteaProfile.login,
+      email: giteaProfile.email,
+      photoUrl: giteaProfile.avatarUrl,
+      elo: 1000,
+      stats: const UserStats(),
+      subscription: const Subscription(),
+      dailyGames: DailyGames.today(),
+      createdAt: DateTime.now(),
+      friends: const [],
+      pendingFriendRequests: const [],
+    );
+  }
+
+  /// Create a copy with updated fields
+  User copyWith({
+    String? userId,
+    String? displayName,
+    String? email,
+    String? photoUrl,
+    int? elo,
+    UserStats? stats,
+    Subscription? subscription,
+    DailyGames? dailyGames,
+    DateTime? createdAt,
+    DateTime? lastLoginAt,
+    List<String>? friends,
+    List<String>? pendingFriendRequests,
+  }) {
+    return User(
+      userId: userId ?? this.userId,
+      displayName: displayName ?? this.displayName,
+      email: email ?? this.email,
+      photoUrl: photoUrl ?? this.photoUrl,
+      elo: elo ?? this.elo,
+      stats: stats ?? this.stats,
+      subscription: subscription ?? this.subscription,
+      dailyGames: dailyGames ?? this.dailyGames,
+      createdAt: createdAt ?? this.createdAt,
+      lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      friends: friends ?? this.friends,
+      pendingFriendRequests: pendingFriendRequests ?? this.pendingFriendRequests,
+    );
+  }
+
   /// Check if user is premium
   bool get isPremium => subscription.isActive;
 
@@ -101,6 +149,27 @@ class UserStats extends Equatable {
     this.currentWinStreak = 0,
     this.bestWinStreak = 0,
   });
+
+  /// Create a copy with updated fields
+  UserStats copyWith({
+    int? totalGames,
+    int? wins,
+    int? losses,
+    int? draws,
+    int? totalCorrectAnswers,
+    int? currentWinStreak,
+    int? bestWinStreak,
+  }) {
+    return UserStats(
+      totalGames: totalGames ?? this.totalGames,
+      wins: wins ?? this.wins,
+      losses: losses ?? this.losses,
+      draws: draws ?? this.draws,
+      totalCorrectAnswers: totalCorrectAnswers ?? this.totalCorrectAnswers,
+      currentWinStreak: currentWinStreak ?? this.currentWinStreak,
+      bestWinStreak: bestWinStreak ?? this.bestWinStreak,
+    );
+  }
 
   @override
   List<Object?> get props => [

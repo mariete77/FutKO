@@ -55,8 +55,18 @@ dependencies:
   # Routing
   go_router: ^13.0.1
 
+  # Gitea OAuth2/OIDC
+  oauth2_client: ^3.3.0
+  http: ^1.2.0
+
   # Icons
   cupertino_icons: ^1.0.6
+
+  # Video
+  video_player: ^2.8.0
+  firebase_messaging: ^16.3.0
+  firebase_crashlytics: ^5.2.3
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +89,7 @@ flutter:
     - assets/silhouettes/
     - assets/audio/
     - assets/lottie/
+    - assets/Fondo.mp4
 
   # fonts:
   #   - family: Poppins

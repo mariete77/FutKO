@@ -280,9 +280,9 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
       case MultiplayerMode.casual:
         return 'Partida Casual';
       case MultiplayerMode.ranked:
-        return 'Partida Ranked';
+        return 'Partida Clasificatoria';
       case MultiplayerMode.ghostRun:
-        return 'Ghost Run';
+        return 'Carrera Fantasma';
       case MultiplayerMode.friendChallenge:
         return 'Reto de Amigo';
     }

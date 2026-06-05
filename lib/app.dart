@@ -10,10 +10,13 @@ import 'package:futko/presentation/screens/multiplayer/multiplayer_game_screen.d
 import 'package:futko/presentation/screens/home/leaderboard_screen.dart';
 import 'package:futko/presentation/screens/history/match_history_screen.dart';
 import 'package:futko/presentation/screens/friends/friends_screen.dart';
+import 'package:futko/presentation/screens/profile/profile_screen.dart';
+import 'package:futko/presentation/screens/settings/settings_screen.dart';
 import 'package:futko/presentation/providers/auth_provider.dart';
 import 'package:futko/presentation/providers/multiplayer_provider.dart';
 import 'package:futko/domain/entities/question.dart';
 import 'package:futko/core/theme/app_theme.dart';
+import 'package:futko/services/analytics_service.dart';
 import 'package:futko/presentation/widgets/common/futko_page_transitions.dart';
 import 'package:futko/l10n/generated/app_localizations.dart';
 
@@ -24,6 +27,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
+    observers: [AnalyticsService.instance.observer],
     redirect: (context, state) {
       // Check both: direct auth state (from sign-in methods) and stream state (from Firebase)
       final isLoggedIn = authNotifierState.valueOrNull != null ||
@@ -112,6 +116,21 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const FriendsScreen(),
         ),
       ),
+      GoRoute(
+        path: '/profile/:userId',
+        pageBuilder: (context, state) {
+          final userId = state.pathParameters['userId'] ?? 'me';
+          return FutKOTransitions.slideHorizontal(
+            child: ProfileScreen(userId: userId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
+          child: const SettingsScreen(),
+        ),
+      ),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
@@ -121,13 +140,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Page not found: ${state.uri}',
+              'Página no encontrada: ${state.uri}',
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.go('/'),
-              child: const Text('Go Home'),
+              child: const Text('Ir al Inicio'),
             ),
           ],
         ),
