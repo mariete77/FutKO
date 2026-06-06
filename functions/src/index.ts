@@ -127,6 +127,43 @@ export const resetDailyGames = functions.pubsub
     return null;
   });
 
+export const onFriendRequest = functions.firestore
+  .document("users/{userId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    if (!before || !after) return null;
+
+    const prev: string[] = before.pending_requests || [];
+    const curr: string[] = after.pending_requests || [];
+    const added = curr.filter((uid) => !prev.includes(uid));
+    if (added.length === 0) return null;
+
+    const tokens: string[] = after.fcmTokens || [];
+    if (tokens.length === 0) return null;
+
+    // Nombre del último solicitante para el cuerpo de la notificación.
+    const requesterDoc = await db
+      .collection("users")
+      .doc(added[added.length - 1])
+      .get();
+    const requesterName = requesterDoc.data()?.displayName ?? "Alguien";
+
+    await admin.messaging().sendEachForMulticast({
+      tokens,
+      notification: {
+        title: "Nueva solicitud de amistad",
+        body: `${requesterName} quiere ser tu amigo en FutKO`,
+      },
+      data: { type: "friend_request" },
+    });
+
+    functions.logger.info(
+      `Friend request push sent to ${context.params.userId} (${tokens.length} tokens)`
+    );
+    return null;
+  });
+
 export const validateAnswer = functions.https.onCall(
   async (data, context) => {
     if (!context.auth) {

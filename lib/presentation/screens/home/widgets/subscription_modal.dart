@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../services/revenuecat_service.dart';
+import '../../../../services/analytics_service.dart';
 import '../../../providers/subscription_provider.dart';
 
 class SubscriptionModal extends ConsumerStatefulWidget {
@@ -287,6 +288,8 @@ class _SubscriptionModalState extends ConsumerState<SubscriptionModal> {
     final package = current.monthly?.storeProduct != null
         ? current.monthly!
         : current.annual ?? current.lifetime ?? current.weekly!;
+
+    AnalyticsService.instance.logPurchaseInitiated(plan: package.identifier);
 
     final success = await notifier.purchasePackage(package);
     if (success && mounted) {
