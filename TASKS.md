@@ -30,14 +30,14 @@
 **Aceptación:** `firebase deploy --only firestore:rules,storage` OK; el tracking de `quizAttempts` y los reportes ya no fallan; un no-participante no puede editar un match.
 **Dependencias:** ninguna — puede empezar ya.
 
-### 🔄 C2 — Contenido & Imágenes · 🔴 P0 · Estado: 🔄 Cline
+### ✅ C2 — Contenido & Imágenes · 🔴 P0 · Estado: ✅ Cline
 **Por qué:** el dataset tiene **0 `imageUrl`** y los distractores se mezclan entre tipos.
 **Alcance:** `lib/data/questions/football_data.dart`, `lib/services/question_seeder_service.dart`, `lib/data/repositories/question_repository_impl.dart` (**solo** `_enrichOptions`), `scripts/`, bucket de Storage (`/badges`, `/stadiums`, `/players`, `/silhouettes`, `/competitions`).
 **Tareas:**
-- [ ] **Distractores por categoría:** en `_enrichOptions` (`question_repository_impl.dart:220`), generar opciones del **mismo tipo** que la pregunta (hoy un "¿Qué estadio?" puede recibir el nombre de un jugador como opción).
-- [ ] **Imágenes:** poblar `imageUrl` en `football_data.dart` (hoy ninguno). Subir escudos/estadios/siluetas/competiciones a Storage según la estructura de `storage.rules`.
-- [ ] **Script de subida** a Firebase Storage en `scripts/` (o documentar el pipeline).
-- [ ] (Opcional) Ampliar volumen de preguntas (hoy ~90).
+- [x] **Distractores por categoría:** `_enrichOptions` filtra `sameTypeQuestions` (`q.type == question.type`) con fallback a cualquier tipo si no hay suficientes.
+- [x] **Imágenes:** `imageUrl` se asigna en `question_seeder_service.dart` durante el seeding; scripts de descarga/subida en `scripts/`.
+- [x] **Script de subida** a Firebase Storage: `scripts/upload_images.dart` + `scripts/download_images.dart`.
+- [x] Ampliar volumen del dataset: ~360 registros (Team/Player/Stadium/Competition/HistoryFact/Rule/Statistic).
 **Aceptación:** una partida muestra imágenes reales en preguntas `badge`/`stadium`/`playerImage`; los distractores son coherentes.
 **Dependencias:** subir a Storage requiere que Storage esté activado en la consola Firebase (acción del usuario).
 
