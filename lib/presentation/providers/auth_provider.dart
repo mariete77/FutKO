@@ -38,7 +38,7 @@ class AuthNotifier extends _$AuthNotifier {
       (failure) => AsyncValue.error(failure, StackTrace.current),
       (user) {
         if (user != null) {
-          RevenueCatService.setUserId(user.uid);
+          RevenueCatService.setUserId(user.userId);
         }
         return AsyncValue.data(user);
       },
@@ -53,7 +53,7 @@ class AuthNotifier extends _$AuthNotifier {
       (failure) => AsyncValue.error(failure, StackTrace.current),
       (user) {
         if (user != null) {
-          RevenueCatService.setUserId(user.uid);
+          RevenueCatService.setUserId(user.userId);
         }
         return AsyncValue.data(user);
       },
@@ -68,7 +68,7 @@ class AuthNotifier extends _$AuthNotifier {
       (failure) => AsyncValue.error(failure, StackTrace.current),
       (user) {
         if (user != null) {
-          RevenueCatService.setUserId(user.uid);
+          RevenueCatService.setUserId(user.userId);
         }
         return AsyncValue.data(user);
       },
@@ -83,7 +83,7 @@ class AuthNotifier extends _$AuthNotifier {
       (failure) => AsyncValue.error(failure, StackTrace.current),
       (user) {
         if (user != null) {
-          RevenueCatService.setUserId(user.uid);
+          RevenueCatService.setUserId(user.userId);
         }
         return AsyncValue.data(user);
       },
@@ -102,7 +102,7 @@ class AuthNotifier extends _$AuthNotifier {
       (failure) => AsyncValue.error(failure, StackTrace.current),
       (user) {
         if (user != null) {
-          RevenueCatService.setUserId(user.uid);
+          RevenueCatService.setUserId(user.userId);
         }
         return AsyncValue.data(user);
       },
