@@ -76,7 +76,7 @@ void main() {
       expect(find.text('SECCIONES'), findsOneWidget);
       expect(find.text('Partida Rápida'), findsOneWidget);
       expect(find.text('Clasificatoria'), findsOneWidget);
-      expect(find.text('Entrenamiento'), findsOneWidget);
+      expect(find.text('Pregunta del Día'), findsOneWidget);
     });
 
     testWidgets('renders ELO display', (tester) async {
