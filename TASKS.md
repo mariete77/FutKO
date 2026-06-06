@@ -74,16 +74,18 @@
 **Aceptación:** un crash forzado aparece en Crashlytics; el dispositivo recibe una push de prueba; eventos visibles en DebugView.
 **Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador.
 
-### 🔲 C6 — Testing · 🟢 P2 · Estado: LIBRE
+### 🔄 C6 — Testing · 🟢 P2 · Estado: 🔄 unit tests hechos; faltan widget tests
 **Por qué:** 0 tests reales; `widget_test.dart` es el template roto.
 **Alcance:** `test/**`, `integration_test/**`. **Solo LEE `lib/`** (no modifica producción) → cero riesgo de choque.
 **Tareas:**
-- [ ] Arreglar/borrar `test/widget_test.dart` (busca un contador inexistente → falla).
-- [ ] Unit tests: `elo_calculator`, `score_calculator`, `fuzzy_matcher`, `_enrichOptions`, `dailyGamesStatus`.
+- [x] Arreglar/borrar `test/widget_test.dart` (borrado en la consolidación).
+- [x] Unit tests: `elo_calculator`, `score_calculator`, `fuzzy_matcher`, `dailyGamesStatus` (`test/core/`, 81 tests en verde). Falta test de `_enrichOptions`.
 - [ ] Widget tests: `LoginScreen` y `HomeScreen`.
 - [ ] (Opcional) `integration_test`: flujo de partida rápida.
-**Aceptación:** `flutter test` en verde, cubriendo las utils de cálculo.
+**Aceptación:** `flutter test` en verde, cubriendo las utils de cálculo. ✅ (utils cubiertas; widget tests pendientes)
 **Dependencias:** ninguna — puede empezar ya. Si C2 cambia `_enrichOptions`, sincronizar el test.
+
+> Nota orquestador (2026-06-06): la rama `carril/6-testing` (tip `58432f5`) era de antes de la consolidación; su contenido (4 tests + `scripts/download_images.dart`) ya estaba en `main` idéntico. Mergearla habría revertido C2/C3/C4 y `functions/`, AGENTS.md, etc. **Borrada** para evitar un merge destructivo (recuperable: `git branch carril/6-testing 58432f5`).
 
 ---
 
