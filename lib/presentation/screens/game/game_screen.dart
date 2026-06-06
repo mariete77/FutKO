@@ -579,7 +579,7 @@ class GameScreen extends ConsumerWidget {
 
         // Question text
         Text(
-          currentQuestion.text,
+          currentQuestion.questionText ?? _fallbackQuestionText(currentQuestion),
           style: GoogleFonts.plusJakartaSans(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -893,6 +893,31 @@ class GameScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  static String _fallbackQuestionText(Question q) {
+    switch (q.type) {
+      case QuestionType.badge:
+        return '¿Qué equipo tiene este escudo?';
+      case QuestionType.playerImage:
+        return '¿Quién es este jugador?';
+      case QuestionType.stadium:
+        return '¿Qué estadio es este?';
+      case QuestionType.team:
+        return '¿De qué equipo se trata?';
+      case QuestionType.player:
+        return '¿De qué jugador se trata?';
+      case QuestionType.competition:
+        return '¿De qué competición se trata?';
+      case QuestionType.history:
+        return 'Pregunta de historia del fútbol';
+      case QuestionType.rules:
+        return 'Pregunta sobre las reglas del fútbol';
+      case QuestionType.statistic:
+        return 'Pregunta de estadísticas';
+      case QuestionType.transfer:
+        return 'Pregunta sobre fichajes';
+    }
   }
 }
 
