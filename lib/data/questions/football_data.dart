@@ -1,5 +1,5 @@
-class FootballData {
-  static final List<_Team> teams = [
+﻿class FootballData {
+  static const List<_Team> teams = [
     _Team('Real Madrid', 'España', 'La Liga', 1902, 'Santiago Bernabéu'),
     _Team('FC Barcelona', 'España', 'La Liga', 1899, 'Camp Nou'),
     _Team('Manchester United', 'Inglaterra', 'Premier League', 1878, 'Old Trafford'),
@@ -28,7 +28,7 @@ class FootballData {
     _Team('Tottenham Hotspur', 'Inglaterra', 'Premier League', 1882, 'Tottenham Hotspur Stadium'),
     _Team('West Ham United', 'Inglaterra', 'Premier League', 1895, 'London Stadium'),
     _Team('Everton FC', 'Inglaterra', 'Premier League', 1878, 'Goodison Park'),
-    _Team('Newcastle United', 'Inglaterra', 'Premier League', 1892, "St James' Park"),
+    _Team('Newcastle United', 'Inglaterra', 'Premier League', 1892, "St James\' Park"),
     _Team('Aston Villa', 'Inglaterra', 'Premier League', 1874, 'Villa Park'),
     _Team('Sevilla FC', 'España', 'La Liga', 1890, 'Ramón Sánchez Pizjuán'),
     _Team('Valencia CF', 'España', 'La Liga', 1919, 'Mestalla'),
@@ -55,13 +55,53 @@ class FootballData {
     _Team('Independiente', 'Argentina', 'Primera División', 1905, 'Estadio Libertadores'),
     _Team('Galatasaray', 'Turquía', 'Süper Lig', 1905, 'Rams Park'),
     _Team('Fenerbahçe', 'Turquía', 'Süper Lig', 1907, 'Şükrü Saracoğlu'),
-    _Team('Ajax Cape Town', 'Sudáfrica', 'Premier Division', 1999, 'Cape Town Stadium'),
     _Team('Al Ahly', 'Egipto', 'Egyptian Premier League', 1907, 'Cairo International Stadium'),
     _Team('Espérance', 'Túnez', 'Tunisian Ligue', 1919, 'Stade Hammadi Agrebi'),
     _Team('Raja Casablanca', 'Marruecos', 'Botola', 1949, 'Stade Mohamed V'),
+    _Team('Wolverhampton', 'Inglaterra', 'Premier League', 1877, 'Molineux Stadium'),
+    _Team('Crystal Palace', 'Inglaterra', 'Premier League', 1905, 'Selhurst Park'),
+    _Team('Nottingham Forest', 'Inglaterra', 'Premier League', 1865, 'City Ground'),
+    _Team('Brighton & Hove Albion', 'Inglaterra', 'Premier League', 1901, 'Amex Stadium'),
+    _Team('Brentford', 'Inglaterra', 'Premier League', 1889, 'Gtech Community Stadium'),
+    _Team('Fulham', 'Inglaterra', 'Premier League', 1879, 'Craven Cottage'),
+    _Team('Bournemouth', 'Inglaterra', 'Premier League', 1899, 'Vitality Stadium'),
+    _Team('Real Sociedad', 'España', 'La Liga', 1909, 'Reale Arena'),
+    _Team('Villarreal CF', 'España', 'La Liga', 1923, 'Estadio de la Cerámica'),
+    _Team('Celta de Vigo', 'España', 'La Liga', 1923, 'Balaídos'),
+    _Team('Girona FC', 'España', 'La Liga', 1930, 'Montilivi'),
+    _Team('Eintracht Frankfurt', 'Alemania', 'Bundesliga', 1899, 'Deutsche Bank Park'),
+    _Team('SC Freiburg', 'Alemania', 'Bundesliga', 1904, 'Europa-Park Stadion'),
+    _Team('Wolfsburg', 'Alemania', 'Bundesliga', 1945, 'Volkswagen Arena'),
+    _Team('Union Berlin', 'Alemania', 'Bundesliga', 1966, 'Stadion An der Alten Försterei'),
+    _Team('Atalanta', 'Italia', 'Serie A', 1907, 'Gewiss Stadium'),
+    _Team('Torino FC', 'Italia', 'Serie A', 1906, 'Stadio Olimpico Grande Torino'),
+    _Team('Udinese', 'Italia', 'Serie A', 1896, 'Friuli'),
+    _Team('Olympiacos', 'Grecia', 'Super League', 1925, 'Karaiskakis Stadium'),
+    _Team('Panathinaikos', 'Grecia', 'Super League', 1908, 'Apostolos Nikolaidis'),
+    _Team('FC Basel', 'Suiza', 'Super League', 1893, 'St. Jakob-Park'),
+    _Team('Young Boys', 'Suiza', 'Super League', 1898, 'Wankdorf Stadium'),
+    _Team('FC København', 'Dinamarca', 'Superligaen', 1992, 'Parken'),
+    _Team('FC Salzburg', 'Austria', 'Bundesliga', 1933, 'Red Bull Arena Salzburg'),
+    _Team('Shakhtar Donetsk', 'Ucrania', 'Premier League', 1936, 'Donbass Arena'),
+    _Team('Dinamo Zagreb', 'Croacia', 'HNL', 1911, 'Maksimir'),
+    _Team('Corinthians', 'Brasil', 'Brasileirão', 1910, 'Neo Química Arena'),
+    _Team('Grêmio', 'Brasil', 'Brasileirão', 1903, 'Arena do Grêmio'),
+    _Team('Botafogo', 'Brasil', 'Brasileirão', 1904, 'Estádio Nilton Santos'),
+    _Team('Fluminense', 'Brasil', 'Brasileirão', 1902, 'Maracanã'),
+    _Team('Racing Club', 'Argentina', 'Primera División', 1867, 'El Cilindro'),
+    _Team('San Lorenzo', 'Argentina', 'Primera División', 1908, 'Nuevo Gasómetro'),
+    _Team('Peñarol', 'Uruguay', 'Primera División', 1891, 'Campeón del Siglo'),
+    _Team('Club Nacional', 'Uruguay', 'Primera División', 1899, 'Gran Parque Central'),
+    _Team('Colo-Colo', 'Chile', 'Primera División', 1925, 'Monumental David Arellano'),
+    _Team('Beşiktaş', 'Turquía', 'Süper Lig', 1903, 'Vodafone Park'),
+    _Team('Mamelodi Sundowns', 'Sudáfrica', 'DStv Premiership', 1970, 'Loftus Versfeld'),
+    _Team('Wydad AC', 'Marruecos', 'Botola', 1937, 'Stade Mohamed V'),
+    _Team('Al Hilal', 'Arabia Saudí', 'Saudi Pro League', 1957, 'King Fahd International Stadium'),
+    _Team('Al Nassr', 'Arabia Saudí', 'Saudi Pro League', 1955, 'Al-Awwal Park'),
+    _Team('Urawa Red Diamonds', 'Japón', 'J1 League', 1950, 'Saitama Stadium 2002'),
   ];
 
-  static final List<_Player> players = [
+  static const List<_Player> players = [
     _Player('Lionel Messi', 'Argentina', 'Delantero', 8, 'FC Barcelona/PSG/Inter Miami'),
     _Player('Cristiano Ronaldo', 'Portugal', 'Delantero', 5, 'Manchester United/Real Madrid/Juventus/Al Nassr'),
     _Player('Neymar Jr', 'Brasil', 'Delantero', 0, 'Santos/FC Barcelona/PSG/Al Hilal'),
@@ -103,7 +143,7 @@ class FootballData {
     _Player('Luis Suárez', 'Uruguay', 'Delantero', 0, 'Ajax/Liverpool/FC Barcelona/Atlético Madrid/Grêmio'),
     _Player('Antoine Griezmann', 'Francia', 'Delantero', 0, 'Real Sociedad/Atlético Madrid/FC Barcelona'),
     _Player('Sergio Busquets', 'España', 'Centrocampista', 0, 'FC Barcelona/Inter Miami'),
-    _Player('N\'Golo Kanté', 'Francia', 'Centrocampista', 0, 'Caen/Leicester/Chelsea/Al Ittihad'),
+    _Player("N\'Golo Kanté", 'Francia', 'Centrocampista', 0, 'Caen/Leicester/Chelsea/Al Ittihad'),
     _Player('Eden Hazard', 'Bélgica', 'Delantero', 0, 'Lille/Chelsea/Real Madrid'),
     _Player('Gareth Bale', 'Gales', 'Delantero', 0, 'Tottenham/Real Madrid/LAFC'),
     _Player('Ruud Gullit', 'Países Bajos', 'Centrocampista', 1, 'Feyenoord/PSV/AC Milan'),
@@ -122,9 +162,43 @@ class FootballData {
     _Player('Jamal Musiala', 'Alemania', 'Centrocampista', 0, 'Chelsea/Bayern Munich'),
     _Player('Pedri', 'España', 'Centrocampista', 0, 'Las Palmas/FC Barcelona'),
     _Player('Gavi', 'España', 'Centrocampista', 0, 'FC Barcelona'),
+    _Player('Florian Wirtz', 'Alemania', 'Centrocampista', 0, 'Bayer Leverkusen/Liverpool'),
+    _Player('Lamine Yamal', 'España', 'Delantero', 0, 'FC Barcelona'),
+    _Player('Cole Palmer', 'Inglaterra', 'Centrocampista', 0, 'Manchester City/Chelsea'),
+    _Player('Declan Rice', 'Inglaterra', 'Centrocampista', 0, 'West Ham/Arsenal'),
+    _Player('William Saliba', 'Francia', 'Defensa', 0, 'Saint-Étienne/Arsenal'),
+    _Player('Ruben Dias', 'Portugal', 'Defensa', 0, 'Benfica/Manchester City'),
+    _Player('Martin Ødegaard', 'Noruega', 'Centrocampista', 0, 'Real Madrid/Arsenal'),
+    _Player('Bruno Fernandes', 'Portugal', 'Centrocampista', 0, 'Sporting CP/Manchester United'),
+    _Player('Moisés Caicedo', 'Ecuador', 'Centrocampista', 0, 'Brighton/Chelsea'),
+    _Player('Dusan Vlahovic', 'Serbia', 'Delantero', 0, 'Fiorentina/Juventus'),
+    _Player('Khvicha Kvaratskhelia', 'Georgia', 'Delantero', 0, 'Rubin Kazan/Nápoles/PSG'),
+    _Player('Raphinha', 'Brasil', 'Delantero', 0, 'Leeds/FC Barcelona'),
+    _Player('Federico Valverde', 'Uruguay', 'Centrocampista', 0, 'Real Madrid'),
+    _Player('Ronald Araújo', 'Uruguay', 'Defensa', 0, 'FC Barcelona'),
+    _Player('Alisson Becker', 'Brasil', 'Portero', 0, 'Roma/Liverpool'),
+    _Player('Jan Oblak', 'Eslovenia', 'Portero', 0, 'Benfica/Atlético Madrid'),
+    _Player('Marc-André ter Stegen', 'Alemania', 'Portero', 0, 'Borussia Mönchengladbach/FC Barcelona'),
+    _Player('Miroslav Klose', 'Alemania', 'Delantero', 0, 'Kaiserslautern/Bayern Munich/Lazio'),
+    _Player('Gerd Müller', 'Alemania', 'Delantero', 1, 'Bayern Munich/Fort Lauderdale'),
+    _Player('Eusébio', 'Portugal', 'Delantero', 1, 'Benfica'),
+    _Player('Ferenc Puskás', 'Hungría', 'Delantero', 0, 'Budapest Honvéd/Real Madrid'),
+    _Player('Kenny Dalglish', 'Escocia', 'Delantero', 0, 'Celtic/Liverpool'),
+    _Player('Alan Shearer', 'Inglaterra', 'Delantero', 0, 'Southampton/Blackburn/Newcastle'),
+    _Player('Dino Zoff', 'Italia', 'Portero', 0, 'Juventus'),
+    _Player('Fabio Cannavaro', 'Italia', 'Defensa', 1, 'Napoli/Inter/Juventus/Real Madrid'),
+    _Player('Kaká', 'Brasil', 'Centrocampista', 1, 'São Paulo/AC Milan/Real Madrid/Orlando City'),
+    _Player("Samuel Eto\'o", 'Camerún', 'Delantero', 0, 'Mallorca/FC Barcelona/Inter/Chelsea'),
+    _Player('Didier Drogba', 'Costa de Marfil', 'Delantero', 0, 'Le Mans/Guingamp/Marseille/Chelsea'),
+    _Player('Philipp Lahm', 'Alemania', 'Defensa', 0, 'Bayern Munich'),
+    _Player('David Beckham', 'Inglaterra', 'Centrocampista', 0, 'Manchester United/Real Madrid/LA Galaxy/PSG'),
+    _Player('Roberto Carlos', 'Brasil', 'Defensa', 0, 'Palmeiras/Inter Milan/Real Madrid'),
+    _Player('Lilian Thuram', 'Francia', 'Defensa', 0, 'Monaco/Parma/Juventus/FC Barcelona'),
+    _Player('Dennis Bergkamp', 'Países Bajos', 'Delantero', 0, 'Ajax/Inter Milan/Arsenal'),
+    _Player('Gianluigi Donnarumma', 'Italia', 'Portero', 0, 'AC Milan/PSG'),
   ];
 
-  static final List<_Competition> competitions = [
+  static const List<_Competition> competitions = [
     _Competition('FIFA World Cup', 'Selecciones', 1930, 'Cada 4 años', 8),
     _Competition('UEFA Champions League', 'Clubes', 1955, 'Anual', 15),
     _Competition('UEFA Euro', 'Selecciones', 1960, 'Cada 4 años', 4),
@@ -145,9 +219,19 @@ class FootballData {
     _Competition('Olympic Football Tournament', 'Selecciones', 1900, 'Cada 4 años', 0),
     _Competition('UEFA Nations League', 'Selecciones', 2018, 'Cada 2 años', 0),
     _Competition('Copa Sudamericana', 'Clubes', 2002, 'Anual', 2),
+    _Competition('UEFA Conference League', 'Clubes', 2021, 'Anual', 2),
+    _Competition('Supercopa de España', 'Clubes', 1982, 'Anual', 0),
+    _Competition('Community Shield', 'Clubes', 1908, 'Anual', 0),
+    _Competition('DFB-Pokal', 'Clubes', 1935, 'Anual', 0),
+    _Competition('Copa Italia', 'Clubes', 1922, 'Anual', 0),
+    _Competition('UEFA Super Cup', 'Clubes', 1972, 'Anual', 3),
+    _Competition('Recopa Sudamericana', 'Clubes', 1989, 'Anual', 2),
+    _Competition('J.League', 'Clubes', 1993, 'Anual', 0),
+    _Competition('MLS Cup', 'Clubes', 1996, 'Anual', 2),
+    _Competition('Indian Super League', 'Clubes', 2013, 'Anual', 0),
   ];
 
-  static final List<_Stadium> stadiums = [
+  static const List<_Stadium> stadiums = [
     _Stadium('Santiago Bernabéu', 'Madrid', 'Real Madrid', 81044),
     _Stadium('Camp Nou', 'Barcelona', 'FC Barcelona', 99354),
     _Stadium('Old Trafford', 'Mánchester', 'Manchester United', 74310),
@@ -180,7 +264,7 @@ class FootballData {
     _Stadium('Tottenham Hotspur Stadium', 'Londres', 'Tottenham Hotspur', 62850),
     _Stadium('Villa Park', 'Birmingham', 'Aston Villa', 42682),
     _Stadium('Goodison Park', 'Liverpool', 'Everton FC', 39572),
-    _Stadium("St James' Park", 'Newcastle', 'Newcastle United', 52305),
+    _Stadium("St James\' Park", 'Newcastle', 'Newcastle United', 52305),
     _Stadium('London Stadium', 'Londres', 'West Ham United', 62500),
     _Stadium('De Kuip', 'Róterdam', 'Feyenoord', 51177),
     _Stadium('Philips Stadion', 'Eindhoven', 'PSV Eindhoven', 35000),
@@ -192,9 +276,20 @@ class FootballData {
     _Stadium('Stade Mohamed V', 'Casablanca', 'Raja Casablanca/Wydad', 67000),
     _Stadium('BayArena', 'Leverkusen', 'Bayer Leverkusen', 30210),
     _Stadium('Borussia-Park', 'Mönchengladbach', 'Borussia Mönchengladbach', 54057),
+    _Stadium('Nou Mestalla', 'Valencia', 'Valencia CF', 75000),
+    _Stadium('Estadio de la Cerámica', 'Villarreal', 'Villarreal CF', 23500),
+    _Stadium('Reale Arena', 'San Sebastián', 'Real Sociedad', 32076),
+    _Stadium('Deutsche Bank Park', 'Frankfurt', 'Eintracht Frankfurt', 53500),
+    _Stadium('Gewiss Stadium', 'Bérgamo', 'Atalanta', 24000),
+    _Stadium('Karaiskakis Stadium', 'El Pireo', 'Olympiacos', 32115),
+    _Stadium('St. Jakob-Park', 'Basilea', 'FC Basel', 38512),
+    _Stadium('Parken', 'Copenhague', 'FC København', 38065),
+    _Stadium('Neo Química Arena', 'São Paulo', 'Corinthians', 49205),
+    _Stadium('Arena do Grêmio', 'Porto Alegre', 'Grêmio', 55662),
+    _Stadium('Estadio Campeón del Siglo', 'Montevideo', 'Peñarol', 40000),
   ];
 
-  static final List<_HistoryFact> historyFacts = [
+  static const List<_HistoryFact> historyFacts = [
     _HistoryFact('Brasil ganó su primer Mundial en 1958 en Suecia', '1958', 'Brasil'),
     _HistoryFact('El Mundial de 1970 fue el primero transmitido en color', '1970', 'México'),
     _HistoryFact('La Eurocopa de 1992 la ganó Dinamarca sin haberse clasificado', '1992', 'Dinamarca'),
@@ -213,9 +308,19 @@ class FootballData {
     _HistoryFact('Argentina no ganó un título oficial entre 1993 y 2021', '1993-2021', 'Argentina'),
     _HistoryFact('El Bayern Munich ganó 6 títulos en 2020 (sextete)', '2020', 'Bayern Munich'),
     _HistoryFact('La Copa América de 2016 se llamó Copa América Centenario', '2016', 'Estados Unidos'),
+    _HistoryFact('Brasil ganó el Mundial de 1994 en tanda de penales contra Italia', '1994', 'Brasil'),
+    _HistoryFact('Francia ganó su primer Mundial en 1998 con dos goles de cabeza de Zidane en la final', '1998', 'Francia'),
+    _HistoryFact('Italia ganó el Mundial de 2006 tras el cabezazo de Zidane a Materazzi en la final', '2006', 'Italia'),
+    _HistoryFact('España ganó su primer Mundial en 2010 con un gol de Iniesta en la prórroga', '2010', 'España'),
+    _HistoryFact('Alemania humilló a Brasil 7-1 en la semifinal del Mundial 2014', '2014', 'Alemania'),
+    _HistoryFact('Leicester City ganó la Premier League 2015-16 con una probabilidad de 5000 a 1', '2016', 'Leicester City'),
+    _HistoryFact('Portugal ganó la Eurocopa 2016 sin Cristiano Ronaldo lesionado en la final', '2016', 'Portugal'),
+    _HistoryFact('El Real Madrid ganó tres Champions League consecutivas entre 2016 y 2018', '2016-2018', 'Real Madrid'),
+    _HistoryFact('La era Abramovich transformó al Chelsea FC en un gigante del fútbol mundial desde 2003', '2003', 'Chelsea'),
+    _HistoryFact('El Manchester City ganó el triplete en 2023', '2023', 'Manchester City'),
   ];
 
-  static final List<_Rule> rules = [
+  static const List<_Rule> rules = [
     _Rule('Un partido dura 90 minutos en dos tiempos de 45', '90'),
     _Rule('Una tarjeta roja directa significa expulsión inmediata', 'Roja'),
     _Rule('El fuera de juego se sanciona cuando un jugador está más cerca del arco que el penúltimo defensor', 'Fuera de juego'),
@@ -233,9 +338,17 @@ class FootballData {
     _Rule('Dos tarjetas amarillas en un partido resultan en tarjeta roja', 'Dos amarillas'),
     _Rule('El tiro de esquina se ejecuta desde el banderín de córner', 'Tiro de esquina'),
     _Rule('El tiro libre indirecto requiere que otro jugador toque el balón antes de gol', 'Indirecto'),
+    _Rule('La regla del pase atrás prohíbe al portero tocar con la mano un pase deliberado de un compañero', 'Pase atrás'),
+    _Rule('El gol de oro era una regla donde el primer gol en la prórroga ganaba el partido', 'Gol de oro'),
+    _Rule('El gol de plata era una variante donde si un equipo ganaba al final del primer tiempo extra ganaba el partido', 'Gol de plata'),
+    _Rule('El tiempo de lesión es añadido por el árbitro al final de cada mitad por interrupciones', 'Tiempo de lesión'),
+    _Rule('El tiempo añadido es determinado por el cuarto árbitro basándose en las interrupciones del juego', 'Tiempo añadido'),
+    _Rule('El cuarto árbitro asiste en sustituciones, tiempo añadido y control del banquillo', 'Cuarto árbitro'),
+    _Rule('El saque de meta se ejecuta desde el área pequeña cuando el balón cruza la línea de fondo del equipo defensor', 'Saque de meta'),
+    _Rule('La tanda de penales consiste en 5 lanzamientos por equipo y continúa en muerte súbita si hay empate', 'Tanda de penales'),
   ];
 
-  static final List<_Statistic> statistics = [
+  static const List<_Statistic> statistics = [
     _Statistic('Cristiano Ronaldo', 'más goles en la historia del fútbol', '900+'),
     _Statistic('Lionel Messi', 'más Balones de Oro', '8'),
     _Statistic('Iker Casillas', 'más porterías a cero en Champions', '57'),
@@ -255,60 +368,70 @@ class FootballData {
     _Statistic('Lionel Messi', 'más asistencias en la historia', '350+'),
     _Statistic('Cristiano Ronaldo', 'más goles de cabeza en Champions', '28'),
     _Statistic('Gianluigi Buffon', 'más minutos sin recibir gol en Serie A', '973'),
+    _Statistic('Cristiano Ronaldo', 'más goles internacionales con su selección', '130+'),
+    _Statistic('Lionel Messi', 'más asistencias en Champions League', '40'),
+    _Statistic('Pelé', 'goleador más joven en la historia de los Mundiales', '17 años 239 días'),
+    _Statistic('Peter Shilton', 'más porterías a cero en la historia de los Mundiales', '10'),
+    _Statistic('Neymar Jr', 'traspaso más caro de la historia', '222 millones de euros'),
+    _Statistic('Rangers FC', 'más títulos de liga ganados por un club', '55'),
+    _Statistic('Sadio Mané', 'hat-trick más rápido en Premier League', '2 minutos 56 segundos'),
+    _Statistic('Richard Dunne', 'más autogoles en la historia de la Premier League', '10'),
+    _Statistic('Arsenal', 'racha más larga sin perder en Premier League', '49 partidos'),
+    _Statistic('Samir Handanović', 'más penales atajados en Serie A', '21'),
   ];
 }
 
 class _Team {
+  const _Team(this.name, this.country, this.league, this.founded, this.stadium);
   final String name;
   final String country;
   final String league;
   final int founded;
   final String stadium;
-  const _Team(this.name, this.country, this.league, this.founded, this.stadium);
 }
 
 class _Player {
+  const _Player(this.name, this.nationality, this.position, this.ballonDor, this.knownFor);
   final String name;
   final String nationality;
   final String position;
   final int ballonDor;
   final String knownFor;
-  const _Player(this.name, this.nationality, this.position, this.ballonDor, this.knownFor);
 }
 
 class _Competition {
+  const _Competition(this.name, this.type, this.firstEdition, this.frequency, this.trophyCount);
   final String name;
   final String type;
   final int firstEdition;
   final String frequency;
   final int trophyCount;
-  const _Competition(this.name, this.type, this.firstEdition, this.frequency, this.trophyCount);
 }
 
 class _Stadium {
+  const _Stadium(this.name, this.city, this.homeTeam, this.capacity);
   final String name;
   final String city;
   final String homeTeam;
   final int capacity;
-  const _Stadium(this.name, this.city, this.homeTeam, this.capacity);
 }
 
 class _HistoryFact {
+  const _HistoryFact(this.fact, this.year, this.subject);
   final String fact;
   final String year;
   final String subject;
-  const _HistoryFact(this.fact, this.year, this.subject);
 }
 
 class _Rule {
+  const _Rule(this.rule, this.keyword);
   final String rule;
   final String keyword;
-  const _Rule(this.rule, this.keyword);
 }
 
 class _Statistic {
+  const _Statistic(this.subject, this.record, this.value);
   final String subject;
   final String record;
   final String value;
-  const _Statistic(this.subject, this.record, this.value);
 }
