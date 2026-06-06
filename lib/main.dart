@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,8 +17,16 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await CrashlyticsService.initialize();
-  await MessagingService.instance.initialize();
+  // Crashlytics no tiene soporte web y Messaging requiere config web aparte
+  // (service worker + VAPID), así que solo se inician en móvil.
+  if (!kIsWeb) {
+    try {
+      await CrashlyticsService.initialize();
+      await MessagingService.instance.initialize();
+    } catch (e) {
+      debugPrint('Crashlytics/Messaging init failed: $e');
+    }
+  }
 
   try {
     await RevenueCatService.initialize();
