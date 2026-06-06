@@ -63,16 +63,16 @@
 **Aceptación:** tocar avatar/perfil navega a `ProfileScreen` real; Settings accesible; sin TODOs de navegación.
 **Dependencias:** usa `AppColors`/tema existentes. Dueño exclusivo de `app.dart` mientras dure el carril.
 
-### 🔲 C5 — Observabilidad & Push · 🟡 P1 · Estado: LIBRE
+### ✅ C5 — Observabilidad & Push · 🟡 P1 · Estado: ✅ Claude
 **Por qué:** sin push, sin crash reporting, sin instrumentación de analytics.
 **Deps ya añadidas en Fase 0:** `firebase_messaging`, `firebase_crashlytics`, `flutter_local_notifications`.
 **Alcance:** `lib/services/` (nuevos: `messaging_service.dart`, `crashlytics_service.dart`), instrumentación en providers, `android/`, `ios/`. (Init en `main.dart`: **coordinar con el orquestador**.)
 **Tareas:**
-- [ ] Inicializar **Crashlytics** (`FlutterError.onError`) y **Messaging** (permisos, token, handlers foreground/background con `flutter_local_notifications`).
-- [ ] Push: invitaciones de amigos y aviso de turno en partidas asíncronas (usa `friend_repository` / ghost runs).
-- [ ] Instrumentar **Analytics** (`firebase_analytics` ya está): `game_started`, `question_answered`, `match_finished`, `purchase_initiated`.
-**Aceptación:** un crash forzado aparece en Crashlytics; el dispositivo recibe una push de prueba; eventos visibles en DebugView.
-**Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador.
+- [x] Inicializar **Crashlytics** (`FlutterError.onError` + `PlatformDispatcher.onError`) y **Messaging** (permisos, token guardado en `users.fcmTokens`, handlers foreground/background con `flutter_local_notifications`). Init en `main.dart`.
+- [x] Push de **invitaciones de amigos**: Cloud Function `onFriendRequest` (trigger `onUpdate` de `users/{id}` → FCM a `fcmTokens` al detectar nuevo `pending_requests`). _Aviso de turno: N/A — los ghost runs son carrera contra grabación, no hay modelo de turnos._
+- [x] Instrumentar **Analytics**: `game_started`, `question_answered`, `match_finished` (en `game_provider`) + `purchase_initiated` (en `subscription_modal`).
+**Aceptación:** un crash forzado aparece en Crashlytics; el dispositivo recibe una push de prueba; eventos visibles en DebugView. _(verificación en dispositivo + deploy de functions: acción del usuario)._
+**Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador. ⚠️ `firebase.json` **no tiene predeploy hook**: hay que correr `npm --prefix functions run build` antes de `firebase deploy --only functions` (afecta también a las funciones de C1).
 
 ### 🔄 C6 — Testing · 🟢 P2 · Estado: 🔄 unit tests hechos; faltan widget tests
 **Por qué:** 0 tests reales; `widget_test.dart` es el template roto.
