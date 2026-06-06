@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
+import 'package:meta/meta.dart';
 import 'package:futko/core/errors/exceptions.dart';
 import 'package:futko/core/errors/failures.dart';
 import 'package:futko/core/constants/firebase_constants.dart';
@@ -10,11 +11,15 @@ import 'package:futko/data/models/question_model.dart';
 
 /// Question repository implementation
 class QuestionRepositoryImpl implements QuestionRepository {
-  final FirebaseFirestore _firestore;
-  final Random _random = Random();
+  final FirebaseFirestore? _firestore;
+  @visibleForTesting
+  final Random random;
 
-  QuestionRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  QuestionRepositoryImpl({FirebaseFirestore? firestore, Random? random})
+      : _firestore = firestore,
+        random = random ?? Random();
+
+  FirebaseFirestore get _db => _firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<Either<Failure, List<Question>>> getRandomQuestions({
@@ -24,7 +29,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
   }) async {
     try {
       // Get all eligible questions
-      Query query = _firestore.collection(FirebaseConstants.questions);
+      Query query = _db.collection(FirebaseConstants.questions);
 
       if (types != null && types.isNotEmpty) {
         query = query.where(
@@ -53,7 +58,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
       }
 
       // Shuffle and select
-      allQuestions.shuffle(_random);
+      allQuestions.shuffle(random);
 
       // Ensure variety of types
       return Right(_selectBalancedQuestions(allQuestions, count));
@@ -71,7 +76,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
   @override
   Future<Either<Failure, Question>> getQuestionById(String id) async {
     try {
-      final doc = await _firestore
+      final doc = await _db
           .collection(FirebaseConstants.questions)
           .doc(id)
           .get();
@@ -97,7 +102,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
     QuestionType type,
   ) async {
     try {
-      final snapshot = await _firestore
+      final snapshot = await _db
           .collection(FirebaseConstants.questions)
           .where(FirebaseConstants.questionType, isEqualTo: type.name)
           .get();
@@ -124,7 +129,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
     Difficulty difficulty,
   ) async {
     try {
-      final snapshot = await _firestore
+      final snapshot = await _db
           .collection(FirebaseConstants.questions)
           .where(FirebaseConstants.difficulty, isEqualTo: difficulty.name)
           .get();
@@ -155,7 +160,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
       // Firestore 'in' queries support max 30 items
       for (var i = 0; i < ids.length; i += 30) {
         final chunk = ids.sublist(i, i + 30 > ids.length ? ids.length : i + 30);
-        final snapshot = await _firestore
+        final snapshot = await _db
             .collection(FirebaseConstants.questions)
             .where(FieldPath.documentId, whereIn: chunk)
             .get();
@@ -208,18 +213,19 @@ class QuestionRepositoryImpl implements QuestionRepository {
       if (selected.length >= count) break;
     }
 
-    selected.shuffle(_random);
+    selected.shuffle(random);
 
     // Enrich questions with fewer than 4 options
-    return selected.map((q) => _enrichOptions(q, questions)).toList();
+    return selected.map((q) => enrichOptions(q, questions)).toList();
   }
 
   /// Enrich a question's options to have at least 4 choices.
   /// For questions with 0-3 options, adds random distractors from other questions.
   /// Silhouette and image-based types always get multiple choice with country distractors.
-  Question _enrichOptions(Question question, List<Question> allQuestions) {
+  @visibleForTesting
+  Question enrichOptions(Question question, List<Question> allQuestions) {
     // Skip if already has enough valid options
-    if (question.options.length >= 4 && !_hasPlaceholderOptions(question.options)) {
+    if (question.options.length >= 4 && !hasPlaceholderOptions(question.options)) {
       return question;
     }
 
@@ -240,7 +246,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
 
     // For types that should always have options but have placeholder data,
     // start with an empty list (correctAnswer will be added later)
-    final enrichedOptions = _hasPlaceholderOptions(question.options)
+    final enrichedOptions = hasPlaceholderOptions(question.options)
         ? <String>[]
         : List<String>.from(question.options);
 
@@ -273,7 +279,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
     allAnswers.removeWhere((a) => enrichedOptions.contains(a));
 
     // Shuffle distractors for randomness
-    allAnswers.shuffle(_random);
+    allAnswers.shuffle(random);
 
     // Add distractors until we have 4 options
     for (final distractor in allAnswers) {
@@ -292,7 +298,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
     }
 
     // Shuffle final options
-    enrichedOptions.shuffle(_random);
+    enrichedOptions.shuffle(random);
 
     return Question(
       id: question.id,
@@ -307,7 +313,8 @@ class QuestionRepositoryImpl implements QuestionRepository {
   }
 
   /// Check if options contain placeholder text (e.g. "Opción Incorrecta A")
-  static bool _hasPlaceholderOptions(List<String> options) {
+  @visibleForTesting
+  static bool hasPlaceholderOptions(List<String> options) {
     const placeholders = {
       'opción incorrecta a', 'opción incorrecta b', 'opción incorrecta c',
       'option a', 'option b', 'option c',
