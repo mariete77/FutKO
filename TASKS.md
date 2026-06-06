@@ -74,15 +74,15 @@
 **Aceptación:** un crash forzado aparece en Crashlytics; el dispositivo recibe una push de prueba; eventos visibles en DebugView. _(verificación en dispositivo + deploy de functions: acción del usuario)._
 **Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador. `firebase.json` ya tiene predeploy hook (`npm run build`), así que `firebase deploy --only functions` compila el TS automáticamente.
 
-### 🔄 C6 — Testing · 🟢 P2 · Estado: 🔄 unit tests hechos; faltan widget tests
+### ✅ C6 — Testing · 🟢 P2 · Estado: ✅ OpenCode
 **Por qué:** 0 tests reales; `widget_test.dart` es el template roto.
 **Alcance:** `test/**`, `integration_test/**`. **Solo LEE `lib/`** (no modifica producción) → cero riesgo de choque.
 **Tareas:**
 - [x] Arreglar/borrar `test/widget_test.dart` (borrado en la consolidación).
-- [x] Unit tests: `elo_calculator`, `score_calculator`, `fuzzy_matcher`, `dailyGamesStatus` (`test/core/`, 81 tests en verde). Falta test de `_enrichOptions`.
-- [ ] Widget tests: `LoginScreen` y `HomeScreen`.
+- [x] Unit tests: `elo_calculator`, `score_calculator`, `fuzzy_matcher`, `dailyGamesStatus` (`test/core/`, 81 tests en verde). + `_enrichOptions` (12 tests).
+- [x] Widget tests: `LoginScreen` (10 tests) y `HomeScreen` (4 tests).
 - [ ] (Opcional) `integration_test`: flujo de partida rápida.
-**Aceptación:** `flutter test` en verde, cubriendo las utils de cálculo. ✅ (utils cubiertas; widget tests pendientes)
+**Aceptación:** `flutter test` en verde (107 tests), cubriendo utils + widgets principales.
 **Dependencias:** ninguna — puede empezar ya. Si C2 cambia `_enrichOptions`, sincronizar el test.
 
 > Nota orquestador (2026-06-06): la rama `carril/6-testing` (tip `58432f5`) era de antes de la consolidación; su contenido (4 tests + `scripts/download_images.dart`) ya estaba en `main` idéntico. Mergearla habría revertido C2/C3/C4 y `functions/`, AGENTS.md, etc. **Borrada** para evitar un merge destructivo (recuperable: `git branch carril/6-testing 58432f5`).
