@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../domain/entities/question.dart';
 import '../../providers/game_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/active_players_provider.dart';
 import 'widgets/timer_widget.dart';
 import 'widgets/question_card.dart';
 import 'widgets/answer_options_widget.dart';
@@ -591,54 +593,70 @@ class GameScreen extends ConsumerWidget {
   }
 
   Widget _buildBottomActions(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
+    final activeCount = ref.watch(activePlayersProvider).valueOrNull ?? 0;
+    final countLabel = activeCount >= 1000
+        ? '+${(activeCount / 1000).round()}k'
+        : activeCount > 0
+            ? '+$activeCount'
+            : null;
+
     return Row(
       children: [
-        // Participants avatars (mock)
         Expanded(
           child: Row(
             children: [
-              ...List.generate(3, (index) {
-                return Container(
-                  width: 36,
-                  height: 36,
-                  margin: const EdgeInsets.only(right: 4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.surfaceContainerHighest,
-                    border: Border.all(
-                      color: AppColors.emerald950,
-                      width: 2,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    size: 16,
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                );
-              }),
+              // Avatar real del usuario actual
               Container(
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.surfaceContainerHighest,
-                  border: Border.all(
-                    color: AppColors.emerald950,
-                    width: 2,
-                  ),
+                  border: Border.all(color: AppColors.emerald950, width: 2),
                 ),
-                child: Center(
-                  child: Text(
-                    '+12k',
-                    style: GoogleFonts.lexend(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.onSurface,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage: user?.photoUrl != null
+                      ? NetworkImage(user!.photoUrl!)
+                      : null,
+                  backgroundColor: AppColors.surfaceContainerHigh,
+                  child: user?.photoUrl == null
+                      ? Text(
+                          user?.displayName.isNotEmpty == true
+                              ? user!.displayName[0].toUpperCase()
+                              : '?',
+                          style: GoogleFonts.lexend(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              // Conteo real de jugadores activos
+              if (countLabel != null)
+                Container(
+                  margin: const EdgeInsets.only(left: 4),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surfaceContainerHighest,
+                    border: Border.all(color: AppColors.emerald950, width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      countLabel,
+                      style: GoogleFonts.lexend(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onSurface,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

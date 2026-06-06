@@ -52,14 +52,14 @@
 **Aceptación:** compra en sandbox funciona; `isPremium` refleja la compra; modos premium bloqueados para free.
 **Dependencias:** cuenta RevenueCat + productos en las stores (acción del usuario).
 
-### 🔲 C4 — Pantallas & UX · 🟡 P1 · Estado: LIBRE
+### ✅ C4 — Pantallas & UX · 🟡 P1 · Estado: ✅ Claude
 **Por qué:** no existe pantalla de perfil; 3 TODOs de navegación muertos; avatars mock.
 **Alcance:** `lib/presentation/screens/**` (archivos nuevos en `profile/`, `settings/`), `lib/app.dart` (**este carril es el ÚNICO dueño de las rutas nuevas**).
 **Tareas:**
-- [ ] Crear **`ProfileScreen`** (perfil, stats, ELO, historial) y enlazar los TODOs: `home_screen.dart:268`, `friends_screen.dart:686`, `match_history_screen.dart:231`.
-- [ ] Crear **`SettingsScreen`** (logout, idioma, sonido, suscripción).
-- [ ] Sustituir "Participants avatars (mock)" (`game_screen.dart:596`) por datos reales.
-- [ ] Añadir rutas en `app.dart` (`/profile/:userId`, `/settings`).
+- [x] Crear **`ProfileScreen`** (perfil, stats, ELO, historial) y enlazar los TODOs: `home_screen.dart:268`, `friends_screen.dart:686`, `match_history_screen.dart:231`.
+- [x] Crear **`SettingsScreen`** (logout, idioma, sonido, suscripción).
+- [x] Sustituir "Participants avatars (mock)" (`game_screen.dart:596`) por datos reales.
+- [x] Añadir rutas en `app.dart` (`/profile/:userId`, `/settings`).
 **Aceptación:** tocar avatar/perfil navega a `ProfileScreen` real; Settings accesible; sin TODOs de navegación.
 **Dependencias:** usa `AppColors`/tema existentes. Dueño exclusivo de `app.dart` mientras dure el carril.
 
