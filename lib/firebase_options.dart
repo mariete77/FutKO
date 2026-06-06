@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -47,34 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCFOIzMkKStbRpsM2dtNoLJcTbWp83xe9w',
-    appId: '1:475890223603:web:df216926b600644c2f6a86',
-    messagingSenderId: '475890223603',
+    apiKey: 'AIzaSyAprAmk1hPhlNbkQhgTSjIeEfmFIlfK18M',
+    appId: '1:671381491956:web:5a85e868be8a6db82dcea1',
+    messagingSenderId: '671381491956',
     projectId: 'futko-battle',
     authDomain: 'futko-battle.firebaseapp.com',
-    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'futko-battle.firebasestorage.app',
-    measurementId: 'G-93XEQYKCFM',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCD6CQT1bx__NH8figYqT57RMwZW-xKTzA',
-    appId: '1:475890223603:android:738e8f34a1fa4fc32f6a86',
-    messagingSenderId: '475890223603',
+    apiKey: 'AIzaSyB_BgMDvlebp2-H-BULVTVGBdrorl6GyGE',
+    appId: '1:671381491956:android:280caebbd97b8d102dcea1',
+    messagingSenderId: '671381491956',
     projectId: 'futko-battle',
-    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'futko-battle.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC7g2ZJ519gaAtE_t3rhNkPANUTtM3T0U0',
-    appId: '1:475890223603:ios:df442053dec5eb692f6a86',
-    messagingSenderId: '475890223603',
+    apiKey: 'AIzaSyC3RwnQpSYI3WnnnoDTqe9m62gjJtYWzUs',
+    appId: '1:671381491956:ios:d44641fc984020132dcea1',
+    messagingSenderId: '671381491956',
     projectId: 'futko-battle',
-    databaseURL: 'https://futko-battle-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'futko-battle.firebasestorage.app',
-    iosClientId: '475890223603-3nvhvvb16b5f6dee1qufv4vnvb8sv79c.apps.googleusercontent.com',
+    iosClientId: '671381491956-l7ul5cgpf07bk3b68gnbm0a8ve16ljet.apps.googleusercontent.com',
+    iosBundleId: 'com.example.futko',
+  );
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyC3RwnQpSYI3WnnnoDTqe9m62gjJtYWzUs',
+    appId: '1:671381491956:ios:d44641fc984020132dcea1',
+    messagingSenderId: '671381491956',
+    projectId: 'futko-battle',
+    storageBucket: 'futko-battle.firebasestorage.app',
+    iosClientId: '671381491956-l7ul5cgpf07bk3b68gnbm0a8ve16ljet.apps.googleusercontent.com',
     iosBundleId: 'com.example.futko',
   );
 
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAprAmk1hPhlNbkQhgTSjIeEfmFIlfK18M',
+    appId: '1:671381491956:web:7debcbda8418b1042dcea1',
+    messagingSenderId: '671381491956',
+    projectId: 'futko-battle',
+    authDomain: 'futko-battle.firebaseapp.com',
+    storageBucket: 'futko-battle.firebasestorage.app',
+  );
 }

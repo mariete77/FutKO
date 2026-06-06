@@ -105,5 +105,5 @@ Clean Architecture in `lib/`, three layers plus shared `core/` and `services/`:
 - **Leftover geography question types.** `QuestionType` (in `domain/entities/question.dart`) still has `area`, `population`, `border`, `river`, `region`, `lake`, `mountain` alongside the football types; they are still referenced in game logic (`_convertToTypeAnswer`). Don't assume the enum is football-only.
 - **`test/widget_test.dart` is the default Flutter counter template** and does not match this app — it will fail if run. There are effectively no working tests and no `integration_test/` directory despite the pubspec dependency.
 - **Duplicate localization files.** Stale copies live in `lib/l10n/*.dart`; the app imports the generated ones from **`lib/l10n/generated/`**. `flutter gen-l10n` writes to `generated/`.
-- **Firebase project ID is still `geoquiz-7790d`** and the Android `applicationId` is the default `com.example.futko` — neither is production-renamed yet.
+- **Firebase project is now `futko-battle`** (configured via `flutterfire configure`; `firebase_options.dart`, `google-services.json` and `firebase.json` all point there). The Android `applicationId`/`namespace` is still the default `com.example.futko` — not production-renamed yet.
 - **App is locked to Spanish** (`locale: const Locale('es')` in `app.dart`); the ARB template is `app_es.arb`, not English.
