@@ -1,7 +1,7 @@
 {
   "@@locale": "es",
 
-  "appTitle": "GeoQuiz Battle",
+  "appTitle": "FutKO Battle",
   "@appTitle": { "description": "App name" },
 
   "loading": "Cargando...",
@@ -154,7 +154,7 @@
   "matchmakingFound": "¡Oponente encontrado!",
   "@matchmakingFound": { "description": "Opponent found" },
 
-  "loginWelcome": "Bienvenido a GeoC",
+  "loginWelcome": "Bienvenido a FutKO",
   "@loginWelcome": { "description": "Login screen welcome" },
 
   "loginSubtitle": "Demuestra tus conocimientos de geografía",

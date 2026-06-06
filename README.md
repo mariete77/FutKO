@@ -1,10 +1,10 @@
-# GeoQuiz Battle 🌍🎮
+# FutKO Battle 🌍🎮
 
 Juego móvil de preguntas 1v1 sobre geografía con partidas de 1 minuto.
 
 ## 📋 Descripción
 
-GeoQuiz Battle es un juego competitivo de geografía donde dos jugadores comparten respondiendo preguntas en tiempo real. Cada partida dura 1 minuto con 10 preguntas de 10 segundos cada una.
+FutKO Battle es un juego competitivo de geografía donde dos jugadores comparten respondiendo preguntas en tiempo real. Cada partida dura 1 minuto con 10 preguntas de 10 segundos cada una.
 
 ### 🎯 Características Principales
 
@@ -32,7 +32,7 @@ GeoQuiz Battle es un juego competitivo de geografía donde dos jugadores compart
 ## 📱 Estructura del Proyecto
 
 ```
-GeoC/
+FutKO/
 ├── lib/                    # Código fuente Flutter
 │   ├── core/              # Constantes, errores, utils, tema
 │   ├── data/              # Models, repositories, datasources
@@ -77,7 +77,7 @@ flutter run
 ### Configuración de Firebase
 
 1. Crear proyecto en Firebase Console: https://console.firebase.google.com
-2. Ejecutar: `flutterfire configure --project=geoquiz-battle`
+2. Ejecutar: `flutterfire configure --project=futko-battle`
 3. Habilitar servicios: Auth, Firestore, Functions, Storage, Realtime Database
 
 ## 🎮 Modos de Juego

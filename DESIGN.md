@@ -1,7 +1,7 @@
 # Design System Document
 
-## 1. Overview & Creative North Star: "GeoC"
-This design system moves away from the sterile, "app-as-a-utility" look to embrace the aesthetic of a **Modern Explorer’s Journal**. Our Creative North Star is **GeoC**: a design language that balances the intellectual rigor of geography with the high-stakes energy of a competitive battle.
+## 1. Overview & Creative North Star: "FutKO"
+This design system moves away from the sterile, "app-as-a-utility" look to embrace the aesthetic of a **Modern Explorer’s Journal**. Our Creative North Star is **FutKO**: a design language that balances the intellectual rigor of geography with the high-stakes energy of a competitive battle.
 
 To achieve a "High-End Editorial" feel, we reject the rigid, centered grids of standard mobile apps. Instead, we use **intentional asymmetry**, **overhanging elements**, and **tonal layering**. This system is designed to feel tactile—like premium heavy-stock paper—while maintaining the fluid speed of a modern digital experience. We prioritize breathing room and high-contrast typography scales to ensure that even in the heat of a "battle," the UI remains an authoritative source of knowledge.
 

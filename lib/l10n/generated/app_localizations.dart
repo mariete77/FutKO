@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// App name
   ///
   /// In es, this message translates to:
-  /// **'GeoQuiz Battle'**
+  /// **'FutKO Battle'**
   String get appTitle;
 
   /// Generic loading text
@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// Login screen welcome
   ///
   /// In es, this message translates to:
-  /// **'Bienvenido a GeoC'**
+  /// **'Bienvenido a FutKO'**
   String get loginWelcome;
 
   /// Login screen subtitle

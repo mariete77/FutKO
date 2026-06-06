@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'GeoQuiz Battle';
+  String get appTitle => 'FutKO Battle';
 
   @override
   String get loading => 'Cargando...';
@@ -162,7 +162,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get matchmakingFound => '¡Oponente encontrado!';
 
   @override
-  String get loginWelcome => 'Bienvenido a GeoC';
+  String get loginWelcome => 'Bienvenido a FutKO';
 
   @override
   String get loginSubtitle => 'Demuestra tus conocimientos de geografía';

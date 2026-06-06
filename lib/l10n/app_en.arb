@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
 
-  "appTitle": "GeoQuiz Battle",
+  "appTitle": "FutKO Battle",
 
   "loading": "Loading...",
 
@@ -101,7 +101,7 @@
 
   "matchmakingFound": "Opponent found!",
 
-  "loginWelcome": "Welcome to GeoC",
+  "loginWelcome": "Welcome to FutKO",
 
   "loginSubtitle": "Show off your geography knowledge",
 
