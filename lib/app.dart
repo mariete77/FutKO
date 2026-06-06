@@ -13,6 +13,7 @@ import 'package:futko/presentation/screens/friends/friends_screen.dart';
 import 'package:futko/presentation/screens/profile/profile_screen.dart';
 import 'package:futko/presentation/screens/settings/settings_screen.dart';
 import 'package:futko/presentation/screens/daily/daily_question_screen.dart';
+import 'package:futko/presentation/screens/rules/rules_screen.dart';
 import 'package:futko/presentation/providers/auth_provider.dart';
 import 'package:futko/presentation/providers/multiplayer_provider.dart';
 import 'package:futko/domain/entities/question.dart';
@@ -136,6 +137,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/daily-question',
         pageBuilder: (context, state) => FutKOTransitions.slideInFromBottom(
           child: const DailyQuestionScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/rules',
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
+          child: const RulesScreen(),
         ),
       ),
     ],

@@ -858,7 +858,7 @@ class HomeScreen extends ConsumerWidget {
               _buildNavItem(
                 icon: Icons.stadium,
                 label: 'Reglas',
-                onTap: () {},
+                onTap: () => context.push('/rules'),
               ),
               _buildNavItem(
                 icon: Icons.style,
