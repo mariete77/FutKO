@@ -1,6 +1,28 @@
 # FutKO — Progreso y Roadmap
 
-> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 04/05/2026.
+> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 06/06/2026.
+
+---
+
+## 🔄 Sesión 2026-06-06 (handoff)
+
+**Hecho hoy (todo en `main`, pusheado):**
+- **Backend migrado a `futko-battle`** (`flutterfire configure`): `firebase_options.dart`, `google-services.json`, `firebase.json` con appId/apiKey correctos. **Desplegado** a futko-battle: `firestore.rules` (+ fix regla `friends`: `contains`→`matches`), `storage.rules` (se cableó en firebase.json) y las **4 Cloud Functions** (runtime subido a **nodejs20**; predeploy hook `npm run build`; cleanup policy de Artifact Registry puesta).
+- **Corre en móvil real** (Redmi Note 8 Pro). Para compilar Android hubo que: subir plugins viejos incompatibles con Flutter 3.41 (v1 embedding eliminado) → `oauth2_client`→4, `purchases_flutter`→8, `sign_in_with_apple`→6; activar **core library desugaring** (flutter_local_notifications); guardar Crashlytics/Messaging solo en móvil (`kIsWeb`) porque crasheaban web.
+- **Bug "las opciones no se veían"** (era multijugador y single): el fork cambió `AnswerOptionsWidget` de un `Column` (GeoC, funcionaba) a un `GridView(childAspectRatio)` que pintaba celdas vacías pese a recibir las opciones correctas. **Fix: vuelto a `Column`.** + test de widget (`test/widgets/answer_options_widget_test.dart`).
+- **Menú inferior "Reglas"** estaba muerto → nueva `RulesScreen` + ruta `/rules`.
+- `flutter analyze` 0 errores · `flutter test` **111 verdes**.
+
+**Entorno Android (este PC):** JDK17 + SDK en `D:\Android\` (C: estaba lleno). Para correr: `flutter run -d <device>` (vars `JAVA_HOME`/`ANDROID_HOME` ya persistentes; si una terminal nueva no las coge, fijar inline). En el móvil hay que tener "Instalar vía USB" (MIUI) activado.
+
+**Pendiente / próximos pasos:**
+- **Imágenes de preguntas** (badge/playerImage/stadium): subir a Storage (`scripts/upload_images.dart`); ahora salen sin imagen. **Solo hay 90 preguntas** sembradas en futko-battle (regla `questions` es `write:false`, hay que sembrar por admin/consola).
+- **Matchmaking** "Partida Rápida" tarda ~60s (timeout `matchmakingTimeoutMs`) antes de caer a ghost/solo — UX mejorable.
+- **Botones muertos**: "PISTA" (hint, `game_screen.dart:670`) y "¿olvidaste contraseña?" (`login_screen.dart:441`) — features sin implementar.
+- `answer_timeline_widget` (resumen fin de partida) parece no renderizar del todo (la "T" cortada) — comparar con GeoC.
+- RevenueCat: faltan API keys reales (`--dart-define`) y productos en stores. `applicationId` sigue `com.example.futko`.
+
+**Técnica clave:** FutKO es fork de **GeoC** (`D:\Repos\GeoC`). Para regresiones, **comparar el archivo equivalente en GeoC** (así se cazó el bug de opciones). Para bugs visuales: `adb screencap` para ver la pantalla real pronto.
 
 ---
 
