@@ -174,6 +174,45 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
                     color: AppColors.onSurface,
                   ),
                 ),
+                if (!widget.isCorrect) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Respuesta: ${widget.correctAnswer}',
+                            style: GoogleFonts.lexend(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

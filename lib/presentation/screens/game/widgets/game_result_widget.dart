@@ -95,15 +95,11 @@ class _GameResultWidgetState extends State<GameResultWidget>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ── Main Result Card ────────────
+                    // â”€â”€ Main Result Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     _buildResultCard(accuracy),
                     const SizedBox(height: 24),
 
-                    // ── Performance Message ─────────
-                    _buildPerformanceMessage(accuracy),
-                    const SizedBox(height: 24),
-
-                    // ── Answer Timeline ─────────────
+                    // â”€â”€ Answer Timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (widget.userAnswers != null)
                       AnswerTimeline(
                         totalQuestions: widget.totalQuestions,
@@ -114,7 +110,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
                       ),
                     if (widget.userAnswers != null) const SizedBox(height: 24),
 
-                    // ── Action Buttons ──────────────
+                    // â”€â”€ Action Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     _buildActionButtons(),
                   ],
                 ),
@@ -146,7 +142,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
       ),
       child: Column(
         children: [
-          // ── Header ──────────────────────
+          // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 32),
@@ -214,7 +210,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
             ),
           ),
 
-          // ── Stats Grid ──────────────────
+          // â”€â”€ Stats Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -266,7 +262,7 @@ class _GameResultWidgetState extends State<GameResultWidget>
             ),
           ),
 
-          // ── ELO Change ──────────────────
+          // â”€â”€ ELO Change â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           if (widget.eloChange != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -347,35 +343,6 @@ class _GameResultWidgetState extends State<GameResultWidget>
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPerformanceMessage(double accuracy) {
-    String message;
-    if (accuracy >= 90) message = '🏆 ¡Eres una leyenda del fútbol!';
-    else if (accuracy >= 80) message = '⚽ ¡Gran partido! ¡Sigue así!';
-    else if (accuracy >= 70) message = '👟 ¡Bien jugado! ¡Cada vez mejor!';
-    else if (accuracy >= 60) message = '💪 ¡Buen esfuerzo! ¡La práctica hace al maestro!';
-    else message = '📚 ¡Sigue entrenando! ¡Cada partido cuenta!';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.05),
-        ),
-      ),
-      child: Text(
-        message,
-        style: GoogleFonts.lexend(
-          color: AppColors.onSurface,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        textAlign: TextAlign.center,
       ),
     );
   }

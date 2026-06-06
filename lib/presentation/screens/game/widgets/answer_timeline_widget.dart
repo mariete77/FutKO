@@ -93,10 +93,24 @@ class AnswerTimeline extends StatelessWidget {
           );
         }
 
+        if (!hasOpponent) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildPlayerHeader(
+                name: playerName,
+                answers: playerAnswers.length,
+                isPrimary: true,
+              ),
+              const SizedBox(height: 16),
+              _buildLegend(),
+            ],
+          );
+        }
+
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Player section - Left aligned
             Expanded(
               flex: 3,
               child: _buildPlayerHeader(
@@ -105,43 +119,33 @@ class AnswerTimeline extends StatelessWidget {
                 isPrimary: true,
               ),
             ),
-
-            // VS section - For multiplayer
-            if (hasOpponent) ...[
-              const SizedBox(width: 16),
-              // VS indicator - Glassmorphism
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'VS',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.onSurface,
-                    letterSpacing: 2,
-                  ),
+            const SizedBox(width: 16),
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'VS',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.onSurface,
+                  letterSpacing: 2,
                 ),
               ),
-              const SizedBox(width: 16),
-
-              // Opponent section
-              Expanded(
-                flex: 3,
-                child: _buildPlayerHeader(
-                  name: opponentName!,
-                  answers: opponentAnswers!.length,
-                  isPrimary: false,
-                ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 3,
+              child: _buildPlayerHeader(
+                name: opponentName!,
+                answers: opponentAnswers!.length,
+                isPrimary: false,
               ),
-            ] else ...[
-               const Spacer(),
-               _buildLegend(),
-            ],
+            ),
           ],
         );
       },

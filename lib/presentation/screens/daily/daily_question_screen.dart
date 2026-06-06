@@ -126,16 +126,41 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
     Color bgColor = AppColors.surfaceContainerHigh;
     Color borderColor = AppColors.outlineVariant.withOpacity(0.3);
     Color textColor = AppColors.onSurface;
+    List<BoxShadow> boxShadow = [];
 
     if (_answered) {
       if (showCorrect) {
-        bgColor = Colors.green.withOpacity(0.2);
-        borderColor = Colors.green;
-        textColor = Colors.green;
+        bgColor = Colors.green.withOpacity(0.15);
+        borderColor = Colors.greenAccent;
+        textColor = Colors.greenAccent;
+        boxShadow = [
+          BoxShadow(
+            color: Colors.greenAccent.withOpacity(0.6),
+            blurRadius: 16,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 30,
+            spreadRadius: 4,
+          ),
+        ];
       } else if (isSelected && !_isCorrect) {
-        bgColor = Colors.red.withOpacity(0.2);
-        borderColor = Colors.red;
-        textColor = Colors.red;
+        bgColor = Colors.red.withOpacity(0.15);
+        borderColor = Colors.redAccent;
+        textColor = Colors.redAccent;
+        boxShadow = [
+          BoxShadow(
+            color: Colors.redAccent.withOpacity(0.6),
+            blurRadius: 16,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.red.withOpacity(0.3),
+            blurRadius: 30,
+            spreadRadius: 4,
+          ),
+        ];
       }
     } else if (isSelected) {
       bgColor = AppColors.primary.withOpacity(0.1);
@@ -143,7 +168,7 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
     }
 
     return Material(
-      color: bgColor,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -151,8 +176,10 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
+            color: bgColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: borderColor, width: 2),
+            boxShadow: boxShadow.isNotEmpty ? boxShadow : null,
           ),
           child: Text(
             option,
