@@ -562,14 +562,14 @@ class HomeScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         _buildModeCard(
           context,
-          title: 'Entrenamiento',
-          subtitle: 'Perfecciona tus tiros y estrategias.',
-          icon: Icons.fitness_center,
+          title: 'Pregunta del Día',
+          subtitle: 'Responde la pregunta diaria y gana puntos extra.',
+          icon: Icons.calendar_today,
           iconBgColor: AppColors.surfaceContainerHighest,
           iconColor: AppColors.primary,
           cardColor: AppColors.surfaceContainerHigh,
           borderColor: Colors.white.withOpacity(0.06),
-          onTap: () => context.go('/matchmaking/ghostRun'),
+          onTap: () => context.go('/daily-question'),
         ),
       ],
     );

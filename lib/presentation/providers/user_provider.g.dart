@@ -44,7 +44,7 @@ final dailyGamesStatusProvider = AutoDisposeProvider<DailyGamesStatus>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DailyGamesStatusRef = AutoDisposeProviderRef<DailyGamesStatus>;
-String _$userNotifierHash() => r'81da986389bfe6a628080e6cd1caec5e9fa112bb';
+String _$userNotifierHash() => r'1f9648f4c3ed926dd6573ce409d24dcbfb6c1f41';
 
 /// Current user profile provider
 ///

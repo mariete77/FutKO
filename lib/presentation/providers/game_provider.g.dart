@@ -107,7 +107,7 @@ final timerProgressProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TimerProgressRef = AutoDisposeProviderRef<double>;
-String _$gameNotifierHash() => r'c3f82f982fadbc39be5b745c2f125c0519f0e041';
+String _$gameNotifierHash() => r'61f7edcbd954026cf5cbbadb7b0048388f7e0ff1';
 
 /// Game provider
 ///
