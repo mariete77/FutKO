@@ -41,14 +41,14 @@
 **Aceptación:** una partida muestra imágenes reales en preguntas `badge`/`stadium`/`playerImage`; los distractores son coherentes.
 **Dependencias:** subir a Storage requiere que Storage esté activado en la consola Firebase (acción del usuario).
 
-### 🔲 C3 — Monetización (RevenueCat) · 🟡 P1 · Estado: LIBRE
+### ✅ C3 — Monetización (RevenueCat) · 🟡 P1 · Estado: ✅ OpenCode
 **Por qué:** API key placeholder; sin productos/entitlements; gating por plan parcial.
 **Alcance:** `lib/services/revenuecat_service.dart`, `lib/presentation/providers/subscription_provider.dart`, `lib/presentation/screens/home/widgets/subscription_modal.dart`. (Init en arranque: coordinar `main.dart` con el orquestador.)
 **Tareas:**
-- [ ] Sustituir `_apiKey = 'YOUR_REVENUECAT_API_KEY'` (`revenuecat_service.dart:4`) por config real **por plataforma vía `--dart-define`** (no hardcode).
-- [ ] Configurar offering + entitlement `premium`; conectar compra/restore reales.
-- [ ] Aplicar **gating por plan** en los modos (hoy parcial). El límite diario ya existe en `user_provider.dart` / `home_screen.dart:546`.
-- [ ] Llamar a `subscription.initialize()` + `setUserId(uid)` tras el login.
+- [x] Sustituir `_apiKey = 'YOUR_REVENUECAT_API_KEY'` (`revenuecat_service.dart:4`) por config real **por plataforma vía `--dart-define`** (no hardcode).
+- [x] Configurar offering + entitlement `premium`; conectar compra/restore reales.
+- [x] Aplicar **gating por plan** en los modos (hoy parcial). El límite diario ya existe en `user_provider.dart` / `home_screen.dart:546`.
+- [x] Llamar a `subscription.initialize()` + `setUserId(uid)` tras el login.
 **Aceptación:** compra en sandbox funciona; `isPremium` refleja la compra; modos premium bloqueados para free.
 **Dependencias:** cuenta RevenueCat + productos en las stores (acción del usuario).
 
