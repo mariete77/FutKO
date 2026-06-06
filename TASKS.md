@@ -72,7 +72,7 @@
 - [x] Push de **invitaciones de amigos**: Cloud Function `onFriendRequest` (trigger `onUpdate` de `users/{id}` → FCM a `fcmTokens` al detectar nuevo `pending_requests`). _Aviso de turno: N/A — los ghost runs son carrera contra grabación, no hay modelo de turnos._
 - [x] Instrumentar **Analytics**: `game_started`, `question_answered`, `match_finished` (en `game_provider`) + `purchase_initiated` (en `subscription_modal`).
 **Aceptación:** un crash forzado aparece en Crashlytics; el dispositivo recibe una push de prueba; eventos visibles en DebugView. _(verificación en dispositivo + deploy de functions: acción del usuario)._
-**Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador. ⚠️ `firebase.json` **no tiene predeploy hook**: hay que correr `npm --prefix functions run build` antes de `firebase deploy --only functions` (afecta también a las funciones de C1).
+**Dependencias:** `main.dart` (hot file) — coordinar el orden de init con el orquestador. `firebase.json` ya tiene predeploy hook (`npm run build`), así que `firebase deploy --only functions` compila el TS automáticamente.
 
 ### 🔄 C6 — Testing · 🟢 P2 · Estado: 🔄 unit tests hechos; faltan widget tests
 **Por qué:** 0 tests reales; `widget_test.dart` es el template roto.
