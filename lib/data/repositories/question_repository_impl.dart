@@ -229,14 +229,21 @@ class QuestionRepositoryImpl implements QuestionRepository {
       return question;
     }
 
-    // Types that should always be multiple choice (comparison + image-based questions)
+    // El seeder crea TODAS las preguntas con options vacías y delega en este
+    // método la generación de opciones. La conversión a type-answer la decide
+    // luego _convertToTypeAnswer (30% aleatorio), así que aquí generamos
+    // opciones para todos los tipos sembrados.
     final multipleChoiceTypes = {
-      QuestionType.statistic,
-      QuestionType.transfer,
-      // Image-based: always generate real distractors
+      QuestionType.player,
+      QuestionType.team,
+      QuestionType.competition,
+      QuestionType.history,
+      QuestionType.rules,
+      QuestionType.stadium,
       QuestionType.badge,
       QuestionType.playerImage,
-      QuestionType.stadium,
+      QuestionType.statistic,
+      QuestionType.transfer,
     };
 
     // If it's not a multiple-choice type and has no options, leave as type-answer
