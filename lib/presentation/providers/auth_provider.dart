@@ -5,6 +5,7 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../core/errors/failures.dart';
 import '../../core/constants/gitea_constants.dart';
+import '../../services/revenuecat_service.dart';
 
 part 'auth_provider.g.dart';
 
@@ -35,7 +36,12 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await ref.read(authRepositoryProvider).signInWithGoogle();
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (user) => AsyncValue.data(user),
+      (user) {
+        if (user != null) {
+          RevenueCatService.setUserId(user.uid);
+        }
+        return AsyncValue.data(user);
+      },
     );
   }
 
@@ -45,7 +51,12 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await ref.read(authRepositoryProvider).signInWithApple();
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (user) => AsyncValue.data(user),
+      (user) {
+        if (user != null) {
+          RevenueCatService.setUserId(user.uid);
+        }
+        return AsyncValue.data(user);
+      },
     );
   }
 
@@ -55,7 +66,12 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await ref.read(authRepositoryProvider).signInWithEmail(email, password);
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (user) => AsyncValue.data(user),
+      (user) {
+        if (user != null) {
+          RevenueCatService.setUserId(user.uid);
+        }
+        return AsyncValue.data(user);
+      },
     );
   }
 
@@ -65,7 +81,12 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await ref.read(authRepositoryProvider).signUpWithEmail(email, password, displayName);
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (user) => AsyncValue.data(user),
+      (user) {
+        if (user != null) {
+          RevenueCatService.setUserId(user.uid);
+        }
+        return AsyncValue.data(user);
+      },
     );
   }
 
@@ -79,7 +100,12 @@ class AuthNotifier extends _$AuthNotifier {
     final result = await ref.read(authRepositoryProvider).signInWithGitea(context);
     state = result.fold(
       (failure) => AsyncValue.error(failure, StackTrace.current),
-      (user) => AsyncValue.data(user),
+      (user) {
+        if (user != null) {
+          RevenueCatService.setUserId(user.uid);
+        }
+        return AsyncValue.data(user);
+      },
     );
   }
 

@@ -1,16 +1,28 @@
+import 'dart:io';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class RevenueCatService {
-  static const String _apiKey = 'YOUR_REVENUECAT_API_KEY';
+  static const String _apiKeyAndroid = String.fromEnvironment(
+    'REVENUECAT_API_KEY_ANDROID',
+    defaultValue: '',
+  );
+  static const String _apiKeyIos = String.fromEnvironment(
+    'REVENUECAT_API_KEY_IOS',
+    defaultValue: '',
+  );
 
   static bool _initialized = false;
 
   static Future<void> initialize() async {
     if (_initialized) return;
 
-    await Purchases.setLogLevel(LogLevel.debug);
-    final configuration = PurchasesConfiguration(_apiKey);
+    final apiKey = Platform.isAndroid ? _apiKeyAndroid : _apiKeyIos;
+    if (apiKey.isEmpty) {
+      throw Exception('RevenueCat API key not configured for current platform');
+    }
 
+    await Purchases.setLogLevel(LogLevel.debug);
+    final configuration = PurchasesConfiguration(apiKey);
     await Purchases.configure(configuration);
     _initialized = true;
   }
@@ -56,10 +68,5 @@ class RevenueCatService {
     } catch (e) {
       // Log error but don't crash
     }
-  }
-
-  static void setApiKey(String apiKey) {
-    // This is a no-op since API key is set at configure time
-    // This method exists for future runtime configuration
   }
 }

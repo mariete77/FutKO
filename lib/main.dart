@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'app.dart';
 import 'services/crashlytics_service.dart';
 import 'services/messaging_service.dart';
+import 'services/revenuecat_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,12 @@ void main() async {
 
   await CrashlyticsService.initialize();
   await MessagingService.instance.initialize();
+
+  try {
+    await RevenueCatService.initialize();
+  } catch (e) {
+    debugPrint('RevenueCat init failed: $e');
+  }
 
   runApp(
     const ProviderScope(

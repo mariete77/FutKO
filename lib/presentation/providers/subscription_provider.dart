@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:futko/services/revenuecat_service.dart';
+import 'package:futko/data/repositories/user_repository_impl.dart';
 
 enum SubscriptionStatus { unknown, loading, free, premium, error }
 
@@ -43,6 +45,9 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = const SubscriptionState(status: SubscriptionStatus.loading);
     try {
       final success = await RevenueCatService.purchasePackage(package);
+      if (success) {
+        await _syncSubscriptionToFirestore(true);
+      }
       state = SubscriptionState(
         status: success ? SubscriptionStatus.premium : SubscriptionStatus.free,
       );
@@ -60,6 +65,9 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = const SubscriptionState(status: SubscriptionStatus.loading);
     try {
       final success = await RevenueCatService.restorePurchases();
+      if (success) {
+        await _syncSubscriptionToFirestore(true);
+      }
       state = SubscriptionState(
         status: success ? SubscriptionStatus.premium : SubscriptionStatus.free,
       );
@@ -76,5 +84,18 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   void setUserId(String userId) {
     RevenueCatService.setUserId(userId);
     initialize();
+  }
+
+  Future<void> _syncSubscriptionToFirestore(bool isPremium) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final repo = UserRepositoryImpl();
+    await repo.updateSubscription(
+      user.uid,
+      isPremium ? 'premium' : 'free',
+      isPremium,
+      null,
+    );
   }
 }
