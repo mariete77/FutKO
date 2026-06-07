@@ -57,12 +57,14 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
 
+      // The toggle is the last enabled TextButton (the forgot-password link
+      // precedes it in sign-in mode).
       final toggleButton = find.byWidgetPredicate(
         (widget) => widget is TextButton && widget.onPressed != null,
       );
-      await tester.ensureVisible(toggleButton.first);
+      await tester.ensureVisible(toggleButton.last);
       await tester.pumpAndSettle();
-      await tester.tap(toggleButton.first);
+      await tester.tap(toggleButton.last);
       await tester.pumpAndSettle();
 
       expect(find.byType(TextFormField), findsNWidgets(3));
@@ -110,14 +112,47 @@ void main() {
 
       expect(find.text('GOOGLE'), findsOneWidget);
       expect(find.text('APPLE ID'), findsOneWidget);
-      expect(find.text('GITEA'), findsOneWidget);
+      expect(find.text('GITEA'), findsNothing);
     });
 
-    testWidgets('renders pro tip section', (tester) async {
+    testWidgets('renders forgot password link', (tester) async {
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('CONSEJO PRO'), findsOneWidget);
+      expect(find.text('¿Olvidaste la contraseña?'), findsOneWidget);
+    });
+
+    testWidgets('forgot password without email shows a hint', (tester) async {
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('¿Olvidaste la contraseña?'));
+      await tester.tap(find.text('¿Olvidaste la contraseña?'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.textContaining('Escribe tu email'), findsOneWidget);
+    });
+
+    testWidgets('forgot password with email shows confirmation', (tester) async {
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+          find.byType(TextFormField).at(0), 'manager@futko.com');
+      await tester.ensureVisible(find.text('¿Olvidaste la contraseña?'));
+      await tester.tap(find.text('¿Olvidaste la contraseña?'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.textContaining('Te enviamos un correo'), findsOneWidget);
+    });
+
+    testWidgets('does not render pro tip section', (tester) async {
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.text('CONSEJO PRO'), findsNothing);
     });
   });
 }
@@ -137,6 +172,9 @@ class _MockAuthNotifier extends AuthNotifier {
 
   @override
   Future<void> signUpWithEmail(String email, String password, String displayName) async {}
+
+  @override
+  Future<String?> sendPasswordReset(String email) async => null;
 
   @override
   Future<void> signInWithGitea(context) async {}

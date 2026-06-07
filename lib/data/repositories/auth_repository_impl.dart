@@ -114,6 +114,18 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> sendPasswordReset(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return const Right(null);
+    } on firebase.FirebaseAuthException catch (e) {
+      return Left(AuthFailure(_mapFirebaseAuthError(e.code)));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
   String _mapFirebaseAuthError(String code) {
     switch (code) {
       case 'user-not-found':

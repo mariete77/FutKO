@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/background_video.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/constants/gitea_constants.dart';
 
 /// Login screen — "PantallaLogin" mockup.
 /// Stadium atmosphere with grass texture, glassmorphism card, gradient CTA.
@@ -47,6 +46,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _passwordController.text,
           );
     }
+  }
+
+  Future<void> _sendPasswordReset() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      _showSnack('Escribe tu email arriba para enviarte el enlace de recuperación');
+      return;
+    }
+    final error =
+        await ref.read(authNotifierProvider.notifier).sendPasswordReset(email);
+    if (!mounted) return;
+    _showSnack(
+      error ?? 'Te enviamos un correo a $email para restablecer tu contraseña',
+    );
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -94,10 +113,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       MediaQuery.of(context).padding.vertical -
                       64,
                 ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    children: [
-                      const Spacer(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
 
                       // ── Brand Section ─────────────────
                       Column(
@@ -258,6 +276,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                                     // ── Kick Off Button ──
                                     _buildKickOffButton(authState),
+
+                                    // Forgot password (sign-in only)
+                                    if (!_isSignUp)
+                                      TextButton(
+                                        onPressed: authState.isLoading
+                                            ? null
+                                            : _sendPasswordReset,
+                                        child: Text(
+                                          '¿Olvidaste la contraseña?',
+                                          style: GoogleFonts.lexend(
+                                            fontSize: 13,
+                                            color: AppColors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
                                     const SizedBox(height: 20),
 
                                     // Toggle sign up / sign in
@@ -327,14 +360,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        _buildSocialButton(
-                          icon: Icons.code,
-                          label: 'GITEA',
-                          onTap: () => ref
-                              .read(authNotifierProvider.notifier)
-                              .signInWithGitea(GiteaAppContext.mobile),
-                        ),
                         const SizedBox(height: 24),
                       ],
 
@@ -346,63 +371,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
 
-                      // ── Pro Tip ───────────────────────
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryContainer.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.primary.withOpacity(0.15),
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'CONSEJO PRO',
-                                    style: GoogleFonts.lexend(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Asegura las credenciales de tu equipo. Los campeones nunca dejan su portería indefensa.',
-                                    style: GoogleFonts.lexend(
-                                      fontSize: 12,
-                                      color: AppColors.onPrimaryContainer,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
                       // Error
                       if (authState.hasError) ...[
                         const SizedBox(height: 16),
                         _buildErrorCard(authState.error!),
                       ],
 
-                      const Spacer(),
                     ],
                   ),
-                ),
               ),
             ),
           ),
@@ -435,25 +411,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 color: AppColors.onSurface.withOpacity(0.7),
               ),
             ),
-            if (label == 'PASSWORD') ...[
-              const Spacer(),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  '¿OLVIDASTE?',
-                  style: GoogleFonts.lexend(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.secondaryFixed,
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
         const SizedBox(height: 8),

@@ -20,6 +20,9 @@ abstract class AuthRepository {
   /// Sign up with email and password
   Future<Either<Failure, User>> signUpWithEmail(String email, String password, String displayName);
 
+  /// Send a password reset email to [email]
+  Future<Either<Failure, void>> sendPasswordReset(String email);
+
   /// Sign in with Gitea OAuth2 / OIDC
   Future<Either<Failure, User>> signInWithGitea(GiteaAppContext context);
 

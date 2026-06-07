@@ -90,6 +90,16 @@ class AuthNotifier extends _$AuthNotifier {
     );
   }
 
+  /// Send a password reset email.
+  /// Returns null on success, or a user-facing error message on failure.
+  Future<String?> sendPasswordReset(String email) async {
+    final result = await ref.read(authRepositoryProvider).sendPasswordReset(email);
+    return result.fold(
+      (failure) => failure.message,
+      (_) => null,
+    );
+  }
+
   /// Sign in with Gitea OAuth2 / OIDC
   ///
   /// [context] determines which Gitea OAuth2 application to use:
