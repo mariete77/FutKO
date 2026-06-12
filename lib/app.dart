@@ -7,6 +7,7 @@ import 'package:futko/presentation/screens/home/home_screen.dart';
 import 'package:futko/presentation/screens/game/game_screen.dart';
 import 'package:futko/presentation/screens/multiplayer/matchmaking_screen.dart';
 import 'package:futko/presentation/screens/multiplayer/multiplayer_game_screen.dart';
+import 'package:futko/presentation/screens/multiplayer/multiplayer_vs_screen.dart';
 import 'package:futko/presentation/screens/home/leaderboard_screen.dart';
 import 'package:futko/presentation/screens/history/match_history_screen.dart';
 import 'package:futko/presentation/screens/friends/friends_screen.dart';
@@ -93,6 +94,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: MatchmakingScreen(mode: mode),
           );
         },
+      ),
+      GoRoute(
+        path: '/multiplayer-vs',
+        pageBuilder: (context, state) => FutKOTransitions.slideInFromBottom(
+          child: const MultiplayerVsScreen(),
+        ),
       ),
       GoRoute(
         path: '/leaderboard',

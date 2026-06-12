@@ -80,7 +80,17 @@ class SettingsScreen extends ConsumerWidget {
           // ── Preferencias ────────────────────────────────────
           _sectionLabel('Preferencias'),
           _card(
-            child: _infoRow(Icons.language_outlined, 'Idioma', 'Español'),
+            child: InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Más idiomas próximamente'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: _infoRow(Icons.language_outlined, 'Idioma', 'Español'),
+            ),
           ),
           const SizedBox(height: 24),
 

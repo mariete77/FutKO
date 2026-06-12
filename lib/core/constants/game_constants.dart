@@ -27,10 +27,6 @@ class GameConstants {
   static const int matchmakingTimeoutMs = 60000; // 60 seconds
   static const int matchmakingCleanupIntervalMs = 60000; // 1 minute
 
-  // Ghost Runs
-  static const int maxGhostRunsPerUser = 5;
-  static const int ghostRunEloRange = 200;
-
   // Question Types
   static const int totalQuestionTypes = 10; // player, team, competition, history, rules, stadium, badge, playerImage, statistic, transfer
   static const int optionsPerQuestion = 4;

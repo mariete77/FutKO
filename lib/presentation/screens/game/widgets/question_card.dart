@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:futko/domain/entities/question.dart';
@@ -52,6 +52,22 @@ class QuestionCard extends StatelessWidget {
         return _buildStatisticQuestion();
       case QuestionType.transfer:
         return _buildTransferQuestion();
+      case QuestionType.champion:
+        return _buildChampionQuestion();
+      case QuestionType.topScorer:
+        return _buildTopScorerQuestion();
+      case QuestionType.award:
+        return _buildAwardQuestion();
+      case QuestionType.coach:
+        return _buildCoachQuestion();
+      case QuestionType.derby:
+        return _buildDerbyQuestion();
+      case QuestionType.nickname:
+        return _buildNicknameQuestion();
+      case QuestionType.nationalTeam:
+        return _buildNationalTeamQuestion();
+      case QuestionType.kit:
+        return _buildKitQuestion();
     }
   }
 
@@ -200,6 +216,70 @@ class QuestionCard extends StatelessWidget {
       icon: Icons.swap_horiz,
       defaultQuestion: '¿A qué equipo fue transferido?',
       iconColor: AppColors.secondary,
+    );
+  }
+
+  Widget _buildChampionQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.emoji_events,
+      defaultQuestion: '¿Quién se llevó el título?',
+      iconColor: AppColors.secondary,
+    );
+  }
+
+  Widget _buildTopScorerQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.sports_soccer,
+      defaultQuestion: '¿Quién fue el máximo goleador?',
+      iconColor: AppColors.primary,
+    );
+  }
+
+  Widget _buildAwardQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.emoji_events,
+      defaultQuestion: '¿Quién ganó este premio?',
+      iconColor: AppColors.secondary,
+    );
+  }
+
+  Widget _buildCoachQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.people_alt,
+      defaultQuestion: '¿Qué entrenador es?',
+      iconColor: AppColors.tertiary,
+    );
+  }
+
+  Widget _buildDerbyQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.sports_kabaddi,
+      defaultQuestion: '¿Qué derbi es?',
+      iconColor: AppColors.primary,
+    );
+  }
+
+  Widget _buildNicknameQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.tag,
+      defaultQuestion: '¿Cuál es el apodo?',
+      iconColor: AppColors.secondary,
+    );
+  }
+
+  Widget _buildNationalTeamQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.flag,
+      defaultQuestion: '¿Qué selección es?',
+      iconColor: AppColors.tertiary,
+    );
+  }
+
+  Widget _buildKitQuestion() {
+    return _buildGenericQuestion(
+      icon: Icons.palette,
+      defaultQuestion: '¿De qué color viste?',
+      iconColor: AppColors.primary,
     );
   }
 

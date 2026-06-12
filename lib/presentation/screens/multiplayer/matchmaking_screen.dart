@@ -53,7 +53,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
     // Listen for state changes and navigate
     ref.listen<MultiplayerState>(multiplayerProvider, (prev, next) {
       if (next.status == MultiplayerStatus.found) {
-        // Show opponent found animation briefly, then game starts
+        context.go('/multiplayer-vs');
       }
       if (next.status == MultiplayerStatus.playing) {
         context.go('/multiplayer-game');
@@ -66,18 +66,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
           ),
         );
       }
-      // Show message when falling back to ghost run
-      if (next.mode == MultiplayerMode.ghostRun &&
-          prev?.mode != MultiplayerMode.ghostRun &&
-          next.status == MultiplayerStatus.found) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se encontraron oponentes. ¡Modo Ghost Run!'),
-            backgroundColor: AppColors.tertiary,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
+
     });
 
     return PopScope(
@@ -281,8 +270,7 @@ class _MatchmakingScreenState extends ConsumerState<MatchmakingScreen>
         return 'Partida Casual';
       case MultiplayerMode.ranked:
         return 'Partida Clasificatoria';
-      case MultiplayerMode.ghostRun:
-        return 'Carrera Fantasma';
+
       case MultiplayerMode.friendChallenge:
         return 'Reto de Amigo';
     }

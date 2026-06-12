@@ -10,6 +10,7 @@ class AnswerFeedbackWidget extends StatefulWidget {
   final String correctAnswer;
   final String selectedAnswer;
   final int score;
+  final int streak;
   final Question? question;
   final VoidCallback? onNextQuestion;
 
@@ -19,6 +20,7 @@ class AnswerFeedbackWidget extends StatefulWidget {
     required this.correctAnswer,
     required this.selectedAnswer,
     required this.score,
+    required this.streak,
     this.question,
     this.onNextQuestion,
   });
@@ -234,7 +236,7 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
                 Expanded(
                   child: _buildStatCard(
                     label: 'Racha',
-                    value: widget.isCorrect ? '5x' : '0x',
+                    value: '${widget.streak}x',
                     icon: Icons.local_fire_department,
                     iconColor: AppColors.tertiary,
                   ),

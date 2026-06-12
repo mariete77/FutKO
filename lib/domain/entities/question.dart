@@ -12,6 +12,14 @@ enum QuestionType {
   playerImage,  // Identify player from photo
   statistic,    // Statistical records (top scorers, appearances)
   transfer,     // Transfer history questions
+  champion,     // Title winners (World Cup, Euro, Champions/Europa League, leagues)
+  topScorer,    // League top scorer by season
+  award,        // Individual awards (Ballon d'Or, Golden Boot, etc.)
+  coach,        // Manager/coach questions
+  derby,        // Derby and rivalry questions
+  nickname,     // Team nickname questions
+  nationalTeam, // National team questions
+  kit,          // Team kit/colors questions
 }
 
 /// Question difficulty

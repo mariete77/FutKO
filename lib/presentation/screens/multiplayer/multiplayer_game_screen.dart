@@ -291,17 +291,9 @@ class MultiplayerGameScreen extends ConsumerWidget {
             }
           })();
 
-    // Convert ghost answers to Answer for display in timeline
+    // Use opponent answers for timeline
     List<Answer>? opponentAnswersForTimeline;
-    if (state.ghostRun != null && state.opponentAnswers == null) {
-      opponentAnswersForTimeline = state.ghostRun!.answers.map((ga) => Answer(
-        questionIndex: ga.questionIndex,
-        selectedAnswer: '',
-        isCorrect: ga.isCorrect,
-        timeMs: ga.timeMs,
-        answeredAt: DateTime.now(),
-      )).toList();
-    } else if (state.opponentAnswers != null) {
+    if (state.opponentAnswers != null) {
       opponentAnswersForTimeline = state.opponentAnswers;
     }
 
@@ -349,8 +341,13 @@ class MultiplayerGameScreen extends ConsumerWidget {
         }
       } : null,
       onPlayAgain: () {
+        final mode = state.mode;
         ref.read(multiplayerProvider.notifier).reset();
-        context.go('/home');
+        if (mode == MultiplayerMode.friendChallenge) {
+          context.go('/home');
+        } else {
+          context.go('/matchmaking/${mode.name}');
+        }
       },
       onGoHome: () {
         ref.read(multiplayerProvider.notifier).reset();

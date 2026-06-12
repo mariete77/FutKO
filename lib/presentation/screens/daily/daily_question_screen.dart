@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../providers/daily_question_provider.dart';
+import '../../../domain/entities/question.dart';
 
 class DailyQuestionScreen extends ConsumerStatefulWidget {
   const DailyQuestionScreen({super.key});
@@ -130,33 +134,33 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
 
     if (_answered) {
       if (showCorrect) {
-        bgColor = Colors.green.withOpacity(0.15);
-        borderColor = Colors.greenAccent;
-        textColor = Colors.greenAccent;
+        bgColor = AppColors.success.withOpacity(0.15);
+        borderColor = AppColors.success;
+        textColor = AppColors.success;
         boxShadow = [
           BoxShadow(
-            color: Colors.greenAccent.withOpacity(0.6),
+            color: AppColors.success.withOpacity(0.6),
             blurRadius: 16,
             spreadRadius: 2,
           ),
           BoxShadow(
-            color: Colors.green.withOpacity(0.3),
+            color: AppColors.success.withOpacity(0.3),
             blurRadius: 30,
             spreadRadius: 4,
           ),
         ];
       } else if (isSelected && !_isCorrect) {
-        bgColor = Colors.red.withOpacity(0.15);
-        borderColor = Colors.redAccent;
-        textColor = Colors.redAccent;
+        bgColor = AppColors.error.withOpacity(0.15);
+        borderColor = AppColors.error;
+        textColor = AppColors.error;
         boxShadow = [
           BoxShadow(
-            color: Colors.redAccent.withOpacity(0.6),
+            color: AppColors.error.withOpacity(0.6),
             blurRadius: 16,
             spreadRadius: 2,
           ),
           BoxShadow(
-            color: Colors.red.withOpacity(0.3),
+            color: AppColors.error.withOpacity(0.3),
             blurRadius: 30,
             spreadRadius: 4,
           ),
@@ -200,11 +204,33 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
       _answered = true;
       _isCorrect = option == correctAnswer;
     });
-
+    _saveDailyAnswer(option, correctAnswer);
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      if (mounted) { Navigator.pop(context); }
     });
+  }
+
+  Future<void> _saveDailyAnswer(String selectedAnswer, String correctAnswer) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final questionAsync = ref.read(dailyQuestionProvider);
+      final question = questionAsync.valueOrNull;
+      if (question == null) return;
+      final now = DateTime.now();
+      final todayKey = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      await FirebaseFirestore.instance
+          .collection('users').doc(user.uid)
+          .collection('dailyAnswers').doc(todayKey)
+          .set({
+        'questionId': question.id,
+        'selectedAnswer': selectedAnswer,
+        'correctAnswer': correctAnswer,
+        'isCorrect': _isCorrect,
+        'answeredAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(e, st);
+    }
   }
 }

@@ -244,6 +244,8 @@ class QuestionRepositoryImpl implements QuestionRepository {
       QuestionType.playerImage,
       QuestionType.statistic,
       QuestionType.transfer,
+      QuestionType.champion,
+      QuestionType.topScorer,
     };
 
     // If it's not a multiple-choice type and has no options, leave as type-answer

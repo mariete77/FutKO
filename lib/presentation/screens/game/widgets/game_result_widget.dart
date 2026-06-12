@@ -396,6 +396,33 @@ class _GameResultWidgetState extends State<GameResultWidget>
         ),
         const SizedBox(height: 12),
 
+        // Add Friend button (multiplayer)
+        if (widget.onAddFriend != null) ...[
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton.icon(
+              onPressed: widget.onAddFriend,
+              icon: const Icon(Icons.person_add),
+              label: Text(
+                'Anadir Amigo',
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: BorderSide(color: AppColors.primary.withOpacity(0.5)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // Go Home
         SizedBox(
           width: double.infinity,

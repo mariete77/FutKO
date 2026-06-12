@@ -14,11 +14,41 @@ import 'package:intl/intl.dart';
 
 /// Home screen — "PantallaPrincipal" mockup.
 /// Stadium atmosphere with top app bar, player stats, game modes, bottom nav.
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with TickerProviderStateMixin {
+  late final AnimationController _ballSpinController;
+  late final AnimationController _trophyController;
+
+  @override
+  void initState() {
+    super.initState();
+    _ballSpinController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+
+    _trophyController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ballSpinController.dispose();
+    _trophyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final currentUser = ref.watch(currentUserProvider);
     final userState = ref.watch(userNotifierProvider);
     final dailyGames = ref.watch(dailyGamesStatusProvider);
@@ -408,7 +438,7 @@ class HomeScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(9999),
                             ),
                             child: Text(
-                               'Liga Pro'.toUpperCase(),
+                               displayUser.rank.name.toUpperCase(),
                               style: GoogleFonts.lexend(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
@@ -536,7 +566,7 @@ class HomeScreen extends ConsumerWidget {
           context,
           title: 'Partida Rápida',
           subtitle: 'Salta directo a la acción contra otros jugadores.',
-          icon: Icons.bolt,
+          icon: Icons.sports_soccer,
           iconBgColor: AppColors.yellow500,
           iconColor: AppColors.emerald950,
           cardColor: AppColors.emerald900,
@@ -544,6 +574,32 @@ class HomeScreen extends ConsumerWidget {
           onTap: dailyGames.canPlayCasual
               ? () => context.go('/game/easy')
               : null,
+          customIcon: AnimatedBuilder(
+            animation: _ballSpinController,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.yellow500,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.yellow500.withOpacity(0.3),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: Transform.rotate(
+                  angle: _ballSpinController.value * 6.28,
+                  child: const Icon(
+                    Icons.sports_soccer,
+                    size: 28,
+                    color: AppColors.emerald950,
+                  ),
+                ),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 12),
         _buildModeCard(
@@ -558,6 +614,34 @@ class HomeScreen extends ConsumerWidget {
           onTap: dailyGames.canPlayRanked
               ? () => context.go('/matchmaking/ranked')
               : null,
+          customIcon: AnimatedBuilder(
+            animation: _trophyController,
+            builder: (context, child) {
+              final glow = 0.3 + (_trophyController.value * 0.5);
+              final scale = 0.85 + (_trophyController.value * 0.15);
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.yellow500.withOpacity(glow),
+                      blurRadius: 12 + (_trophyController.value * 12),
+                      spreadRadius: 1 + (_trophyController.value * 2),
+                    ),
+                  ],
+                ),
+                child: Transform.scale(
+                  scale: scale,
+                  child: const Icon(
+                    Icons.emoji_events,
+                    size: 28,
+                    color: AppColors.yellow500,
+                  ),
+                ),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 12),
         _buildModeCard(
@@ -586,6 +670,7 @@ class HomeScreen extends ConsumerWidget {
     Color? glowColor,
     Color? borderColor,
     VoidCallback? onTap,
+    Widget? customIcon,
   }) {
     return Material(
       color: cardColor,
@@ -611,27 +696,26 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: glowColor != null
-                        ? [
-                            BoxShadow(
-                              color: AppColors.yellow500.withOpacity(0.3),
-                              blurRadius: 15,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 28,
-                    color: iconColor,
-                  ),
+                  child: customIcon ??
+                      Container(
+                        decoration: BoxDecoration(
+                          color: iconBgColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: glowColor != null
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.yellow500.withOpacity(0.3),
+                                    blurRadius: 15,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Icon(icon, size: 28, color: iconColor),
+                      ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -848,7 +932,6 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.sports_soccer,
                 label: 'Jugar',
                 isActive: true,
-                onTap: () {},
               ),
               _buildNavItem(
                 icon: Icons.emoji_events,
@@ -876,7 +959,7 @@ class HomeScreen extends ConsumerWidget {
     required IconData icon,
     required String label,
     bool isActive = false,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,

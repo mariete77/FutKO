@@ -67,10 +67,14 @@ class GameScreen extends ConsumerWidget {
                   child: gameState.when(
                     initial: () => _buildInitial(context, ref),
                     loading: () => _buildLoading(),
-                    playing: (_, currentQuestionIndex, ___, score, _____, correctAnswers, ________) =>
-                        _buildPlaying(context, ref, currentQuestion, currentQuestionIndex, progress, timerProgress, score, correctAnswers),
+                    playing: (_, currentQuestionIndex, ___, score, _____, correctAnswers, ________, hintUsed, hintedOptions) =>
+                        _buildPlaying(context, ref, currentQuestion, currentQuestionIndex, progress, timerProgress, score, correctAnswers, hintUsed, hintedOptions),
                     answered: (isCorrect, correctAnswer, selectedAnswer, score) =>
-                        _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion),
+                        ref.read(gameNotifierProvider).maybeWhen(
+                          playing: (questions, _, timeRemaining, __, userAnswers, correctAnswers, streak, ___, ____) =>
+                              _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion, streak),
+                          orElse: () => _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion, 0),
+                        ),
                     finished: (score, totalQuestions, correctAnswers, userAnswers, averageTime) =>
                         _buildFinished(context, ref, score, totalQuestions, correctAnswers, userAnswers, averageTime),
                     error: (message) => _buildError(context, message, ref),
@@ -87,7 +91,7 @@ class GameScreen extends ConsumerWidget {
 
   Widget _buildTopBar(BuildContext context, WidgetRef ref, GameState gameState) {
     final score = gameState.maybeWhen(
-      playing: (_, __, ___, score, _____, ______, _______) => score,
+      playing: (_, __, ___, score, _____, ______, _______, ________, _________) => score,
       answered: (_, __, ___, score) => score,
       finished: (score, ___, _____, _______, ______) => score,
       orElse: () => 0,
@@ -304,7 +308,7 @@ class GameScreen extends ConsumerWidget {
   Widget _buildPlaying(
     BuildContext context, WidgetRef ref, dynamic currentQuestion,
     int currentQuestionIndex, double progress, double timerProgress,
-    int score, int correctAnswers,
+    int score, int correctAnswers, bool hintUsed, List<String>? hintedOptions,
   ) {
     if (currentQuestion == null) return _buildLoading();
 
@@ -336,6 +340,7 @@ class GameScreen extends ConsumerWidget {
           else
             AnswerOptionsWidget(
               question: currentQuestion,
+              overrideOptions: hintedOptions,
               onAnswerSelected: (answer) {
                 ref.read(gameNotifierProvider.notifier).submitAnswer(selectedAnswer: answer, isTimeout: false);
               },
@@ -344,7 +349,7 @@ class GameScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // ── Bottom Actions ──────────────────
-          _buildBottomActions(context, ref),
+          _buildBottomActions(context, ref, hintUsed, currentQuestion),
         ],
       ),
     );
@@ -434,7 +439,9 @@ class GameScreen extends ConsumerWidget {
                           width: 80,
                           height: 80,
                           child: CircularProgressIndicator(
-                            value: timeRemaining / GameConstants.secondsPerQuestion,
+                            value: timeRemaining / (currentQuestion?.options.isEmpty ?? false
+                              ? GameConstants.secondsPerTypeQuestion
+                              : GameConstants.secondsPerQuestion),
                             strokeWidth: 5,
                             backgroundColor: AppColors.surfaceContainerHighest,
                             valueColor: AlwaysStoppedAnimation<Color>(
@@ -592,7 +599,8 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomActions(BuildContext context, WidgetRef ref) {
+  Widget _buildBottomActions(
+      BuildContext context, WidgetRef ref, bool hintUsed, dynamic currentQuestion) {
     final user = ref.watch(currentUserProvider);
     final activeCount = ref.watch(activePlayersProvider).valueOrNull ?? 0;
     final countLabel = activeCount >= 1000
@@ -600,6 +608,14 @@ class GameScreen extends ConsumerWidget {
         : activeCount > 0
             ? '+$activeCount'
             : null;
+
+    // The 50/50 hint is available only if not yet spent this match and the
+    // current question is multiple-choice with options to remove.
+    final reducibleOptions = (currentQuestion.options as List)
+        .where((o) => (o as String).trim().isNotEmpty)
+        .length;
+    final canUseHint = !hintUsed && reducibleOptions > 2;
+    final hintColor = canUseHint ? AppColors.success : AppColors.error;
 
     return Row(
       children: [
@@ -661,27 +677,29 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
 
-        // Hint button
+        // Hint button (50/50, once per match): green when available, red once spent.
         Material(
-          color: AppColors.surfaceContainerHighest,
+          color: hintColor.withOpacity(0.12),
           borderRadius: BorderRadius.circular(12),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () {},
+            onTap: canUseHint
+                ? () => ref.read(gameNotifierProvider.notifier).useHint()
+                : null,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.outlineVariant.withOpacity(0.3),
+                  color: hintColor.withOpacity(0.5),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    Icons.help_outline,
+                    canUseHint ? Icons.help_outline : Icons.block,
                     size: 18,
-                    color: AppColors.onSurface,
+                    color: hintColor,
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -689,7 +707,7 @@ class GameScreen extends ConsumerWidget {
                     style: GoogleFonts.lexend(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.onSurface,
+                      color: hintColor,
                     ),
                   ),
                 ],
@@ -702,13 +720,14 @@ class GameScreen extends ConsumerWidget {
   }
 
   Widget _buildAnswered(BuildContext context, WidgetRef ref, bool isCorrect,
-    String correctAnswer, String selectedAnswer, int score, dynamic currentQuestion,
+    String correctAnswer, String selectedAnswer, int score, dynamic currentQuestion, [int streak = 0],
   ) {
     return AnswerFeedbackWidget(
       isCorrect: isCorrect,
       correctAnswer: correctAnswer,
       selectedAnswer: selectedAnswer,
       score: score,
+      streak: streak,
       question: currentQuestion,
       onNextQuestion: () => ref.read(gameNotifierProvider.notifier).nextQuestion(),
     );
@@ -917,6 +936,22 @@ class GameScreen extends ConsumerWidget {
         return 'Pregunta de estadísticas';
       case QuestionType.transfer:
         return 'Pregunta sobre fichajes';
+      case QuestionType.champion:
+        return 'Pregunta sobre palmarés';
+      case QuestionType.topScorer:
+        return 'Pregunta sobre máximos goleadores';
+      case QuestionType.award:
+        return 'Pregunta sobre premios individuales';
+      case QuestionType.coach:
+        return 'Pregunta sobre entrenadores';
+      case QuestionType.derby:
+        return 'Pregunta sobre derbis y rivalidades';
+      case QuestionType.nickname:
+        return 'Pregunta sobre apodos de equipos';
+      case QuestionType.nationalTeam:
+        return 'Pregunta sobre selecciones nacionales';
+      case QuestionType.kit:
+        return 'Pregunta sobre colores de equipos';
     }
   }
 }

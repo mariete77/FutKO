@@ -296,7 +296,12 @@ class LeaderboardScreen extends ConsumerWidget {
             ? const Color(0xFFC0C0C0) // Silver
             : const Color(0xFFCD7F32); // Bronze
 
-    return Container(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.push('/profile/${user.userId}'),
+        child: Container(
       height: height,
       decoration: BoxDecoration(
         color: isMe ? AppColors.primaryContainer.withOpacity(0.15) : AppColors.surfaceContainerLow,
@@ -374,22 +379,29 @@ class LeaderboardScreen extends ConsumerWidget {
           ],
         ],
       ),
+      ),
+      ),
     );
   }
 
   // ── Player Row (4th+) ───────────────────────────────────
 
   Widget _buildPlayerRow(BuildContext context, User user, int rank, bool isMe) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isMe ? AppColors.primary.withOpacity(0.06) : AppColors.surfaceContainerLow,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        border: isMe
-            ? Border.all(color: AppColors.primary.withOpacity(0.2))
-            : Border.all(color: AppColors.outlineVariant.withOpacity(0.1)),
-      ),
-      child: Row(
+        onTap: () => context.push('/profile/${user.userId}'),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isMe ? AppColors.primary.withOpacity(0.06) : AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(12),
+            border: isMe
+                ? Border.all(color: AppColors.primary.withOpacity(0.2))
+                : Border.all(color: AppColors.outlineVariant.withOpacity(0.1)),
+          ),
+          child: Row(
         children: [
           // Rank number
           SizedBox(
@@ -465,6 +477,8 @@ class LeaderboardScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+      ),
       ),
     );
   }

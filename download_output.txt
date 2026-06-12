@@ -1,0 +1,25 @@
+URLs-only mode (no downloads).
+
+=== Team badges ===
++++++++x++++++++++++++++++++++++++++++++++++++++++++++++++
+  => 57/58 badges found
+
+=== Stadium images ===
++xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  => 1/58 stadiums found
+
+=== Player silhouettes ===
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  => 0/60 silhouettes found
+
+=== Competition logos ===
+xxxxxxxxxxxxxxxxxxxx
+  => 0/20 competition logos found
+
+Saved scripts/image_urls.json
+  badges:        57
+  stadiums:      1
+  silhouettes:   0
+  competitions:  0
+
+Done!

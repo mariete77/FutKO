@@ -4,9 +4,9 @@ class FirebaseConstants {
   static const String users = 'users';
   static const String matches = 'matches';
   static const String questions = 'questions';
-  static const String ghostRuns = 'ghostRuns';
   static const String questionReports = 'questionReports';
   static const String quizAttempts = 'quizAttempts';
+  static const String challenges = 'challenges';
 
   // Firestore Fields - Users
   static const String userId = 'userId';
@@ -39,10 +39,6 @@ class FirebaseConstants {
   static const String imageUrl = 'imageUrl';
   static const String questionText = 'questionText';
   static const String extraData = 'extraData';
-
-  // Firestore Fields - Ghost Runs
-  static const String ghostUserId = 'userId';
-  static const String ghostAnswers = 'answers';
 
   // Realtime Database Paths
   static const String matchmakingQueue = 'matchmaking/queue';

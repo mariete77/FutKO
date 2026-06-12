@@ -7,16 +7,22 @@ class AnswerOptionsWidget extends StatelessWidget {
   final Question question;
   final Function(String) onAnswerSelected;
 
+  /// When set (e.g. after using the 50/50 hint), these options are shown
+  /// instead of [question.options].
+  final List<String>? overrideOptions;
+
   const AnswerOptionsWidget({
     super.key,
     required this.question,
     required this.onAnswerSelected,
+    this.overrideOptions,
   });
 
   @override
   Widget build(BuildContext context) {
-    final options =
-        question.options.where((o) => o.trim().isNotEmpty).toList();
+    final options = (overrideOptions ?? question.options)
+        .where((o) => o.trim().isNotEmpty)
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

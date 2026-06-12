@@ -44,6 +44,10 @@ class GameState with _$GameState {
     required List<Answer> userAnswers,
     required int correctAnswers,
     required int streak,
+    // 50/50 hint (once per match). [hintedOptions] holds the two surviving
+    // options for the current question (correct + one wrong), or null.
+    @Default(false) bool hintUsed,
+    List<String>? hintedOptions,
   }) = _Playing;
   const factory GameState.answered({
     required bool isCorrect,
@@ -70,6 +74,9 @@ class GameNotifier extends _$GameNotifier {
   Timer? _answeredTimer;
   List<Question> _questions = [];
   int _currentQuestionIndex = 0;
+
+  // Whether the once-per-match 50/50 hint has been spent.
+  bool _hintUsed = false;
 
   // Pending state for manual "next question" flow
   int _pendingScore = 0;
@@ -113,6 +120,7 @@ class GameNotifier extends _$GameNotifier {
           // Convert some questions to type-answer mode (strip options)
           _questions = _convertToTypeAnswer(questions);
           _currentQuestionIndex = 0;
+          _hintUsed = false;
 
           AnalyticsService.instance.logGameStarted(
             mode: 'practice',
@@ -414,6 +422,9 @@ class GameNotifier extends _$GameNotifier {
         userAnswers: ua,
         correctAnswers: ca,
         streak: st,
+        // Hint stays spent for the rest of the match; new question gets full
+        // options again (hintedOptions left null).
+        hintUsed: _hintUsed,
       );
       _startTimer();
     }
@@ -460,6 +471,7 @@ class GameNotifier extends _$GameNotifier {
     _answeredTimer?.cancel();
     _questions = [];
     _currentQuestionIndex = 0;
+    _hintUsed = false;
     _pendingScore = 0;
     _pendingUserAnswers = [];
     _pendingCorrectAnswers = 0;
@@ -510,6 +522,32 @@ class GameNotifier extends _$GameNotifier {
       isTimeout: true,
     );
   }
+
+  /// Use the once-per-match 50/50 hint: reduce the current multiple-choice
+  /// question's options to two — the correct answer plus one random wrong one.
+  /// No-op if already used or the question can't be reduced (type-answer / ≤2
+  /// options).
+  void useHint() {
+    final currentState = state;
+    if (currentState is! _Playing) return;
+    if (_hintUsed) return;
+
+    final question = currentState.questions[currentState.currentQuestionIndex];
+    final options =
+        question.options.where((o) => o.trim().isNotEmpty).toList();
+    if (options.length <= 2) return;
+
+    final correctOption = options.firstWhere(
+      (o) => question.isCorrect(o),
+      orElse: () => question.correctAnswer,
+    );
+    final wrongOptions = options.where((o) => !question.isCorrect(o)).toList()
+      ..shuffle();
+    final kept = <String>[correctOption, wrongOptions.first]..shuffle();
+
+    _hintUsed = true;
+    state = currentState.copyWith(hintUsed: true, hintedOptions: kept);
+  }
 }
 
 /// Current question provider
@@ -517,7 +555,7 @@ class GameNotifier extends _$GameNotifier {
 Question? currentQuestion(CurrentQuestionRef ref) {
   final gameState = ref.watch(gameNotifierProvider);
   return gameState.maybeWhen(
-    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak) {
+    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak, hintUsed, hintedOptions) {
       if (currentQuestionIndex < questions.length) {
         return questions[currentQuestionIndex];
       }
@@ -532,7 +570,7 @@ Question? currentQuestion(CurrentQuestionRef ref) {
 double progressPercentage(ProgressPercentageRef ref) {
   final gameState = ref.watch(gameNotifierProvider);
   return gameState.maybeWhen(
-    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak) {
+    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak, hintUsed, hintedOptions) {
       if (questions.isEmpty) return 0.0;
       return (currentQuestionIndex + 1) / questions.length;
     },
@@ -545,7 +583,7 @@ double progressPercentage(ProgressPercentageRef ref) {
 double timerProgress(TimerProgressRef ref) {
   final gameState = ref.watch(gameNotifierProvider);
   return gameState.maybeWhen(
-    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak) {
+    playing: (questions, currentQuestionIndex, timeRemaining, score, userAnswers, correctAnswers, streak, hintUsed, hintedOptions) {
       // Use the correct max time based on current question type
       final currentQuestion = currentQuestionIndex < questions.length
           ? questions[currentQuestionIndex]

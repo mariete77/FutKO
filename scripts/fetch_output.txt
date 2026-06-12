@@ -1,0 +1,28 @@
+Running build hooks...Running build hooks...URLs-only mode (no downloads).
+
+=== Team badges (TheSportsDB) ===
++++++++x++++++++++++++++++++++++++++++++++++++++++++++++++
+  => 57/58 badges found
+
+=== Stadium images (Wikipedia) ===
++++++++++++++xxxxx+xxxxxxxxxxxxxxxx+xxxxxxxxxxx+xxxxxx+
+  => 17/55 stadiums found
+
+=== Player images (Wikipedia) ===
++++++++++++++xx+xxx++xx+++x+++xxxxxxxxxxxx+x+xxxxxxxxx+x+++xxx+++xx++xx+xx++++++++++++++++x+++
+  => 53/94 players found
+
+=== Competition logos (Wikipedia) ===
++++x+++++x+++xxxxx+xxxxxx++xx
+  => 14/29 competitions found
+
+Saved scripts/image_urls.json
+  badges:        57
+  stadiums:      17
+  silhouettes:   53
+  competitions:  14
+  TOTAL:         141 / 198
+
+Done!
+
+C:\Users\mario\dev\personal\FutKO>

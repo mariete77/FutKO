@@ -2,6 +2,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:futko/core/constants/firebase_constants.dart';
 import 'package:futko/data/questions/football_data.dart';
+import 'package:futko/data/questions/honours_data.dart';
+import 'package:futko/data/questions/top_scorers_data.dart';
+import 'package:futko/data/questions/awards_data.dart';
+import 'package:futko/data/questions/extra_football_data.dart';
 import 'package:futko/domain/entities/question.dart';
 
 class QuestionSeederService {
@@ -12,30 +16,32 @@ class QuestionSeederService {
   QuestionSeederService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<int> seedQuestions({bool overwrite = false}) async {
+  Future<int> seedQuestions({bool overwrite = true}) async {
     _questionCount = 0;
+
+    // When overwriting, wipe the existing collection first so re-seeding is
+    // idempotent (otherwise every seed appends a duplicate of everything).
+    if (overwrite) {
+      await _deleteAllQuestions();
+    }
 
     final questions = _generateAllQuestions();
     questions.shuffle(_random);
 
-    final batch = _firestore.batch();
+    // A WriteBatch cannot be reused after commit, so create a fresh one per
+    // chunk of 500 operations (Firestore's batch limit).
+    var batch = _firestore.batch();
     var operationCount = 0;
 
     for (final q in questions) {
-      final docRef = _firestore
-          .collection(FirebaseConstants.questions)
-          .doc();
-
-      if (overwrite) {
-        batch.set(docRef, _toFirestoreMap(q));
-      } else {
-        batch.set(docRef, _toFirestoreMap(q));
-      }
+      final docRef = _firestore.collection(FirebaseConstants.questions).doc();
+      batch.set(docRef, _toFirestoreMap(q));
       operationCount++;
       _questionCount++;
 
       if (operationCount >= 500) {
         await batch.commit();
+        batch = _firestore.batch();
         operationCount = 0;
       }
     }
@@ -45,6 +51,22 @@ class QuestionSeederService {
     }
 
     return _questionCount;
+  }
+
+  /// Delete every document in the questions collection, paging in batches of
+  /// 500 (Firestore's batch limit) until the collection is empty.
+  Future<void> _deleteAllQuestions() async {
+    final collection = _firestore.collection(FirebaseConstants.questions);
+    while (true) {
+      final snapshot = await collection.limit(500).get();
+      if (snapshot.docs.isEmpty) break;
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
   }
 
   Map<String, dynamic> _toFirestoreMap(Question q) {
@@ -92,6 +114,14 @@ class QuestionSeederService {
       ..._generateTransferQuestions(),
       ..._generateBadgeQuestions(),
       ..._generatePlayerImageQuestions(),
+      ..._generateChampionQuestions(),
+      ..._generateTopScorerQuestions(),
+      ..._generateAwardQuestions(),
+      ..._generateCoachQuestions(),
+      ..._generateDerbyQuestions(),
+      ..._generateNicknameQuestions(),
+      ..._generateNationalTeamQuestions(),
+      ..._generateKitQuestions(),
     ];
     return questions;
   }
@@ -469,13 +499,429 @@ class QuestionSeederService {
     return questions;
   }
 
+  /// Generate title-winner questions (World Cup, Euro, Champions/Europa
+  /// League, domestic leagues). Options are built here from coherent pools
+  /// (countries vs clubs) so distractors stay sensible.
+  List<Question> _generateChampionQuestions() {
+    final questions = <Question>[];
+
+    // International — selections (countries).
+    final selectionPool =
+        HonoursData.internationalWins.map((e) => e.winner).toSet().toList();
+    for (final w in HonoursData.internationalWins) {
+      final comp = w.tournament == 'Mundial' ? 'el Mundial' : 'la Eurocopa';
+      questions.add(_q(
+        type: QuestionType.champion,
+        difficulty: Difficulty.medium,
+        correctAnswer: w.winner,
+        questionText: '¿Qué selección ganó $comp de ${w.year}?',
+        options: _pickOptions(w.winner, selectionPool, selectionPool),
+      ));
+    }
+
+    // Pool of all club winners, used for club-cup distractors and as the
+    // fallback pool for leagues with few distinct champions.
+    final clubPool = <String>{
+      ...HonoursData.clubTitles.map((e) => e.winner),
+      ...HonoursData.leagueTitles.map((e) => e.winner),
+    }.toList();
+
+    // Club cups — Champions League / Europa League (UEFA Cup before 2010).
+    for (final t in HonoursData.clubTitles) {
+      final name = t.competition == 'Europa League' && t.year < 2010
+          ? 'la Copa de la UEFA'
+          : 'la ${t.competition}';
+      questions.add(_q(
+        type: QuestionType.champion,
+        difficulty: Difficulty.medium,
+        correctAnswer: t.winner,
+        questionText: '¿Qué club ganó $name en ${t.year}?',
+        options: _pickOptions(t.winner, clubPool, clubPool),
+      ));
+    }
+
+    // Domestic leagues — distractors prefer other champions of the same league.
+    for (final l in HonoursData.leagueTitles) {
+      final sameLeaguePool = HonoursData.leagueTitles
+          .where((e) => e.league == l.league)
+          .map((e) => e.winner)
+          .toSet()
+          .toList();
+      final season =
+          '${l.year - 1}-${(l.year % 100).toString().padLeft(2, '0')}';
+      questions.add(_q(
+        type: QuestionType.champion,
+        difficulty: Difficulty.medium,
+        correctAnswer: l.winner,
+        questionText:
+            '¿Qué equipo ganó ${l.league} en la temporada $season?',
+        options: _pickOptions(l.winner, sameLeaguePool, clubPool),
+      ));
+    }
+
+    return questions;
+  }
+
+  /// Generate top-scorer-by-season questions for the four major European
+  /// leagues. Distractors are other top scorers from the same league.
+  List<Question> _generateTopScorerQuestions() {
+    final questions = <Question>[];
+
+    // All leagues and their data.
+    final leagues = <_LeagueScorers>[
+      _LeagueScorers('La Liga', TopScorersData.laLiga),
+      _LeagueScorers('la Premier League', TopScorersData.premierLeague),
+      _LeagueScorers('la Serie A', TopScorersData.serieA),
+      _LeagueScorers('la Bundesliga', TopScorersData.bundesliga),
+    ];
+
+    // Global pool of all scorers across all leagues (fallback).
+    final allScorers = leagues
+        .expand((l) => l.scorers.map((s) => s.scorer))
+        .toSet()
+        .toList();
+
+    for (final league in leagues) {
+      // Preferred pool: other scorers from the same league.
+      final sameLeaguePool =
+          league.scorers.map((s) => s.scorer).toSet().toList();
+
+      for (final entry in league.scorers) {
+        final season =
+            '${entry.year - 1}-${(entry.year % 100).toString().padLeft(2, '0')}';
+        questions.add(_q(
+          type: QuestionType.topScorer,
+          difficulty: _randomDifficulty(),
+          correctAnswer: entry.scorer,
+          questionText:
+              '¿Quién fue el máximo goleador de ${league.name} en la temporada $season?',
+          options: _pickOptions(entry.scorer, sameLeaguePool, allScorers),
+        ));
+      }
+    }
+
+    return questions;
+  }
+
+  /// Build a 4-option list: the correct answer plus up to 3 distractors drawn
+  /// first from [preferredPool], then from [fallbackPool] if needed.
+  List<String> _pickOptions(
+    String answer,
+    List<String> preferredPool,
+    List<String> fallbackPool,
+  ) {
+    final options = <String>[answer];
+
+    void fillFrom(List<String> pool) {
+      final candidates = pool.where((c) => c != answer).toList()
+        ..shuffle(_random);
+      for (final c in candidates) {
+        if (options.length >= 4) break;
+        if (!options.contains(c)) options.add(c);
+      }
+    }
+
+    fillFrom(preferredPool);
+    if (options.length < 4) fillFrom(fallbackPool);
+
+    options.shuffle(_random);
+    return options;
+  }
+
   /// Convert a name to a filesystem-friendly slug.
-  /// e.g. "Real Madrid" -> "real_madrid", "FC Barcelona" -> "fc_barcelona"
+  /// Convert a name to a filesystem-friendly slug.
+  /// Strips accents for cross-platform compatibility.
+  /// e.g. "Atlético Madrid" -> "atletico_madrid"
+  /// Must match the slugify in scripts/download_images.dart
   static String _slugify(String name) {
     return name
         .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9\u00f1\u00e1\u00e9\u00ed\u00f3\u00fa]+'), '_')
+        .replaceAll('á', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll('ñ', 'n')
+        .replaceAll('ü', 'u')
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
         .replaceAll(RegExp(r'^_|_$'), '');
+  }
+
+  /// Generate award questions (Ballon d'Or, World Cup Golden Boot,
+  /// European Golden Shoe).
+  List<Question> _generateAwardQuestions() {
+    final questions = <Question>[];
+
+    // ── Ballon d'Or ──
+    final ballonDorWinners =
+        AwardsData.ballonDor.map((e) => e.winner).toSet().toList();
+    for (final award in AwardsData.ballonDor) {
+      final type = _random.nextInt(3);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.award,
+            difficulty: Difficulty.medium,
+            correctAnswer: award.winner,
+            questionText: '¿Quién ganó el Balón de Oro en ${award.year}?',
+            options: _pickOptions(award.winner, ballonDorWinners,
+                ballonDorWinners),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.award,
+            difficulty: Difficulty.hard,
+            correctAnswer: award.winner,
+            questionText:
+                '¿Qué futbolista de ${award.nationality} ganó el Balón de Oro en ${award.year}?',
+            options: _pickOptions(award.winner, ballonDorWinners,
+                ballonDorWinners),
+          ));
+          break;
+        case 2:
+          questions.add(_q(
+            type: QuestionType.award,
+            difficulty: Difficulty.easy,
+            correctAnswer: award.nationality,
+            questionText:
+                '¿De qué país es ${award.winner}, ganador del Balón de Oro ${award.year}?',
+            options: _pickOptions(
+                award.nationality,
+                AwardsData.ballonDor.map((e) => e.nationality).toSet().toList(),
+                AwardsData.ballonDor.map((e) => e.nationality).toSet().toList()),
+          ));
+          break;
+      }
+    }
+
+    // ── World Cup Golden Boot ──
+    final wcScorers =
+        AwardsData.worldCupGoldenBoots.map((e) => e.winner).toSet().toList();
+    for (final award in AwardsData.worldCupGoldenBoots) {
+      final type = _random.nextInt(2);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.award,
+            difficulty: Difficulty.medium,
+            correctAnswer: award.winner,
+            questionText:
+                '¿Quién fue el máximo goleador del Mundial de ${award.year} con ${award.goals} goles?',
+            options: _pickOptions(award.winner, wcScorers, ballonDorWinners),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.award,
+            difficulty: Difficulty.hard,
+            correctAnswer: award.winner,
+            questionText:
+                '¿Qué jugador ganó la Bota de Oro del Mundial de ${award.year}?',
+            options: _pickOptions(award.winner, wcScorers, ballonDorWinners),
+          ));
+          break;
+      }
+    }
+
+    // ── European Golden Shoe ──
+    final shoeWinners =
+        AwardsData.europeanGoldenShoes.map((e) => e.winner).toSet().toList();
+    for (final award in AwardsData.europeanGoldenShoes) {
+      questions.add(_q(
+        type: QuestionType.award,
+        difficulty: Difficulty.medium,
+        correctAnswer: award.winner,
+        questionText:
+            '¿Quién ganó la Bota de Oro europea en la temporada ${award.year - 1}-${(award.year % 100).toString().padLeft(2, '0')} con ${award.goals} goles?',
+        options:
+            _pickOptions(award.winner, shoeWinners, ballonDorWinners),
+      ));
+    }
+
+    return questions;
+  }
+
+  List<Question> _generateCoachQuestions() {
+    final questions = <Question>[];
+    final data = ExtraFootballData.coaches;
+    final coachNames = data.map((c) => c.name).toList();
+    final nationalities = data.map((c) => c.nationality).toSet().toList();
+
+    for (final coach in data) {
+      final type = _random.nextInt(3);
+      switch (type) {
+        case 0:
+          final team = coach.teams[_random.nextInt(coach.teams.length)];
+          questions.add(_q(
+            type: QuestionType.coach,
+            difficulty: Difficulty.medium,
+            correctAnswer: coach.name,
+            questionText: '¿Qué entrenador dirigió al $team?',
+            options: _pickOptions(coach.name, coachNames, coachNames),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.coach,
+            difficulty: Difficulty.easy,
+            correctAnswer: coach.nationality,
+            questionText: '¿De qué nacionalidad es ${coach.name}?',
+            options: _pickOptions(coach.nationality, nationalities, nationalities),
+          ));
+          break;
+        case 2:
+          if (coach.championsLeagues > 0) {
+            questions.add(_q(
+              type: QuestionType.coach,
+              difficulty: Difficulty.hard,
+              correctAnswer: coach.name,
+              questionText: '¿Qué entrenador ha ganado ${coach.championsLeagues} Champions League(s)?',
+              options: _pickOptions(coach.name, coachNames, coachNames),
+            ));
+          }
+          break;
+      }
+    }
+    return questions;
+  }
+
+  List<Question> _generateDerbyQuestions() {
+    final questions = <Question>[];
+    final data = ExtraFootballData.derbies;
+    final derbyNames = data.map((d) => d.name).toList();
+    final allTeams = data.expand((d) => [d.teamA, d.teamB]).toSet().toList();
+
+    for (final derby in data) {
+      final type = _random.nextInt(2);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.derby,
+            difficulty: Difficulty.medium,
+            correctAnswer: derby.name,
+            questionText: '¿Qué derbi enfrenta a ${derby.teamA} y ${derby.teamB}?',
+            options: _pickOptions(derby.name, derbyNames, derbyNames),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.derby,
+            difficulty: Difficulty.medium,
+            correctAnswer: derby.teamB,
+            questionText: 'En el ${derby.name}, ¿contra qué equipo juega ${derby.teamA}?',
+            options: _pickOptions(derby.teamB, allTeams, allTeams),
+          ));
+          break;
+      }
+    }
+    return questions;
+  }
+
+  List<Question> _generateNicknameQuestions() {
+    final questions = <Question>[];
+    final data = ExtraFootballData.nicknames;
+    final teams = data.map((n) => n.team).toList();
+    final nicknames = data.map((n) => n.nickname.split(' / ').first).toList();
+
+    for (final entry in data) {
+      final primary = entry.nickname.split(' / ').first;
+      final type = _random.nextInt(2);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.nickname,
+            difficulty: Difficulty.easy,
+            correctAnswer: entry.team,
+            questionText: '¿Qué equipo es conocido como "$primary"?',
+            options: _pickOptions(entry.team, teams, teams),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.nickname,
+            difficulty: Difficulty.medium,
+            correctAnswer: primary,
+            questionText: '¿Cuál es el apodo del ${entry.team}?',
+            options: _pickOptions(primary, nicknames, nicknames),
+          ));
+          break;
+      }
+    }
+    return questions;
+  }
+
+  List<Question> _generateNationalTeamQuestions() {
+    final questions = <Question>[];
+    final data = ExtraFootballData.nationalTeams;
+    final teamNames = data.map((n) => n.name).toList();
+
+    for (final team in data) {
+      final type = _random.nextInt(3);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.nationalTeam,
+            difficulty: Difficulty.easy,
+            correctAnswer: team.name,
+            questionText: '¿Qué selección es conocida como "${team.nickname}"?',
+            options: _pickOptions(team.name, teamNames, teamNames),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.nationalTeam,
+            difficulty: Difficulty.medium,
+            correctAnswer: team.name,
+            questionText: '¿Qué selección ha ganado ${team.worldCups} Mundial(es)?',
+            options: _pickOptions(team.name, teamNames, teamNames),
+          ));
+          break;
+        case 2:
+          if (team.worldCups > 0) {
+            questions.add(_q(
+              type: QuestionType.nationalTeam,
+              difficulty: Difficulty.hard,
+              correctAnswer: team.name,
+              questionText: '¿Qué combinado nacional tiene ${team.worldCups} estrellas en su escudo?',
+              options: _pickOptions(team.name, teamNames, teamNames),
+            ));
+          }
+          break;
+      }
+    }
+    return questions;
+  }
+
+  List<Question> _generateKitQuestions() {
+    final questions = <Question>[];
+    final data = ExtraFootballData.kits;
+    final teams = data.map((k) => k.team).toList();
+
+    for (final kit in data) {
+      final type = _random.nextInt(2);
+      switch (type) {
+        case 0:
+          questions.add(_q(
+            type: QuestionType.kit,
+            difficulty: Difficulty.easy,
+            correctAnswer: kit.team,
+            questionText: '¿Qué equipo juega de ${kit.homeKit} como local?',
+            options: _pickOptions(kit.team, teams, teams),
+          ));
+          break;
+        case 1:
+          questions.add(_q(
+            type: QuestionType.kit,
+            difficulty: Difficulty.medium,
+            correctAnswer: kit.homeKit,
+            questionText: '¿De qué color es la camiseta local del ${kit.team}?',
+            options: [],
+          ));
+          break;
+      }
+    }
+    return questions;
   }
 }
 
@@ -486,3 +932,10 @@ class _TransferData {
   final int fee;
   const _TransferData(this.player, this.fromClub, this.toClub, this.fee);
 }
+
+class _LeagueScorers {
+  final String name; // display fragment for question text
+  final List<TopScorerEntry> scorers;
+  const _LeagueScorers(this.name, this.scorers);
+}
+

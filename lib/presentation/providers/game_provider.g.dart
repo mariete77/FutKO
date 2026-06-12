@@ -49,7 +49,7 @@ final quizAttemptRepositoryProvider =
 // ignore: unused_element
 typedef QuizAttemptRepositoryRef
     = AutoDisposeProviderRef<QuizAttemptRepository>;
-String _$currentQuestionHash() => r'7638f00ad111e7b2fd92d36bff46ec55bd80cdb0';
+String _$currentQuestionHash() => r'ef6004e0fd18ee6abca858f54a810d2b228dd3a8';
 
 /// Current question provider
 ///
@@ -69,7 +69,7 @@ final currentQuestionProvider = AutoDisposeProvider<Question?>.internal(
 // ignore: unused_element
 typedef CurrentQuestionRef = AutoDisposeProviderRef<Question?>;
 String _$progressPercentageHash() =>
-    r'178c8f6433aef71150a3230054d9e55d455028db';
+    r'726ba492f23dcf7cd170ada0cafa4ac03d0f47b5';
 
 /// Progress percentage provider
 ///
@@ -88,7 +88,7 @@ final progressPercentageProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ProgressPercentageRef = AutoDisposeProviderRef<double>;
-String _$timerProgressHash() => r'f62f55f0ebe08dc8f1ff591c40e1155f8e71f1ae';
+String _$timerProgressHash() => r'1844cb4296f85fb32fe0715866d668da83b0c4fb';
 
 /// Timer progress provider (0.0 to 1.0)
 ///
@@ -107,7 +107,7 @@ final timerProgressProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TimerProgressRef = AutoDisposeProviderRef<double>;
-String _$gameNotifierHash() => r'61f7edcbd954026cf5cbbadb7b0048388f7e0ff1';
+String _$gameNotifierHash() => r'0f62c370bbed5efe68a5b6d988bb7ef66006c3f8';
 
 /// Game provider
 ///

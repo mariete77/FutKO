@@ -278,36 +278,53 @@ class _SubscriptionModalState extends ConsumerState<SubscriptionModal> {
   }
 
   Future<void> _purchase(BuildContext context) async {
-    final notifier = ref.read(subscriptionProvider.notifier);
-    final offerings = await RevenueCatService.getOfferings();
-    if (offerings == null) return;
-
-    final current = offerings.current;
-    if (current == null) return;
-
-    final package = current.monthly?.storeProduct != null
-        ? current.monthly!
-        : current.annual ?? current.lifetime ?? current.weekly!;
-
-    AnalyticsService.instance.logPurchaseInitiated(plan: package.identifier);
-
-    final success = await notifier.purchasePackage(package);
-    if (success && mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Bienvenido a la élite!')),
-      );
+    try {
+      final notifier = ref.read(subscriptionProvider.notifier);
+      final offerings = await RevenueCatService.getOfferings();
+      if (offerings == null || offerings.current == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Suscripcion no disponible aun. Proximamente.'), duration: Duration(seconds: 3)),
+          );
+        }
+        return;
+      }
+      final current = offerings.current!;
+      final package = current.monthly?.storeProduct != null
+          ? current.monthly!
+          : current.annual ?? current.lifetime ?? current.weekly!;
+      AnalyticsService.instance.logPurchaseInitiated(plan: package.identifier);
+      final success = await notifier.purchasePackage(package);
+      if (success && mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('¡Bienvenido a la élite!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al procesar suscripcion. Intenta mas tarde.'), duration: Duration(seconds: 3)),
+        );
+      }
     }
   }
 
   Future<void> _restore(BuildContext context) async {
-    final notifier = ref.read(subscriptionProvider.notifier);
-    final success = await notifier.restorePurchases();
-    if (success && mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Compras restauradas correctamente')),
-      );
+    try {
+      final notifier = ref.read(subscriptionProvider.notifier);
+      await notifier.restorePurchases();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Compras restauradas')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se encontraron compras'), duration: Duration(seconds: 3)),
+        );
+      }
     }
   }
 

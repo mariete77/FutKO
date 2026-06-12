@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/repositories/match_repository_impl.dart';
-import '../../data/repositories/ghost_run_repository_impl.dart';
 import '../../data/repositories/question_repository_impl.dart';
 import '../../domain/entities/match.dart';
 import '../../domain/entities/question.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/match_repository.dart';
-import '../../domain/repositories/ghost_run_repository.dart';
 import '../../domain/repositories/question_repository.dart';
 import '../../domain/repositories/quiz_attempt_repository.dart';
 import '../../data/repositories/quiz_attempt_repository_impl.dart';
@@ -25,10 +23,6 @@ final matchRepositoryProvider = Provider<MatchRepository>((ref) {
   return MatchRepositoryImpl();
 });
 
-final ghostRunRepositoryProvider = Provider<GhostRunRepository>((ref) {
-  return GhostRunRepositoryImpl();
-});
-
 final questionRepositoryMultiProvider = Provider<QuestionRepository>((ref) {
   return QuestionRepositoryImpl();
 });
@@ -39,7 +33,7 @@ final quizAttemptRepositoryMultiProvider = Provider<QuizAttemptRepository>((ref)
 });
 
 /// Multiplayer game mode
-enum MultiplayerMode { casual, ranked, ghostRun, friendChallenge }
+enum MultiplayerMode { casual, ranked, friendChallenge }
 
 /// Multiplayer state
 enum MultiplayerStatus {
@@ -56,7 +50,6 @@ class MultiplayerState {
   final MultiplayerStatus status;
   final MultiplayerMode mode;
   final GameMatch? currentMatch;
-  final GhostRun? ghostRun;
   final List<Question> questions;
   final int currentQuestionIndex;
   final int timeRemaining;
@@ -78,7 +71,6 @@ class MultiplayerState {
     this.status = MultiplayerStatus.idle,
     this.mode = MultiplayerMode.casual,
     this.currentMatch,
-    this.ghostRun,
     this.questions = const [],
     this.currentQuestionIndex = 0,
     this.timeRemaining = 0,
@@ -130,7 +122,6 @@ class MultiplayerState {
     MultiplayerStatus? status,
     MultiplayerMode? mode,
     GameMatch? currentMatch,
-    GhostRun? ghostRun,
     List<Question>? questions,
     int? currentQuestionIndex,
     int? timeRemaining,
@@ -152,7 +143,6 @@ class MultiplayerState {
       status: status ?? this.status,
       mode: mode ?? this.mode,
       currentMatch: currentMatch ?? this.currentMatch,
-      ghostRun: ghostRun ?? this.ghostRun,
       questions: questions ?? this.questions,
       currentQuestionIndex: currentQuestionIndex ?? this.currentQuestionIndex,
       timeRemaining: timeRemaining ?? this.timeRemaining,
@@ -216,96 +206,13 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     );
 
     try {
-      if (mode == MultiplayerMode.ghostRun) {
-        await _startGhostRunMatch();
-      } else {
-        await _startPvPMatch(mode);
-      }
+      await _startPvPMatch(mode);
     } catch (e) {
       state = state.copyWith(
         status: MultiplayerStatus.error,
         errorMessage: 'Error al iniciar búsqueda: $e',
       );
     }
-  }
-
-  /// Start a ghost run match (play against a previous player's answers)
-  Future<void> _startGhostRunMatch() async {
-    final userElo = _userElo;
-    final result = await _ref.read(ghostRunRepositoryProvider).findGhostRun(
-          userId: _currentUserId!,
-          playerElo: userElo,
-        );
-
-    await result.fold(
-      (failure) async {
-        // No ghost run found - play solo and save as ghost run
-        await _startSoloAndSaveGhost();
-      },
-      (ghostRun) async {
-        if (ghostRun == null) {
-          await _startSoloAndSaveGhost();
-          return;
-        }
-
-        // Load the SAME questions the ghost played with
-        final questionsResult = await _ref
-            .read(questionRepositoryMultiProvider)
-            .getQuestionsByIds(ghostRun.questionIds);
-
-        await questionsResult.fold(
-          (failure) async {
-            // Fall back to solo
-            await _startSoloAndSaveGhost();
-          },
-          (questions) async {
-            if (questions.isEmpty) {
-              await _startSoloAndSaveGhost();
-              return;
-            }
-
-            _questions = questions;
-            state = state.copyWith(
-              status: MultiplayerStatus.found,
-              ghostRun: ghostRun,
-              opponentName: 'Corredor Fantasma',
-              opponentElo: ghostRun.elo,
-            );
-
-            // Auto-start after short delay
-            await Future.delayed(const Duration(seconds: 2));
-            _startPlaying();
-          },
-        );
-      },
-    );
-  }
-
-  /// Start solo game and save as ghost run
-  Future<void> _startSoloAndSaveGhost() async {
-    final questionsResult = await _ref
-        .read(questionRepositoryMultiProvider)
-        .getRandomQuestions(count: GameConstants.questionsPerMatch);
-
-    questionsResult.fold(
-      (failure) {
-        state = state.copyWith(
-          status: MultiplayerStatus.error,
-          errorMessage: 'Error al cargar preguntas',
-        );
-      },
-      (questions) {
-        _questions = questions;
-        state = state.copyWith(
-          status: MultiplayerStatus.found,
-          opponentName: 'Oponente',
-        );
-
-        Future.delayed(const Duration(seconds: 2), () {
-          _startPlaying();
-        });
-      },
-    );
   }
 
   /// Start a PvP match: try to join an existing waiting match, otherwise create one
@@ -389,15 +296,16 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           _questions = questions;
         }
 
+        final opponentId = joinedMatch.getOpponentId(_currentUserId);
+        final opponentName = opponentId != null
+            ? await _getOpponentDisplayName(opponentId)
+            : 'Oponente';
+
         state = state.copyWith(
           status: MultiplayerStatus.found,
           currentMatch: joinedMatch,
-          opponentName: 'Oponente',
+          opponentName: opponentName,
         );
-
-        Future.delayed(const Duration(seconds: 2), () {
-          _startPlaying();
-        });
       },
     );
   }
@@ -473,15 +381,17 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           },
         );
 
-        // Overall timeout — fall back to ghost run after 60 seconds
+        // Overall timeout — show error after 60 seconds
         _matchmakingTimer = Timer(
           Duration(milliseconds: GameConstants.matchmakingTimeoutMs),
           () {
             if (state.status == MultiplayerStatus.searching) {
               _searchTimer?.cancel();
               _cancelMatchmaking(matchId);
-              // Fallback to ghost run mode for casual/ranked
-              _fallbackToGhostRun();
+              state = state.copyWith(
+                status: MultiplayerStatus.error,
+                errorMessage: 'No se encontró oponente. Inténtalo de nuevo.',
+              );
             }
           },
         );
@@ -523,15 +433,16 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
 
     await _ref.read(matchRepositoryProvider).updateMatch(match.id, updatedMatch);
 
+    final opponentId = updatedMatch.getOpponentId(_currentUserId);
+    final opponentName = opponentId != null
+        ? await _getOpponentDisplayName(opponentId)
+        : 'Oponente';
+
     state = state.copyWith(
       status: MultiplayerStatus.found,
       currentMatch: updatedMatch,
-      opponentName: 'Oponente',
+      opponentName: opponentName,
     );
-
-    // Auto-start after short delay
-    await Future.delayed(const Duration(seconds: 2));
-    _startPlaying();
   }
 
   /// Cancel matchmaking — only marks the match as cancelled if still 'waiting'
@@ -554,137 +465,32 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
   }
 
   /// Challenge a specific friend to a match
-  /// Uses the friend's most recent ghost run if available, otherwise generates random questions
-  Future<void> challengeFriend(
-    String friendId, {
-    String? friendName,
-    int? friendElo,
-  }) async {
+  Future<void> challengeFriend(String friendId, {String? friendName, int? friendElo}) async {
     if (_currentUserId == null) {
-      state = state.copyWith(
-        status: MultiplayerStatus.error,
-        errorMessage: 'Not authenticated',
-      );
+      state = state.copyWith(status: MultiplayerStatus.error, errorMessage: 'Not authenticated');
       return;
     }
     if (friendId == _currentUserId) {
-      state = state.copyWith(
-        status: MultiplayerStatus.error,
-        errorMessage: 'Cannot challenge yourself',
-      );
+      state = state.copyWith(status: MultiplayerStatus.error, errorMessage: 'Cannot challenge yourself');
       return;
     }
-
-    state = state.copyWith(
-      status: MultiplayerStatus.searching,
-      mode: MultiplayerMode.friendChallenge,
-      errorMessage: null,
-    );
-
+    state = state.copyWith(status: MultiplayerStatus.searching, mode: MultiplayerMode.friendChallenge, errorMessage: null);
     try {
-      // Fetch friend info from Firestore if not provided
-      String name = friendName ?? 'Amigo';
-      int elo = friendElo ?? 1000;
+      String name = friendName ?? 'Amigo'; int elo = friendElo ?? 1000;
       if (friendName == null || friendElo == null) {
-        final friendDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(friendId)
-            .get();
-        if (friendDoc.exists) {
-          final data = friendDoc.data()!;
-          name = data['displayName'] ?? name;
-          elo = data['elo'] ?? elo;
-        }
+        final doc = await FirebaseFirestore.instance.collection('users').doc(friendId).get();
+        if (doc.exists) { final d = doc.data()!; name = d['displayName'] ?? name; elo = d['elo'] ?? elo; }
       }
-
-      // Try to find friend's most recent ghost run to play against
-      final ghostResult = await _ref
-          .read(ghostRunRepositoryProvider)
-          .getUserGhostRuns(friendId);
-
-      await ghostResult.fold(
-        (failure) async {
-          // Couldn't fetch ghost runs — play with random questions
-          await _startFriendChallengeSolo(name, elo, friendId);
-        },
-        (ghostRuns) async {
-          if (ghostRuns.isEmpty) {
-            await _startFriendChallengeSolo(name, elo, friendId);
-            return;
-          }
-
-          // Use friend's most recent ghost run
-          final friendGhostRun = ghostRuns.first;
-          final questionsResult = await _ref
-              .read(questionRepositoryMultiProvider)
-              .getQuestionsByIds(friendGhostRun.questionIds);
-
-          await questionsResult.fold(
-            (failure) async {
-              await _startFriendChallengeSolo(name, elo, friendId);
-            },
-            (questions) async {
-              if (questions.isEmpty) {
-                await _startFriendChallengeSolo(name, elo, friendId);
-                return;
-              }
-
-              _questions = questions;
-              state = state.copyWith(
-                status: MultiplayerStatus.found,
-                ghostRun: friendGhostRun,
-                opponentName: name,
-                opponentElo: elo,
-                invitedFriendId: friendId,
-              );
-
-              // Auto-start after short delay
-              await Future.delayed(const Duration(seconds: 2));
-              _startPlaying();
-            },
-          );
-        },
+      final r = await _ref.read(questionRepositoryMultiProvider).getRandomQuestions(count: GameConstants.questionsPerMatch);
+      r.fold(
+        (failure) => state = state.copyWith(status: MultiplayerStatus.error, errorMessage: 'Failed to load questions'),
+        (qs) { _questions = qs; state = state.copyWith(status: MultiplayerStatus.found, opponentName: name, opponentElo: elo, invitedFriendId: friendId); },
       );
-    } catch (e) {
-      state = state.copyWith(
-        status: MultiplayerStatus.error,
-        errorMessage: 'Error al crear reto: $e',
-      );
-    }
+    } catch (e) { state = state.copyWith(status: MultiplayerStatus.error, errorMessage: 'Error al crear reto: $e'); }
   }
 
-  /// Start friend challenge with random questions (no ghost run available)
-  Future<void> _startFriendChallengeSolo(
-    String friendName,
-    int friendElo,
-    String friendId,
-  ) async {
-    final questionsResult = await _ref
-        .read(questionRepositoryMultiProvider)
-        .getRandomQuestions(count: GameConstants.questionsPerMatch);
-
-    questionsResult.fold(
-      (failure) {
-        state = state.copyWith(
-          status: MultiplayerStatus.error,
-          errorMessage: 'Failed to load questions',
-        );
-      },
-      (questions) {
-        _questions = questions;
-        state = state.copyWith(
-          status: MultiplayerStatus.found,
-          opponentName: friendName,
-          opponentElo: friendElo,
-          invitedFriendId: friendId,
-        );
-
-        Future.delayed(const Duration(seconds: 2), () {
-          _startPlaying();
-        });
-      },
-    );
-  }
+  /// Public entry point for the VS screen to start the match
+  void startPlaying() => _startPlaying();
 
   /// Start playing the match
   void _startPlaying() {
@@ -784,19 +590,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     final newCorrect = isCorrect ? state.correctAnswers + 1 : state.correctAnswers;
     final newStreak = isCorrect ? state.streak + 1 : 0;
 
-    // Calculate ghost opponent score
     int newOpponentScore = state.opponentScore;
-    if (state.ghostRun != null && currentIndex < state.ghostRun!.answers.length) {
-      final ghostAnswer = state.ghostRun!.answers[currentIndex];
-      if (ghostAnswer.isCorrect) {
-        newOpponentScore += calculateQuestionScore(
-          isCorrect: true,
-          timeRemaining: maxTime - (ghostAnswer.timeMs ~/ 1000),
-          streak: 0,
-          isTimeout: false,
-        );
-      }
-    }
 
     // Move to next question or finish
     final nextIndex = currentIndex + 1;
@@ -922,17 +716,6 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     final newStreak = isCorrect ? state.streak + 1 : 0;
 
     int newOpponentScore = state.opponentScore;
-    if (state.ghostRun != null && currentIndex < state.ghostRun!.answers.length) {
-      final ghostAnswer = state.ghostRun!.answers[currentIndex];
-      if (ghostAnswer.isCorrect) {
-        newOpponentScore += calculateQuestionScore(
-          isCorrect: true,
-          timeRemaining: maxTime - (ghostAnswer.timeMs ~/ 1000),
-          streak: 0,
-          isTimeout: false,
-        );
-      }
-    }
 
     state = state.copyWith(
       playerScore: newScore,
@@ -974,16 +757,8 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
       final currentMatch = state.currentMatch;
       final currentUserId = _currentUserId;
 
-      // ── 1. Submit local answers and save ghost ────────────────
+      // ── 1. Submit local answers ────────────────
       if (currentUserId != null && state.playerAnswers.isNotEmpty) {
-        // Save ghost run asynchronously
-        _ref.read(ghostRunRepositoryProvider).saveGhostRun(
-              userId: currentUserId,
-              elo: _userElo,
-              questionIds: _questions.map((q) => q.id).toList(),
-              answers: state.playerAnswers,
-            ).catchError((e) => print('Error saving ghost: $e'));
-
         // Submit each answer to Firestore match collection
         if (currentMatch != null) {
           for (final answer in state.playerAnswers) {
@@ -1164,14 +939,17 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
     }
   }
 
-  /// Fallback to ghost run when no opponent found
-  Future<void> _fallbackToGhostRun() async {
-    // Switch to ghost run mode and start match
-    state = state.copyWith(
-      mode: MultiplayerMode.ghostRun,
-      currentMatch: null,
-    );
-    await _startGhostRunMatch();
+  /// Fetch opponent display name from Firestore
+  Future<String> _getOpponentDisplayName(String opponentId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(opponentId)
+          .get();
+      return doc.data()?['displayName'] as String? ?? 'Oponente';
+    } catch (_) {
+      return 'Oponente';
+    }
   }
 
   /// Reset state

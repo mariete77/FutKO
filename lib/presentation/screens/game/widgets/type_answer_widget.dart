@@ -180,6 +180,10 @@ class _TypeAnswerWidgetState extends State<TypeAnswerWidget> {
         return 'Escribe tu respuesta';
       case QuestionType.transfer:
         return 'Escribe el nombre del equipo';
+      case QuestionType.champion:
+        return 'Escribe el ganador';
+      case QuestionType.topScorer:
+        return 'Escribe el nombre del goleador';
       default:
         return 'Escribe tu respuesta';
     }

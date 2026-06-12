@@ -26,6 +26,12 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "antlr4",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/antlr4-4.13.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "archive",
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.0.9",
       "packageUri": "lib/",
@@ -158,6 +164,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "cel",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/cel-0.5.4+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "characters",
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/characters-1.4.1",
       "packageUri": "lib/",
@@ -282,6 +294,18 @@
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "fake_cloud_firestore",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/fake_cloud_firestore-4.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "fake_firebase_security_rules",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/fake_firebase_security_rules-0.5.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "ffi",
@@ -429,9 +453,9 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///D:/flutter/packages/flutter",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/flutter",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "flutter_cache_manager",
@@ -441,9 +465,9 @@
     },
     {
       "name": "flutter_driver",
-      "rootUri": "file:///D:/flutter/packages/flutter_driver",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/flutter_driver",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "flutter_lints",
@@ -471,9 +495,9 @@
     },
     {
       "name": "flutter_localizations",
-      "rootUri": "file:///D:/flutter/packages/flutter_localizations",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/flutter_localizations",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "flutter_riverpod",
@@ -525,9 +549,9 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///D:/flutter/packages/flutter_test",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/flutter_test",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "flutter_web_auth_2",
@@ -543,9 +567,9 @@
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///D:/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/flutter_web_plugins",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "freezed",
@@ -567,9 +591,9 @@
     },
     {
       "name": "fuchsia_remote_debug_protocol",
-      "rootUri": "file:///D:/flutter/packages/fuchsia_remote_debug_protocol",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/fuchsia_remote_debug_protocol",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "glob",
@@ -663,9 +687,9 @@
     },
     {
       "name": "integration_test",
-      "rootUri": "file:///D:/flutter/packages/integration_test",
+      "rootUri": "file:///C:/Users/mario/flutter/packages/integration_test",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "intl",
@@ -722,6 +746,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "logger",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/logger-2.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "logging",
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/logging-1.3.0",
       "packageUri": "lib/",
@@ -735,7 +765,7 @@
     },
     {
       "name": "matcher",
-      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.18",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.19",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -747,7 +777,7 @@
     },
     {
       "name": "meta",
-      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.17.0",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.18.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -758,10 +788,22 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "mock_exceptions",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/mock_exceptions-0.8.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "mockito",
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/mockito-5.4.6",
       "packageUri": "lib/",
       "languageVersion": "3.7"
+    },
+    {
+      "name": "more",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/more-4.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
     },
     {
       "name": "native_toolchain_c",
@@ -926,6 +968,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "rx",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/rx-0.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "rxdart",
       "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/rxdart-0.28.0",
       "packageUri": "lib/",
@@ -1011,9 +1059,9 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///D:/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///C:/Users/mario/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.10"
     },
     {
       "name": "source_gen",
@@ -1113,7 +1161,7 @@
     },
     {
       "name": "test_api",
-      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.9",
+      "rootUri": "file:///C:/Users/mario/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.11",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -1317,8 +1365,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.11.0",
-  "flutterRoot": "file:///D:/flutter",
-  "flutterVersion": "3.41.2",
+  "generatorVersion": "3.12.0",
+  "flutterRoot": "file:///C:/Users/mario/flutter",
+  "flutterVersion": "3.44.0",
   "pubCache": "file:///C:/Users/mario/AppData/Local/Pub/Cache"
 }

@@ -27,7 +27,9 @@ mixin _$GameState {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -49,7 +51,9 @@ mixin _$GameState {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -71,7 +75,9 @@ mixin _$GameState {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -186,7 +192,9 @@ class _$InitialImpl implements _Initial {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -211,7 +219,9 @@ class _$InitialImpl implements _Initial {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -236,7 +246,9 @@ class _$InitialImpl implements _Initial {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -351,7 +363,9 @@ class _$LoadingImpl implements _Loading {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -376,7 +390,9 @@ class _$LoadingImpl implements _Loading {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -401,7 +417,9 @@ class _$LoadingImpl implements _Loading {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -479,7 +497,9 @@ abstract class _$$PlayingImplCopyWith<$Res> {
       int score,
       List<Answer> userAnswers,
       int correctAnswers,
-      int streak});
+      int streak,
+      bool hintUsed,
+      List<String>? hintedOptions});
 }
 
 /// @nodoc
@@ -502,6 +522,8 @@ class __$$PlayingImplCopyWithImpl<$Res>
     Object? userAnswers = null,
     Object? correctAnswers = null,
     Object? streak = null,
+    Object? hintUsed = null,
+    Object? hintedOptions = freezed,
   }) {
     return _then(_$PlayingImpl(
       questions: null == questions
@@ -532,6 +554,14 @@ class __$$PlayingImplCopyWithImpl<$Res>
           ? _value.streak
           : streak // ignore: cast_nullable_to_non_nullable
               as int,
+      hintUsed: null == hintUsed
+          ? _value.hintUsed
+          : hintUsed // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hintedOptions: freezed == hintedOptions
+          ? _value._hintedOptions
+          : hintedOptions // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }
@@ -546,9 +576,12 @@ class _$PlayingImpl implements _Playing {
       required this.score,
       required final List<Answer> userAnswers,
       required this.correctAnswers,
-      required this.streak})
+      required this.streak,
+      this.hintUsed = false,
+      final List<String>? hintedOptions})
       : _questions = questions,
-        _userAnswers = userAnswers;
+        _userAnswers = userAnswers,
+        _hintedOptions = hintedOptions;
 
   final List<Question> _questions;
   @override
@@ -576,10 +609,24 @@ class _$PlayingImpl implements _Playing {
   final int correctAnswers;
   @override
   final int streak;
+// 50/50 hint (once per match). [hintedOptions] holds the two surviving
+// options for the current question (correct + one wrong), or null.
+  @override
+  @JsonKey()
+  final bool hintUsed;
+  final List<String>? _hintedOptions;
+  @override
+  List<String>? get hintedOptions {
+    final value = _hintedOptions;
+    if (value == null) return null;
+    if (_hintedOptions is EqualUnmodifiableListView) return _hintedOptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'GameState.playing(questions: $questions, currentQuestionIndex: $currentQuestionIndex, timeRemaining: $timeRemaining, score: $score, userAnswers: $userAnswers, correctAnswers: $correctAnswers, streak: $streak)';
+    return 'GameState.playing(questions: $questions, currentQuestionIndex: $currentQuestionIndex, timeRemaining: $timeRemaining, score: $score, userAnswers: $userAnswers, correctAnswers: $correctAnswers, streak: $streak, hintUsed: $hintUsed, hintedOptions: $hintedOptions)';
   }
 
   @override
@@ -598,7 +645,11 @@ class _$PlayingImpl implements _Playing {
                 .equals(other._userAnswers, _userAnswers) &&
             (identical(other.correctAnswers, correctAnswers) ||
                 other.correctAnswers == correctAnswers) &&
-            (identical(other.streak, streak) || other.streak == streak));
+            (identical(other.streak, streak) || other.streak == streak) &&
+            (identical(other.hintUsed, hintUsed) ||
+                other.hintUsed == hintUsed) &&
+            const DeepCollectionEquality()
+                .equals(other._hintedOptions, _hintedOptions));
   }
 
   @override
@@ -610,7 +661,9 @@ class _$PlayingImpl implements _Playing {
       score,
       const DeepCollectionEquality().hash(_userAnswers),
       correctAnswers,
-      streak);
+      streak,
+      hintUsed,
+      const DeepCollectionEquality().hash(_hintedOptions));
 
   /// Create a copy of GameState
   /// with the given fields replaced by the non-null parameter values.
@@ -632,7 +685,9 @@ class _$PlayingImpl implements _Playing {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -643,7 +698,7 @@ class _$PlayingImpl implements _Playing {
     required TResult Function(String message) error,
   }) {
     return playing(questions, currentQuestionIndex, timeRemaining, score,
-        userAnswers, correctAnswers, streak);
+        userAnswers, correctAnswers, streak, hintUsed, hintedOptions);
   }
 
   @override
@@ -658,7 +713,9 @@ class _$PlayingImpl implements _Playing {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -669,7 +726,7 @@ class _$PlayingImpl implements _Playing {
     TResult? Function(String message)? error,
   }) {
     return playing?.call(questions, currentQuestionIndex, timeRemaining, score,
-        userAnswers, correctAnswers, streak);
+        userAnswers, correctAnswers, streak, hintUsed, hintedOptions);
   }
 
   @override
@@ -684,7 +741,9 @@ class _$PlayingImpl implements _Playing {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -697,7 +756,7 @@ class _$PlayingImpl implements _Playing {
   }) {
     if (playing != null) {
       return playing(questions, currentQuestionIndex, timeRemaining, score,
-          userAnswers, correctAnswers, streak);
+          userAnswers, correctAnswers, streak, hintUsed, hintedOptions);
     }
     return orElse();
   }
@@ -754,7 +813,9 @@ abstract class _Playing implements GameState {
       required final int score,
       required final List<Answer> userAnswers,
       required final int correctAnswers,
-      required final int streak}) = _$PlayingImpl;
+      required final int streak,
+      final bool hintUsed,
+      final List<String>? hintedOptions}) = _$PlayingImpl;
 
   List<Question> get questions;
   int get currentQuestionIndex;
@@ -762,7 +823,10 @@ abstract class _Playing implements GameState {
   int get score;
   List<Answer> get userAnswers;
   int get correctAnswers;
-  int get streak;
+  int get streak; // 50/50 hint (once per match). [hintedOptions] holds the two surviving
+// options for the current question (correct + one wrong), or null.
+  bool get hintUsed;
+  List<String>? get hintedOptions;
 
   /// Create a copy of GameState
   /// with the given fields replaced by the non-null parameter values.
@@ -881,7 +945,9 @@ class _$AnsweredImpl implements _Answered {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -906,7 +972,9 @@ class _$AnsweredImpl implements _Answered {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -931,7 +999,9 @@ class _$AnsweredImpl implements _Answered {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -1147,7 +1217,9 @@ class _$FinishedImpl implements _Finished {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -1173,7 +1245,9 @@ class _$FinishedImpl implements _Finished {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -1199,7 +1273,9 @@ class _$FinishedImpl implements _Finished {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -1359,7 +1435,9 @@ class _$ErrorImpl implements _Error {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)
         playing,
     required TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)
@@ -1384,7 +1462,9 @@ class _$ErrorImpl implements _Error {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult? Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
@@ -1409,7 +1489,9 @@ class _$ErrorImpl implements _Error {
             int score,
             List<Answer> userAnswers,
             int correctAnswers,
-            int streak)?
+            int streak,
+            bool hintUsed,
+            List<String>? hintedOptions)?
         playing,
     TResult Function(bool isCorrect, String correctAnswer,
             String selectedAnswer, int score)?
