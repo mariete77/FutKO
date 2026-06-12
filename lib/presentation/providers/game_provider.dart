@@ -15,6 +15,7 @@ import '../../core/utils/score_calculator.dart';
 import '../../core/utils/fuzzy_matcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/analytics_service.dart';
+import '../../services/audio_service.dart';
 
 part 'game_provider.freezed.dart';
 part 'game_provider.g.dart';
@@ -172,11 +173,16 @@ class GameNotifier extends _$GameNotifier {
 
         if (currentState.timeRemaining <= 1) {
           timer.cancel();
+          AudioService().playRedCard();
           submitAnswer(
             selectedAnswer: '',
             isTimeout: true,
           );
         } else {
+          // Countdown en últimos 3 segundos
+          if (currentState.timeRemaining <= 3) {
+            AudioService().playCountdown();
+          }
           state = currentState.copyWith(
             timeRemaining: currentState.timeRemaining - 1,
           );

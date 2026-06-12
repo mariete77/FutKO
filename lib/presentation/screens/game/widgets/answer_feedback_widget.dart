@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:futko/domain/entities/question.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../services/audio_service.dart';
 import '../../../widgets/common/report_question_dialog.dart';
 
 class AnswerFeedbackWidget extends StatefulWidget {
@@ -55,6 +56,13 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
     );
 
     _controller.forward();
+
+    // Reproducir sonido apropiado
+    if (widget.isCorrect) {
+      AudioService().playGoal();
+    } else {
+      AudioService().playRedCard();
+    }
   }
 
   @override
