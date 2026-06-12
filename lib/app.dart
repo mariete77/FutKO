@@ -15,6 +15,7 @@ import 'package:futko/presentation/screens/profile/profile_screen.dart';
 import 'package:futko/presentation/screens/settings/settings_screen.dart';
 import 'package:futko/presentation/screens/daily/daily_question_screen.dart';
 import 'package:futko/presentation/screens/rules/rules_screen.dart';
+import 'package:futko/presentation/screens/stats/question_stats_screen.dart';
 import 'package:futko/presentation/providers/auth_provider.dart';
 import 'package:futko/presentation/providers/multiplayer_provider.dart';
 import 'package:futko/domain/entities/question.dart';
@@ -150,6 +151,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/rules',
         pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
           child: const RulesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/stats/questions',
+        pageBuilder: (context, state) => FutKOTransitions.slideHorizontal(
+          child: const QuestionStatsScreen(),
         ),
       ),
     ],
