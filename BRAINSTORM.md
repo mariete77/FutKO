@@ -21,12 +21,12 @@ la apuesta de fondo.
 | 2  | Feedback instantáneo al pulsar + recortar el "hueco muerto" | 🔥 alto | alto | bajo | ✅ Hecho |
 | 3  | Popup flotante "+100" (rise & fade) al puntuar | 🔥 alto | medio | bajo | ✅ Hecho |
 | 4  | Timer con pulso de tensión (late/satura, no solo color) | 🔥 alto | medio | bajo | ✅ Hecho |
-| 5  | Celebración de racha y victoria (confetti/partículas) | 🔥 alto | alto | medio | Pendiente |
-| 6  | **1v1 en vivo de verdad** (marcador del rival en tiempo real) | 🔥 alto | alto | alto | Pendiente |
-| 7  | Modos rápidos: Blitz / Muerte súbita / Racha infinita | 🔥 alto | alto | medio | Pendiente |
-| 8  | Comodines en vivo (+tiempo, saltar, doble puntos) | medio | medio | medio | Pendiente |
-| 9  | Racha diaria (la Pregunta del Día hoy NO tiene streak) | medio | alto | bajo | Pendiente |
-| 10 | Misiones diarias/semanales + logros (no existe nada) | medio | alto | medio | Pendiente |
+| 5  | Celebración de racha y victoria (confetti/partículas) | 🔥 alto | alto | medio | ✅ Racha (confetti victoria pend.) |
+| 6  | **1v1 en vivo de verdad** (marcador del rival en tiempo real) | 🔥 alto | alto | alto | Pendiente (requiere prueba 2 clientes) |
+| 7  | Modos rápidos: Blitz / Muerte súbita / Racha infinita | 🔥 alto | alto | medio | Pendiente (decisión de UX) |
+| 8  | Comodines en vivo (+tiempo, doble puntos) | medio | medio | medio | ✅ Hecho |
+| 9  | Racha diaria (la Pregunta del Día hoy NO tiene streak) | medio | alto | bajo | ✅ Hecho |
+| 10 | Logros (no existe nada) | medio | alto | medio | ✅ Hecho |
 
 > Los quick wins 1–4 están implementados en la rama `feat/game-feel-quickwins`.
 
