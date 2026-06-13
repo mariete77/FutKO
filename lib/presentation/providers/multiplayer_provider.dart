@@ -16,6 +16,7 @@ import '../../core/constants/game_constants.dart';
 import '../../core/utils/score_calculator.dart';
 import '../../core/utils/fuzzy_matcher.dart';
 import '../../core/utils/elo_calculator.dart';
+import '../../core/utils/league_system.dart';
 import 'user_provider.dart';
 
 /// Repository providers
@@ -856,6 +857,15 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           gamesPlayed: gamesPlayed,
         );
 
+        // League points earned this match (modulated by the ELO expectation).
+        // NOTE: applied for every multiplayer match; gate to ranked-only once
+        // casual/ranked are distinguished here.
+        final lpDelta = LeagueSystem.lpDelta(
+          playerElo: playerElo,
+          opponentElo: opponentElo,
+          score: score,
+        );
+
         // Calculate opponent's ELO change
         final opponentScore = 1.0 - score;
         final oppEloChange = eloCalc.calculateChange(
@@ -904,8 +914,20 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           final newStreak = isWin ? currentUser.stats.currentWinStreak + 1 : 0;
           final bestStreak = newStreak > currentUser.stats.bestWinStreak ? newStreak : currentUser.stats.bestWinStreak;
 
+          // Resolve league promotion/relegation. New players are shielded from
+          // relegation during their placement games.
+          final league = LeagueSystem.applyMatch(
+            tier: currentUser.leagueTier,
+            leaguePoints: currentUser.leaguePoints,
+            lpDelta: lpDelta,
+            protectedFromRelegation:
+                currentUser.stats.totalGames < GameConstants.placementGames,
+          );
+
           final updatedUser = currentUser.copyWith(
             elo: newElo,
+            leagueTier: league.tier,
+            leaguePoints: league.leaguePoints,
             stats: currentUser.stats.copyWith(
               totalGames: currentUser.stats.totalGames + 1,
               wins: currentUser.stats.wins + (isWin ? 1 : 0),

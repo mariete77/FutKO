@@ -126,6 +126,35 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           _rankBadge(user.rank),
+          const SizedBox(height: 10),
+          // Progreso de puntos en la liga actual
+          SizedBox(
+            width: 180,
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: (user.leaguePoints / 100).clamp(0.0, 1.0),
+                    minHeight: 6,
+                    backgroundColor: AppColors.yellow500.withOpacity(0.15),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.yellow500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${user.leaguePoints} / 100 pts',
+                  style: GoogleFonts.lexend(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 24),
 
           // ── ELO destacado ───────────────────────────────────
@@ -214,10 +243,11 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _rankBadge(String rank) {
     final color = switch (rank) {
-      'Diamond' => const Color(0xFF6FE7FF),
-      'Platinum' => const Color(0xFFB7C9D6),
-      'Gold' => AppColors.yellow500,
-      'Silver' => const Color(0xFFBFC4C9),
+      'Primera División' => const Color(0xFFFFD700),
+      'Segunda División' => const Color(0xFFE5E4E2),
+      'Primera RFEF' => const Color(0xFF4ADE80),
+      'Segunda RFEF' => const Color(0xFFB0B7C3),
+      'Tercera RFEF' => const Color(0xFFCD7F32),
       _ => AppColors.tertiary,
     };
     return Container(

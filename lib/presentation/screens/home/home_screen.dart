@@ -447,6 +447,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ),
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          // Barra de puntos de la liga actual (0–100)
+                          SizedBox(
+                            width: 150,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(3),
+                                  child: LinearProgressIndicator(
+                                    value: (user.leaguePoints / 100).clamp(0.0, 1.0),
+                                    minHeight: 5,
+                                    backgroundColor:
+                                        AppColors.yellow500.withOpacity(0.15),
+                                    valueColor: const AlwaysStoppedAnimation<Color>(
+                                      AppColors.yellow500,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${user.leaguePoints}/100 pts para ascender',
+                                  style: GoogleFonts.lexend(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                       Column(

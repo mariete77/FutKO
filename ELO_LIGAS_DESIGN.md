@@ -1,8 +1,15 @@
 # Estudio: sistema de clasificación por Ligas (pirámide española) para FutKO
 
-> Generado el 2026-06-13. Estudio de diseño — **decisión, no implementación**.
+> Generado el 2026-06-13. Estudio de diseño + **v1 implementada**.
 > Objetivo: elegir la mejor forma de clasificar jugadores con 5 ligas estilo
 > pirámide española, puntos por liga y ascenso/descenso por partida multijugador.
+
+> **Estado (v1, rama `feat/league-system`):** modelo híbrido implementado.
+> Decidido: inicio en Segunda RFEF, 5 ligas planas, sin temporadas/recompensas
+> aún. Hecho: `LeagueSystem` (+ tests), campos `leagueTier`/`leaguePoints` en
+> `User`/`UserModel`, actualización de LP al cerrar partida multijugador, y
+> Liga + barra de puntos en home y perfil. Pendiente: banner de ascenso/descenso
+> en pantalla de resultado, gating casual vs ranked, temporadas y recompensas.
 
 ---
 

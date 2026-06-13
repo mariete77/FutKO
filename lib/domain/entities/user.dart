@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../core/utils/league_system.dart';
 
 /// User entity
 class User extends Equatable {
@@ -6,7 +7,15 @@ class User extends Equatable {
   final String displayName;
   final String? email;
   final String? photoUrl;
+
+  /// Hidden MMR used for matchmaking and to modulate league points.
   final int elo;
+
+  /// Points within the current league (0–99). Reaching 100 promotes.
+  final int leaguePoints;
+
+  /// League tier 1 (Tercera RFEF) .. 5 (Primera División).
+  final int leagueTier;
   final UserStats stats;
   final Subscription subscription;
   final DailyGames dailyGames;
@@ -21,6 +30,8 @@ class User extends Equatable {
     this.email,
     this.photoUrl,
     required this.elo,
+    this.leaguePoints = 0,
+    this.leagueTier = 2, // Segunda RFEF
     required this.stats,
     required this.subscription,
     required this.dailyGames,
@@ -71,6 +82,8 @@ class User extends Equatable {
     String? email,
     String? photoUrl,
     int? elo,
+    int? leaguePoints,
+    int? leagueTier,
     UserStats? stats,
     Subscription? subscription,
     DailyGames? dailyGames,
@@ -85,6 +98,8 @@ class User extends Equatable {
       email: email ?? this.email,
       photoUrl: photoUrl ?? this.photoUrl,
       elo: elo ?? this.elo,
+      leaguePoints: leaguePoints ?? this.leaguePoints,
+      leagueTier: leagueTier ?? this.leagueTier,
       stats: stats ?? this.stats,
       subscription: subscription ?? this.subscription,
       dailyGames: dailyGames ?? this.dailyGames,
@@ -98,14 +113,8 @@ class User extends Equatable {
   /// Check if user is premium
   bool get isPremium => subscription.isActive;
 
-  /// Get rank name
-  String get rank {
-    if (elo >= 1800) return 'Diamond';
-    if (elo >= 1600) return 'Platinum';
-    if (elo >= 1400) return 'Gold';
-    if (elo >= 1200) return 'Silver';
-    return 'Bronze';
-  }
+  /// League name (derived from [leagueTier]).
+  String get rank => LeagueSystem.nameForTier(leagueTier);
 
   /// Get win rate
   double get winRate {
@@ -120,6 +129,8 @@ class User extends Equatable {
         email,
         photoUrl,
         elo,
+        leaguePoints,
+        leagueTier,
         stats,
         subscription,
         dailyGames,

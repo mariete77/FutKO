@@ -13,6 +13,8 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String?,
       photoUrl: json['photoUrl'] as String?,
       elo: (json['elo'] as num?)?.toInt() ?? 1000,
+      leaguePoints: (json['leaguePoints'] as num?)?.toInt() ?? 0,
+      leagueTier: (json['leagueTier'] as num?)?.toInt() ?? 2,
       stats: json['stats'] == null
           ? const UserStatsModel()
           : UserStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
@@ -45,6 +47,8 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'email': instance.email,
       'photoUrl': instance.photoUrl,
       'elo': instance.elo,
+      'leaguePoints': instance.leaguePoints,
+      'leagueTier': instance.leagueTier,
       'stats': instance.stats,
       'subscription': instance.subscription,
       'dailyGames': instance.dailyGames,

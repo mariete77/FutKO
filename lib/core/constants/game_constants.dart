@@ -42,12 +42,27 @@ class GameConstants {
   static const int answeredDelayIncorrectMs = 2600; // Delay after incorrect answer (more time to read correct answer)
   static const int answeredDelayTimeoutMs = 1800; // Delay after timeout
 
-  // Ranks (ELO ranges)
+  // Ranks (ELO ranges) — legacy bands, kept for EloCalculator.getRank.
   static const int rankBronze = 0;
   static const int rankSilver = 1200;
   static const int rankGold = 1400;
   static const int rankPlatinum = 1600;
   static const int rankDiamond = 1800;
+
+  // Leagues (Spanish football pyramid). tier 1 (lowest) .. 5 (highest).
+  // ELO is kept as a hidden MMR; the visible progression is league + points.
+  static const int leagueCount = 5;
+  static const int leagueStartTier = 2; // Segunda RFEF
+  static const int lpToPromote = 100; // points within a league to ascend
+  static const int lpBaseDelta = 24; // base swing, modulated by ELO expectation
+  static const int lpWinFloor = 10; // minimum gain on a win
+  static const int lpLossFloor = 10; // minimum loss on a defeat
+  static const int lpClampMin = -30;
+  static const int lpClampMax = 34;
+  static const int lpPromoteStart = 20; // LP after promoting
+  static const int lpRelegateStart = 75; // LP after relegating
+  static const int lpPerfBonusMax = 6; // extra LP for a dominant result
+  static const int placementGames = 5; // no relegation during placement
 
   // Subscription
   static const String subscriptionTypePremium = 'premium';

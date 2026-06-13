@@ -15,6 +15,8 @@ class UserModel with _$UserModel {
     String? email,
     String? photoUrl,
     @Default(1000) int elo,
+    @Default(0) int leaguePoints,
+    @Default(2) int leagueTier,
     @Default(UserStatsModel()) UserStatsModel stats,
     @Default(SubscriptionModel()) SubscriptionModel subscription,
     @Default(DailyGamesModel()) DailyGamesModel dailyGames,
@@ -49,6 +51,8 @@ class UserModel with _$UserModel {
       email: email,
       photoUrl: photoUrl,
       elo: elo,
+      leaguePoints: leaguePoints,
+      leagueTier: leagueTier,
       stats: UserStats(
         totalGames: stats.totalGames,
         wins: stats.wins,
@@ -83,6 +87,8 @@ class UserModel with _$UserModel {
       email: user.email,
       photoUrl: user.photoUrl,
       elo: user.elo,
+      leaguePoints: user.leaguePoints,
+      leagueTier: user.leagueTier,
       stats: UserStatsModel(
         totalGames: user.stats.totalGames,
         wins: user.stats.wins,

@@ -25,6 +25,8 @@ mixin _$UserModel {
   String? get email => throw _privateConstructorUsedError;
   String? get photoUrl => throw _privateConstructorUsedError;
   int get elo => throw _privateConstructorUsedError;
+  int get leaguePoints => throw _privateConstructorUsedError;
+  int get leagueTier => throw _privateConstructorUsedError;
   UserStatsModel get stats => throw _privateConstructorUsedError;
   SubscriptionModel get subscription => throw _privateConstructorUsedError;
   DailyGamesModel get dailyGames => throw _privateConstructorUsedError;
@@ -54,6 +56,8 @@ abstract class $UserModelCopyWith<$Res> {
       String? email,
       String? photoUrl,
       int elo,
+      int leaguePoints,
+      int leagueTier,
       UserStatsModel stats,
       SubscriptionModel subscription,
       DailyGamesModel dailyGames,
@@ -87,6 +91,8 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = freezed,
     Object? photoUrl = freezed,
     Object? elo = null,
+    Object? leaguePoints = null,
+    Object? leagueTier = null,
     Object? stats = null,
     Object? subscription = null,
     Object? dailyGames = null,
@@ -115,6 +121,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
       elo: null == elo
           ? _value.elo
           : elo // ignore: cast_nullable_to_non_nullable
+              as int,
+      leaguePoints: null == leaguePoints
+          ? _value.leaguePoints
+          : leaguePoints // ignore: cast_nullable_to_non_nullable
+              as int,
+      leagueTier: null == leagueTier
+          ? _value.leagueTier
+          : leagueTier // ignore: cast_nullable_to_non_nullable
               as int,
       stats: null == stats
           ? _value.stats
@@ -192,6 +206,8 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? email,
       String? photoUrl,
       int elo,
+      int leaguePoints,
+      int leagueTier,
       UserStatsModel stats,
       SubscriptionModel subscription,
       DailyGamesModel dailyGames,
@@ -226,6 +242,8 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = freezed,
     Object? photoUrl = freezed,
     Object? elo = null,
+    Object? leaguePoints = null,
+    Object? leagueTier = null,
     Object? stats = null,
     Object? subscription = null,
     Object? dailyGames = null,
@@ -254,6 +272,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
       elo: null == elo
           ? _value.elo
           : elo // ignore: cast_nullable_to_non_nullable
+              as int,
+      leaguePoints: null == leaguePoints
+          ? _value.leaguePoints
+          : leaguePoints // ignore: cast_nullable_to_non_nullable
+              as int,
+      leagueTier: null == leagueTier
+          ? _value.leagueTier
+          : leagueTier // ignore: cast_nullable_to_non_nullable
               as int,
       stats: null == stats
           ? _value.stats
@@ -296,6 +322,8 @@ class _$UserModelImpl extends _UserModel {
       this.email,
       this.photoUrl,
       this.elo = 1000,
+      this.leaguePoints = 0,
+      this.leagueTier = 2,
       this.stats = const UserStatsModel(),
       this.subscription = const SubscriptionModel(),
       this.dailyGames = const DailyGamesModel(),
@@ -321,6 +349,12 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey()
   final int elo;
+  @override
+  @JsonKey()
+  final int leaguePoints;
+  @override
+  @JsonKey()
+  final int leagueTier;
   @override
   @JsonKey()
   final UserStatsModel stats;
@@ -355,7 +389,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, displayName: $displayName, email: $email, photoUrl: $photoUrl, elo: $elo, stats: $stats, subscription: $subscription, dailyGames: $dailyGames, createdAt: $createdAt, lastLoginAt: $lastLoginAt, friends: $friends, pendingFriendRequests: $pendingFriendRequests)';
+    return 'UserModel(userId: $userId, displayName: $displayName, email: $email, photoUrl: $photoUrl, elo: $elo, leaguePoints: $leaguePoints, leagueTier: $leagueTier, stats: $stats, subscription: $subscription, dailyGames: $dailyGames, createdAt: $createdAt, lastLoginAt: $lastLoginAt, friends: $friends, pendingFriendRequests: $pendingFriendRequests)';
   }
 
   @override
@@ -370,6 +404,10 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.photoUrl, photoUrl) ||
                 other.photoUrl == photoUrl) &&
             (identical(other.elo, elo) || other.elo == elo) &&
+            (identical(other.leaguePoints, leaguePoints) ||
+                other.leaguePoints == leaguePoints) &&
+            (identical(other.leagueTier, leagueTier) ||
+                other.leagueTier == leagueTier) &&
             (identical(other.stats, stats) || other.stats == stats) &&
             (identical(other.subscription, subscription) ||
                 other.subscription == subscription) &&
@@ -393,6 +431,8 @@ class _$UserModelImpl extends _UserModel {
       email,
       photoUrl,
       elo,
+      leaguePoints,
+      leagueTier,
       stats,
       subscription,
       dailyGames,
@@ -424,6 +464,8 @@ abstract class _UserModel extends UserModel {
       final String? email,
       final String? photoUrl,
       final int elo,
+      final int leaguePoints,
+      final int leagueTier,
       final UserStatsModel stats,
       final SubscriptionModel subscription,
       final DailyGamesModel dailyGames,
@@ -446,6 +488,10 @@ abstract class _UserModel extends UserModel {
   String? get photoUrl;
   @override
   int get elo;
+  @override
+  int get leaguePoints;
+  @override
+  int get leagueTier;
   @override
   UserStatsModel get stats;
   @override
