@@ -66,6 +66,10 @@ class MultiplayerState {
   final List<Answer>? opponentAnswers;
   final int? eloChange;
   final int? newElo;
+  final int? lpDelta;
+  final bool promoted;
+  final bool relegated;
+  final int? newLeagueTier;
   final String? invitedFriendId;
 
   const MultiplayerState({
@@ -87,6 +91,10 @@ class MultiplayerState {
     this.opponentAnswers,
     this.eloChange,
     this.newElo,
+    this.lpDelta,
+    this.promoted = false,
+    this.relegated = false,
+    this.newLeagueTier,
     this.invitedFriendId,
   });
 
@@ -138,6 +146,10 @@ class MultiplayerState {
     List<Answer>? opponentAnswers,
     int? eloChange,
     int? newElo,
+    int? lpDelta,
+    bool? promoted,
+    bool? relegated,
+    int? newLeagueTier,
     String? invitedFriendId,
   }) {
     return MultiplayerState(
@@ -159,6 +171,10 @@ class MultiplayerState {
       opponentAnswers: opponentAnswers ?? this.opponentAnswers,
       eloChange: eloChange ?? this.eloChange,
       newElo: newElo ?? this.newElo,
+      lpDelta: lpDelta ?? this.lpDelta,
+      promoted: promoted ?? this.promoted,
+      relegated: relegated ?? this.relegated,
+      newLeagueTier: newLeagueTier ?? this.newLeagueTier,
       invitedFriendId: invitedFriendId ?? this.invitedFriendId,
     );
   }
@@ -822,9 +838,14 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
       );
 
       // ── 3. ELO and Results calculation ────────────────────────
+      final isRanked = state.mode == MultiplayerMode.ranked;
       int? eloChange;
       int? newElo;
       MatchResult? matchResult;
+      int matchLpDelta = 0;
+      bool matchPromoted = false;
+      bool matchRelegated = false;
+      int? matchNewTier;
 
       if (currentUserId != null) {
         final userState = _ref.read(userNotifierProvider);
@@ -858,13 +879,17 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
         );
 
         // League points earned this match (modulated by the ELO expectation).
-        // NOTE: applied for every multiplayer match; gate to ranked-only once
-        // casual/ranked are distinguished here.
+        // Only ranked matches affect ELO and league points.
         final lpDelta = LeagueSystem.lpDelta(
           playerElo: playerElo,
           opponentElo: opponentElo,
           score: score,
         );
+
+        if (!isRanked) {
+          eloChange = 0;
+          newElo = playerElo;
+        }
 
         // Calculate opponent's ELO change
         final opponentScore = 1.0 - score;
@@ -914,15 +939,27 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           final newStreak = isWin ? currentUser.stats.currentWinStreak + 1 : 0;
           final bestStreak = newStreak > currentUser.stats.bestWinStreak ? newStreak : currentUser.stats.bestWinStreak;
 
-          // Resolve league promotion/relegation. New players are shielded from
-          // relegation during their placement games.
-          final league = LeagueSystem.applyMatch(
-            tier: currentUser.leagueTier,
-            leaguePoints: currentUser.leaguePoints,
-            lpDelta: lpDelta,
-            protectedFromRelegation:
-                currentUser.stats.totalGames < GameConstants.placementGames,
-          );
+          // Resolve league promotion/relegation (ranked only). New players are
+          // shielded from relegation during their placement games.
+          final league = isRanked
+              ? LeagueSystem.applyMatch(
+                  tier: currentUser.leagueTier,
+                  leaguePoints: currentUser.leaguePoints,
+                  lpDelta: lpDelta,
+                  protectedFromRelegation:
+                      currentUser.stats.totalGames < GameConstants.placementGames,
+                )
+              : LeagueResult(
+                  tier: currentUser.leagueTier,
+                  leaguePoints: currentUser.leaguePoints,
+                  lpDelta: 0,
+                  promoted: false,
+                  relegated: false,
+                );
+          matchLpDelta = league.lpDelta;
+          matchPromoted = league.promoted;
+          matchRelegated = league.relegated;
+          matchNewTier = league.tier;
 
           final updatedUser = currentUser.copyWith(
             elo: newElo,
@@ -948,8 +985,12 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           status: MultiplayerStatus.finished,
           eloChange: eloChange,
           newElo: newElo,
-          opponentElo: (matchResult != null && opponentId != null) 
-              ? matchResult.newElo[opponentId] 
+          lpDelta: matchLpDelta,
+          promoted: matchPromoted,
+          relegated: matchRelegated,
+          newLeagueTier: matchNewTier,
+          opponentElo: (matchResult != null && opponentId != null)
+              ? matchResult.newElo[opponentId]
               : state.opponentElo,
         );
       } else {

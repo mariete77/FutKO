@@ -90,6 +90,10 @@ class GameNotifier extends _$GameNotifier {
   int _lastScoreDelta = 0;
   int get lastScoreDelta => _lastScoreDelta;
 
+  /// Streak after the most recent answer (the answered state no longer carries
+  /// the playing streak, so the feedback screen reads it from here).
+  int get lastStreak => _pendingStreak;
+
   @override
   GameState build() {
     ref.onDispose(() {

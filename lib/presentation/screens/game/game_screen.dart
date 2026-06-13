@@ -70,11 +70,9 @@ class GameScreen extends ConsumerWidget {
                     playing: (_, currentQuestionIndex, ___, score, _____, correctAnswers, ________, hintUsed, hintedOptions) =>
                         _buildPlaying(context, ref, currentQuestion, currentQuestionIndex, progress, timerProgress, score, correctAnswers, hintUsed, hintedOptions),
                     answered: (isCorrect, correctAnswer, selectedAnswer, score) =>
-                        ref.read(gameNotifierProvider).maybeWhen(
-                          playing: (questions, _, timeRemaining, __, userAnswers, correctAnswers, streak, ___, ____) =>
-                              _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion, streak),
-                          orElse: () => _buildAnswered(context, ref, isCorrect, correctAnswer, selectedAnswer, score, currentQuestion, 0),
-                        ),
+                        _buildAnswered(context, ref, isCorrect, correctAnswer,
+                            selectedAnswer, score, currentQuestion,
+                            ref.read(gameNotifierProvider.notifier).lastStreak),
                     finished: (score, totalQuestions, correctAnswers, userAnswers, averageTime) =>
                         _buildFinished(context, ref, score, totalQuestions, correctAnswers, userAnswers, averageTime),
                     error: (message) => _buildError(context, message, ref),

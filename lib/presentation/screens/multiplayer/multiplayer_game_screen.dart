@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../providers/multiplayer_provider.dart';
 import '../../providers/friends_provider.dart';
 import '../game/widgets/timer_widget.dart';
@@ -11,6 +12,7 @@ import '../game/widgets/type_answer_widget.dart';
 import '../game/widgets/game_result_widget.dart';
 import '../../../core/constants/game_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/league_system.dart';
 import '../../../domain/entities/match.dart';
 
 /// Multiplayer game screen
@@ -315,7 +317,7 @@ class MultiplayerGameScreen extends ConsumerWidget {
           })()
         : null;
 
-    return GameResultWidget(
+    final result = GameResultWidget(
       score: state.playerScore,
       totalQuestions: totalQuestions,
       correctAnswers: state.correctAnswers,
@@ -353,6 +355,25 @@ class MultiplayerGameScreen extends ConsumerWidget {
         ref.read(multiplayerProvider.notifier).reset();
         context.go('/home');
       },
+    );
+
+    if (!state.promoted && !state.relegated) return result;
+
+    return Stack(
+      children: [
+        result,
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: SafeArea(
+            child: _LeagueChangeBanner(
+              promoted: state.promoted,
+              tier: state.newLeagueTier ?? GameConstants.leagueStartTier,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -409,6 +430,65 @@ class MultiplayerGameScreen extends ConsumerWidget {
             child: Text('Salir', style: TextStyle(color: AppColors.error)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Banner de ascenso/descenso de liga que aparece sobre el resultado.
+class _LeagueChangeBanner extends StatelessWidget {
+  final bool promoted;
+  final int tier;
+
+  const _LeagueChangeBanner({required this.promoted, required this.tier});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = promoted ? AppColors.success : AppColors.error;
+    final label = promoted ? '¡ASCENSO!' : 'DESCENSO';
+    final league = LeagueSystem.nameForTier(tier);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutBack,
+      builder: (context, t, child) => Opacity(
+        opacity: t.clamp(0.0, 1.0),
+        child: Transform.translate(
+          offset: Offset(0, -24 * (1 - t)),
+          child: child,
+        ),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.5)),
+          boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 24)],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              promoted ? Icons.arrow_upward : Icons.arrow_downward,
+              color: color,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                '$label  $league',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

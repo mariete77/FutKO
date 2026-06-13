@@ -215,6 +215,10 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
                     color: AppColors.onSurface,
                   ),
                 ),
+                if (widget.isCorrect && widget.streak >= 3) ...[
+                  const SizedBox(height: 12),
+                  _buildStreakChip(),
+                ],
                 if (!widget.isCorrect) ...[
                   const SizedBox(height: 12),
                   Container(
@@ -409,6 +413,41 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Celebración de racha: chip que rebota al encadenar 3+ aciertos.
+  Widget _buildStreakChip() {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.elasticOut,
+      builder: (context, t, child) =>
+          Transform.scale(scale: t.clamp(0.0, 1.2), child: child),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.tertiary.withOpacity(0.18),
+          borderRadius: BorderRadius.circular(9999),
+          border: Border.all(color: AppColors.tertiary.withOpacity(0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.local_fire_department,
+                size: 18, color: AppColors.tertiary),
+            const SizedBox(width: 6),
+            Text(
+              '¡RACHA x${widget.streak}!',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: AppColors.tertiary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
