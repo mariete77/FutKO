@@ -572,6 +572,9 @@ class GameScreen extends ConsumerWidget {
         .length;
     final canUseHint = !hintUsed && reducibleOptions > 2;
     final hintColor = canUseHint ? AppColors.success : AppColors.error;
+    final notifier = ref.read(gameNotifierProvider.notifier);
+    final timeUsed = notifier.timeUsed;
+    final doubleUsed = notifier.doubleUsed;
 
     return Row(
       children: [
@@ -633,6 +636,21 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
 
+        // +Tiempo power-up (once per match)
+        _powerupButton(
+          icon: Icons.more_time,
+          enabled: !timeUsed,
+          onTap: () => notifier.addTime(),
+        ),
+        const SizedBox(width: 8),
+        // Doble puntos power-up (once per match)
+        _powerupButton(
+          icon: Icons.bolt,
+          enabled: !doubleUsed,
+          onTap: () => notifier.useDoublePoints(),
+        ),
+        const SizedBox(width: 8),
+
         // Hint button (50/50, once per match): green when available, red once spent.
         Material(
           color: hintColor.withOpacity(0.12),
@@ -672,6 +690,33 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// Compact icon button for an in-game power-up; dims when already spent.
+  Widget _powerupButton({
+    required IconData icon,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    final color = enabled
+        ? AppColors.yellow500
+        : AppColors.onSurfaceVariant.withOpacity(0.4);
+    return Material(
+      color: color.withOpacity(0.12),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: enabled ? onTap : null,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withOpacity(0.5)),
+          ),
+          child: Icon(icon, size: 18, color: color),
+        ),
+      ),
     );
   }
 

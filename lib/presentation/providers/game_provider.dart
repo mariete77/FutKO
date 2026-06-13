@@ -77,8 +77,13 @@ class GameNotifier extends _$GameNotifier {
   List<Question> _questions = [];
   int _currentQuestionIndex = 0;
 
-  // Whether the once-per-match 50/50 hint has been spent.
+  // Once-per-match power-ups.
   bool _hintUsed = false;
+  bool _timeUsed = false;
+  bool _doubleUsed = false;
+  bool _doubleActive = false; // next correct answer scores double
+  bool get timeUsed => _timeUsed;
+  bool get doubleUsed => _doubleUsed;
 
   // Pending state for manual "next question" flow
   int _pendingScore = 0;
@@ -131,6 +136,9 @@ class GameNotifier extends _$GameNotifier {
           _questions = _convertToTypeAnswer(questions);
           _currentQuestionIndex = 0;
           _hintUsed = false;
+          _timeUsed = false;
+          _doubleUsed = false;
+          _doubleActive = false;
 
           AnalyticsService.instance.logGameStarted(
             mode: 'practice',
@@ -216,12 +224,15 @@ class GameNotifier extends _$GameNotifier {
 
     final maxTime = _getTimeForQuestion(question);
 
-    final questionScore = calculateTypedScore(
+    final baseScore = calculateTypedScore(
       similarity: similarity,
       timeRemaining: currentState.timeRemaining,
       maxTime: maxTime,
       streak: currentState.streak,
     );
+    final questionScore =
+        (_doubleActive && isCorrect) ? baseScore * 2 : baseScore;
+    if (_doubleActive && isCorrect) _doubleActive = false;
 
     final answer = Answer(
       questionIndex: currentState.currentQuestionIndex,
@@ -262,13 +273,16 @@ class GameNotifier extends _$GameNotifier {
     final question = currentState.questions[currentState.currentQuestionIndex];
     final isCorrect = !isTimeout && question.isCorrect(selectedAnswer);
 
-    // Calculate score using score_calculator
-    final questionScore = calculateQuestionScore(
+    // Calculate score (x2 if the double-points power-up is active)
+    final baseScore = calculateQuestionScore(
       isCorrect: isCorrect,
       timeRemaining: currentState.timeRemaining,
       streak: currentState.streak,
       isTimeout: isTimeout,
     );
+    final questionScore =
+        (_doubleActive && isCorrect) ? baseScore * 2 : baseScore;
+    if (_doubleActive && isCorrect) _doubleActive = false;
 
     // Create answer record - use appropriate time for this question type
     final maxTime = _getTimeForQuestion(question);
@@ -492,6 +506,9 @@ class GameNotifier extends _$GameNotifier {
     _questions = [];
     _currentQuestionIndex = 0;
     _hintUsed = false;
+    _timeUsed = false;
+    _doubleUsed = false;
+    _doubleActive = false;
     _pendingScore = 0;
     _pendingUserAnswers = [];
     _pendingCorrectAnswers = 0;
@@ -567,6 +584,27 @@ class GameNotifier extends _$GameNotifier {
 
     _hintUsed = true;
     state = currentState.copyWith(hintUsed: true, hintedOptions: kept);
+  }
+
+  /// +Tiempo: añade 5 segundos al cronómetro (una vez por partida).
+  void addTime() {
+    final currentState = state;
+    if (currentState is! _Playing) return;
+    if (_timeUsed) return;
+    _timeUsed = true;
+    state = currentState.copyWith(
+      timeRemaining: currentState.timeRemaining + 5,
+    );
+  }
+
+  /// Doble puntos: la siguiente respuesta correcta vale el doble (una vez).
+  /// El botón se deshabilita en el siguiente tick del cronómetro.
+  void useDoublePoints() {
+    final currentState = state;
+    if (currentState is! _Playing) return;
+    if (_doubleUsed) return;
+    _doubleUsed = true;
+    _doubleActive = true;
   }
 }
 
