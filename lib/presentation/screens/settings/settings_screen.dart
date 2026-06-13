@@ -79,6 +79,19 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // ── Progreso ────────────────────────────────────────
+          _sectionLabel('Progreso'),
+          _card(
+            child: _tile(
+              icon: Icons.emoji_events_outlined,
+              iconColor: AppColors.yellow500,
+              title: 'Logros',
+              subtitle: 'Tus medallas y retos',
+              onTap: () => context.push('/achievements'),
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // ── Preferencias ────────────────────────────────────
           _sectionLabel('Preferencias'),
           _card(
