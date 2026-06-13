@@ -206,12 +206,38 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
   /// Get current user ELO (defaults to 1000 if profile not loaded)
   int get _userElo => _ref.read(userNotifierProvider).valueOrNull?.elo ?? 1000;
 
+  /// Whether the user can still play [mode] today given the freemium limits.
+  bool _canPlay(User user, MultiplayerMode mode) {
+    if (mode == MultiplayerMode.friendChallenge) return true; // no cuenta
+    final isRanked = mode == MultiplayerMode.ranked;
+    final daily = user.dailyGames;
+    final played = daily.isToday
+        ? (isRanked ? daily.rankedPlayed : daily.casualPlayed)
+        : 0;
+    final limit = isRanked
+        ? (user.isPremium
+            ? GameConstants.premiumRankedGamesPerDay
+            : GameConstants.freeRankedGamesPerDay)
+        : (user.isPremium ? 1 << 30 : GameConstants.freeCasualGamesPerDay);
+    return played < limit;
+  }
+
   /// Start searching for a match
   Future<void> startMatchmaking(MultiplayerMode mode) async {
     if (_currentUserId == null) {
       state = state.copyWith(
         status: MultiplayerStatus.error,
         errorMessage: 'No autenticado',
+      );
+      return;
+    }
+
+    final user = _ref.read(userNotifierProvider).valueOrNull;
+    if (user != null && !_canPlay(user, mode)) {
+      state = state.copyWith(
+        status: MultiplayerStatus.error,
+        errorMessage:
+            'Has alcanzado tu límite diario de partidas. Hazte Premium para jugar sin límites.',
       );
       return;
     }
@@ -961,10 +987,25 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           matchRelegated = league.relegated;
           matchNewTier = league.tier;
 
+          // Count this match toward the daily freemium limit (skip friend
+          // challenges). Resets the counters when the stored day is not today.
+          final dg = currentUser.dailyGames;
+          final dgToday = dg.isToday;
+          final newDaily = state.mode == MultiplayerMode.friendChallenge
+              ? dg
+              : DailyGames(
+                  date: DateTime.now(),
+                  casualPlayed:
+                      (dgToday ? dg.casualPlayed : 0) + (isRanked ? 0 : 1),
+                  rankedPlayed:
+                      (dgToday ? dg.rankedPlayed : 0) + (isRanked ? 1 : 0),
+                );
+
           final updatedUser = currentUser.copyWith(
             elo: newElo,
             leagueTier: league.tier,
             leaguePoints: league.leaguePoints,
+            dailyGames: newDaily,
             stats: currentUser.stats.copyWith(
               totalGames: currentUser.stats.totalGames + 1,
               wins: currentUser.stats.wins + (isWin ? 1 : 0),
