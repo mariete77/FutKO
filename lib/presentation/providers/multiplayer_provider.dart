@@ -296,7 +296,9 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           _questions = questions;
         }
 
-        final opponentId = joinedMatch.getOpponentId(_currentUserId);
+        final opponentId = _currentUserId != null
+            ? joinedMatch.getOpponentId(_currentUserId!)
+            : null;
         final opponentName = opponentId != null
             ? await _getOpponentDisplayName(opponentId)
             : 'Oponente';
@@ -433,7 +435,9 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
 
     await _ref.read(matchRepositoryProvider).updateMatch(match.id, updatedMatch);
 
-    final opponentId = updatedMatch.getOpponentId(_currentUserId);
+    final opponentId = _currentUserId != null
+        ? updatedMatch.getOpponentId(_currentUserId!)
+        : null;
     final opponentName = opponentId != null
         ? await _getOpponentDisplayName(opponentId)
         : 'Oponente';

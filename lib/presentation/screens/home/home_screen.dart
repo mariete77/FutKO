@@ -438,7 +438,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               borderRadius: BorderRadius.circular(9999),
                             ),
                             child: Text(
-                               displayUser.rank.name.toUpperCase(),
+                              user.rank.toUpperCase(),
                               style: GoogleFonts.lexend(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,

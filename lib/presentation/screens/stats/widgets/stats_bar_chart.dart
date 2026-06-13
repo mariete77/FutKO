@@ -6,7 +6,7 @@ import '../../../../domain/repositories/quiz_attempt_repository.dart';
 
 /// Gráfico de barras horizontales: acierto % por tipo de pregunta
 class StatsBarChart extends StatelessWidget {
-  final Map<String, QuestionStats> statsByType;
+  final Map<String, TypeStats> statsByType;
 
   const StatsBarChart({super.key, required this.statsByType});
 
