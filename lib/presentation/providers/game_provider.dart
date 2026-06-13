@@ -16,6 +16,7 @@ import '../../core/utils/fuzzy_matcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/analytics_service.dart';
 import '../../services/audio_service.dart';
+import '../../services/haptics_service.dart';
 
 part 'game_provider.freezed.dart';
 part 'game_provider.g.dart';
@@ -84,6 +85,10 @@ class GameNotifier extends _$GameNotifier {
   List<Answer> _pendingUserAnswers = [];
   int _pendingCorrectAnswers = 0;
   int _pendingStreak = 0;
+
+  // Points earned on the most recent answer (for the floating "+X" animation).
+  int _lastScoreDelta = 0;
+  int get lastScoreDelta => _lastScoreDelta;
 
   @override
   GameState build() {
@@ -182,6 +187,7 @@ class GameNotifier extends _$GameNotifier {
           // Countdown en últimos 3 segundos
           if (currentState.timeRemaining <= 3) {
             AudioService().playCountdown();
+            HapticsService().countdownTick();
           }
           state = currentState.copyWith(
             timeRemaining: currentState.timeRemaining - 1,
@@ -232,6 +238,7 @@ class GameNotifier extends _$GameNotifier {
       question: question,
       selectedAnswer: typedAnswer,
       newScore: newScore,
+      scoreDelta: questionScore,
       updatedAnswers: updatedAnswers,
       newCorrectAnswers: newCorrectAnswers,
       newStreak: newStreak,
@@ -299,6 +306,7 @@ class GameNotifier extends _$GameNotifier {
       question: question,
       selectedAnswer: selectedAnswer,
       newScore: newScore,
+      scoreDelta: questionScore,
       updatedAnswers: updatedAnswers,
       newCorrectAnswers: newCorrectAnswers,
       newStreak: newStreak,
@@ -356,6 +364,7 @@ class GameNotifier extends _$GameNotifier {
     required Question question,
     required String selectedAnswer,
     required int newScore,
+    required int scoreDelta,
     required List<Answer> updatedAnswers,
     required int newCorrectAnswers,
     required int newStreak,
@@ -367,6 +376,7 @@ class GameNotifier extends _$GameNotifier {
     _pendingUserAnswers = updatedAnswers;
     _pendingCorrectAnswers = newCorrectAnswers;
     _pendingStreak = newStreak;
+    _lastScoreDelta = scoreDelta;
 
     state = GameState.answered(
       isCorrect: isCorrect,

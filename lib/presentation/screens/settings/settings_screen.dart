@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/audio_settings_provider.dart';
+import '../../providers/haptics_settings_provider.dart';
 import '../home/widgets/subscription_modal.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -97,6 +98,14 @@ class SettingsScreen extends ConsumerWidget {
                   icon: Icons.music_note_outlined,
                   title: 'Música',
                   provider: audioMusicEnabledProvider,
+                ),
+                const Divider(height: 1, color: Colors.white10),
+                // Haptics toggle
+                _switchRow(
+                  ref,
+                  icon: Icons.vibration,
+                  title: 'Vibración',
+                  provider: hapticsEnabledProvider,
                 ),
                 const Divider(height: 1, color: Colors.white10),
                 // Language (placeholder)
@@ -254,7 +263,7 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref, {
     required IconData icon,
     required String title,
-    required StateNotifierProvider<StateNotifier<bool>, bool> provider,
+    required StateNotifierProvider<BoolSettingNotifier, bool> provider,
   }) {
     final value = ref.watch(provider);
     return Padding(

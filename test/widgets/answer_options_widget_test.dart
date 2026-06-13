@@ -57,6 +57,8 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Pelé'));
+      // El callback se dispara tras un breve flash de acierto/fallo (~280 ms).
+      await tester.pump(const Duration(milliseconds: 300));
       expect(selected, 'Pelé');
     });
 

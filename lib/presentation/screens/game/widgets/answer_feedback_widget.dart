@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:futko/domain/entities/question.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../services/audio_service.dart';
+import '../../../../services/haptics_service.dart';
 import '../../../widgets/common/report_question_dialog.dart';
 
 class AnswerFeedbackWidget extends StatefulWidget {
@@ -12,6 +13,9 @@ class AnswerFeedbackWidget extends StatefulWidget {
   final String selectedAnswer;
   final int score;
   final int streak;
+
+  /// Points earned on this question (for the floating "+X" flourish).
+  final int scoreDelta;
   final Question? question;
   final VoidCallback? onNextQuestion;
 
@@ -22,6 +26,7 @@ class AnswerFeedbackWidget extends StatefulWidget {
     required this.selectedAnswer,
     required this.score,
     required this.streak,
+    this.scoreDelta = 0,
     this.question,
     this.onNextQuestion,
   });
@@ -31,10 +36,13 @@ class AnswerFeedbackWidget extends StatefulWidget {
 }
 
 class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
+
+  // Drives the floating "+X" points flourish over the result icon.
+  late AnimationController _pointsController;
 
   @override
   void initState() {
@@ -55,19 +63,31 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
+    _pointsController = AnimationController(
+      duration: const Duration(milliseconds: 1100),
+      vsync: this,
+    );
+
     _controller.forward();
 
-    // Reproducir sonido apropiado
+    // Reproducir sonido + vibración apropiados
     if (widget.isCorrect) {
       AudioService().playGoal();
+      HapticsService().success();
     } else {
       AudioService().playRedCard();
+      HapticsService().error();
+    }
+
+    if (widget.isCorrect && widget.scoreDelta > 0) {
+      _pointsController.forward();
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _pointsController.dispose();
     super.dispose();
   }
 
@@ -139,31 +159,42 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
             ),
             child: Column(
               children: [
-                // Icon
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: widget.isCorrect ? AppColors.primary : AppColors.error,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.15),
-                      width: 4,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (widget.isCorrect ? AppColors.primary : AppColors.error)
-                            .withOpacity(0.3),
-                        blurRadius: 30,
-                        spreadRadius: 4,
+                // Icon + floating "+X" points
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: widget.isCorrect ? AppColors.primary : AppColors.error,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.15),
+                          width: 4,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (widget.isCorrect ? AppColors.primary : AppColors.error)
+                                .withOpacity(0.3),
+                            blurRadius: 30,
+                            spreadRadius: 4,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    widget.isCorrect ? Icons.sports_soccer : Icons.rectangle,
-                    size: 40,
-                    color: widget.isCorrect ? AppColors.onPrimary : AppColors.onError,
-                  ),
+                      child: Icon(
+                        widget.isCorrect ? Icons.sports_soccer : Icons.rectangle,
+                        size: 40,
+                        color: widget.isCorrect ? AppColors.onPrimary : AppColors.onError,
+                      ),
+                    ),
+                    if (widget.isCorrect && widget.scoreDelta > 0)
+                      Positioned(
+                        top: -34,
+                        child: _buildFloatingPoints(),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -378,6 +409,43 @@ class _AnswerFeedbackWidgetState extends State<AnswerFeedbackWidget>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Floating "+X" that pops above the result icon and drifts up while fading.
+  Widget _buildFloatingPoints() {
+    return AnimatedBuilder(
+      animation: _pointsController,
+      builder: (context, child) {
+        final t = _pointsController.value;
+        final dy = -38.0 * Curves.easeOut.transform(t);
+        final opacity = t < 0.2
+            ? t / 0.2
+            : (t > 0.7 ? (1 - (t - 0.7) / 0.3).clamp(0.0, 1.0) : 1.0);
+        final scale =
+            1.3 - 0.3 * Curves.easeOut.transform((t / 0.3).clamp(0.0, 1.0));
+        return Opacity(
+          opacity: opacity,
+          child: Transform.translate(
+            offset: Offset(0, dy),
+            child: Transform.scale(scale: scale, child: child),
+          ),
+        );
+      },
+      child: Text(
+        '+${widget.scoreDelta}',
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 30,
+          fontWeight: FontWeight.w900,
+          color: AppColors.yellow500,
+          shadows: [
+            Shadow(
+              color: AppColors.yellow500.withOpacity(0.5),
+              blurRadius: 14,
+            ),
+          ],
+        ),
       ),
     );
   }

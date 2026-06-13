@@ -312,14 +312,17 @@ class GameScreen extends ConsumerWidget {
   ) {
     if (currentQuestion == null) return _buildLoading();
 
-    final timeRemaining = (timerProgress * GameConstants.secondsPerQuestion).ceil();
+    final maxTime = currentQuestion.options.isEmpty
+        ? GameConstants.secondsPerTypeQuestion
+        : GameConstants.secondsPerQuestion;
+    final timeRemaining = (timerProgress * maxTime).ceil();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
       child: Column(
         children: [
           // ── Scoreboard ──────────────────────
-          _buildScoreboard(context, currentQuestionIndex, timeRemaining, score),
+          _buildScoreboard(context, currentQuestionIndex, timeRemaining, score, maxTime),
           const SizedBox(height: 24),
 
           // ── Question ────────────────────────
@@ -355,7 +358,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScoreboard(BuildContext context, int currentQuestionIndex, int timeRemaining, int score) {
+  Widget _buildScoreboard(BuildContext context, int currentQuestionIndex, int timeRemaining, int score, int maxTime) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow.withOpacity(0.8),
@@ -431,53 +434,8 @@ class GameScreen extends ConsumerWidget {
                       ],
                     ),
 
-                    // Timer
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 80,
-                          height: 80,
-                          child: CircularProgressIndicator(
-                            value: timeRemaining / (currentQuestion?.options.isEmpty ?? false
-                              ? GameConstants.secondsPerTypeQuestion
-                              : GameConstants.secondsPerQuestion),
-                            strokeWidth: 5,
-                            backgroundColor: AppColors.surfaceContainerHighest,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              timeRemaining <= 5 ? AppColors.error : AppColors.yellow500,
-                            ),
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            Text(
-                              timeRemaining.toString().padLeft(2, '0'),
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.yellow500,
-                                shadows: [
-                                  Shadow(
-                                    color: AppColors.yellow500.withOpacity(0.4),
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              'Segundos',
-                              style: GoogleFonts.lexend(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.yellow500.withOpacity(0.5),
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    // Timer (pulsa y se enrojece en los últimos segundos)
+                    _PulseTimer(timeRemaining: timeRemaining, maxTime: maxTime),
 
                     // Match Score
                     Column(
@@ -720,14 +678,14 @@ class GameScreen extends ConsumerWidget {
   }
 
   Widget _buildAnswered(BuildContext context, WidgetRef ref, bool isCorrect,
-    String correctAnswer, String selectedAnswer, int score, dynamic currentQuestion, [int streak = 0],
-  ) {
+    String correctAnswer, String selectedAnswer, int score, dynamic currentQuestion, [int streak = 0]) {
     return AnswerFeedbackWidget(
       isCorrect: isCorrect,
       correctAnswer: correctAnswer,
       selectedAnswer: selectedAnswer,
       score: score,
       streak: streak,
+      scoreDelta: ref.read(gameNotifierProvider.notifier).lastScoreDelta,
       question: currentQuestion,
       onNextQuestion: () => ref.read(gameNotifierProvider.notifier).nextQuestion(),
     );
@@ -979,4 +937,95 @@ class _PitchMarkingsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Pulsing Timer ─────────────────────────────────────────
+/// Circular countdown that pulses (scale) and turns red in the last seconds
+/// to build tension. Stateless visuals come from [timeRemaining]/[maxTime].
+class _PulseTimer extends StatefulWidget {
+  final int timeRemaining;
+  final int maxTime;
+
+  const _PulseTimer({required this.timeRemaining, required this.maxTime});
+
+  @override
+  State<_PulseTimer> createState() => _PulseTimerState();
+}
+
+class _PulseTimerState extends State<_PulseTimer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  bool get _low => widget.timeRemaining <= 5;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = widget.maxTime > 0
+        ? (widget.timeRemaining / widget.maxTime).clamp(0.0, 1.0)
+        : 0.0;
+    final color = _low ? AppColors.error : AppColors.yellow500;
+
+    return AnimatedBuilder(
+      animation: _pulse,
+      builder: (context, child) {
+        final scale = _low ? 1.0 + 0.10 * _pulse.value : 1.0;
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 80,
+            height: 80,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 5,
+              backgroundColor: AppColors.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.timeRemaining.toString().padLeft(2, '0'),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                  shadows: [
+                    Shadow(color: color.withOpacity(0.4), blurRadius: 10),
+                  ],
+                ),
+              ),
+              Text(
+                'Segundos',
+                style: GoogleFonts.lexend(
+                  fontSize: 8,
+                  fontWeight: FontWeight.w600,
+                  color: color.withOpacity(0.5),
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
