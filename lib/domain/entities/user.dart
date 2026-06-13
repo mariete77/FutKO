@@ -16,6 +16,13 @@ class User extends Equatable {
 
   /// League tier 1 (Tercera RFEF) .. 5 (Primera División).
   final int leagueTier;
+
+  /// Consecutive days the daily question has been answered.
+  final int dailyStreak;
+  final int bestDailyStreak;
+
+  /// Last day the daily question was answered (yyyy-MM-dd).
+  final String? lastDailyDate;
   final UserStats stats;
   final Subscription subscription;
   final DailyGames dailyGames;
@@ -32,6 +39,9 @@ class User extends Equatable {
     required this.elo,
     this.leaguePoints = 0,
     this.leagueTier = 2, // Segunda RFEF
+    this.dailyStreak = 0,
+    this.bestDailyStreak = 0,
+    this.lastDailyDate,
     required this.stats,
     required this.subscription,
     required this.dailyGames,
@@ -84,6 +94,9 @@ class User extends Equatable {
     int? elo,
     int? leaguePoints,
     int? leagueTier,
+    int? dailyStreak,
+    int? bestDailyStreak,
+    String? lastDailyDate,
     UserStats? stats,
     Subscription? subscription,
     DailyGames? dailyGames,
@@ -100,6 +113,9 @@ class User extends Equatable {
       elo: elo ?? this.elo,
       leaguePoints: leaguePoints ?? this.leaguePoints,
       leagueTier: leagueTier ?? this.leagueTier,
+      dailyStreak: dailyStreak ?? this.dailyStreak,
+      bestDailyStreak: bestDailyStreak ?? this.bestDailyStreak,
+      lastDailyDate: lastDailyDate ?? this.lastDailyDate,
       stats: stats ?? this.stats,
       subscription: subscription ?? this.subscription,
       dailyGames: dailyGames ?? this.dailyGames,
@@ -131,6 +147,9 @@ class User extends Equatable {
         elo,
         leaguePoints,
         leagueTier,
+        dailyStreak,
+        bestDailyStreak,
+        lastDailyDate,
         stats,
         subscription,
         dailyGames,

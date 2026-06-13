@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../providers/daily_question_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../../domain/entities/question.dart';
 
 class DailyQuestionScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,8 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
   @override
   Widget build(BuildContext context) {
     final questionAsync = ref.watch(dailyQuestionProvider);
+    final dailyStreak =
+        ref.watch(userNotifierProvider).valueOrNull?.dailyStreak ?? 0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -41,6 +44,39 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          if (dailyStreak > 0)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.tertiary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(9999),
+                    border: Border.all(color: AppColors.tertiary.withOpacity(0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.local_fire_department,
+                          size: 16, color: AppColors.tertiary),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$dailyStreak',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.tertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -205,9 +241,37 @@ class _DailyQuestionScreenState extends ConsumerState<DailyQuestionScreen> {
       _isCorrect = option == correctAnswer;
     });
     _saveDailyAnswer(option, correctAnswer);
+    _updateDailyStreak();
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) { Navigator.pop(context); }
     });
+  }
+
+  /// Incrementa la racha diaria si se responde en días consecutivos.
+  Future<void> _updateDailyStreak() async {
+    try {
+      final user = ref.read(userNotifierProvider).valueOrNull;
+      if (user == null) return;
+      final now = DateTime.now();
+      String key(DateTime d) =>
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      final today = key(now);
+      final yesterday = key(now.subtract(const Duration(days: 1)));
+      if (user.lastDailyDate == today) return; // ya contado hoy
+      final newStreak =
+          user.lastDailyDate == yesterday ? user.dailyStreak + 1 : 1;
+      final best =
+          newStreak > user.bestDailyStreak ? newStreak : user.bestDailyStreak;
+      await ref.read(userNotifierProvider.notifier).updateUserProfile(
+            user.copyWith(
+              dailyStreak: newStreak,
+              bestDailyStreak: best,
+              lastDailyDate: today,
+            ),
+          );
+    } catch (e, st) {
+      FirebaseCrashlytics.instance.recordError(e, st);
+    }
   }
 
   Future<void> _saveDailyAnswer(String selectedAnswer, String correctAnswer) async {

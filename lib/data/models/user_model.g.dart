@@ -15,6 +15,9 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       elo: (json['elo'] as num?)?.toInt() ?? 1000,
       leaguePoints: (json['leaguePoints'] as num?)?.toInt() ?? 0,
       leagueTier: (json['leagueTier'] as num?)?.toInt() ?? 2,
+      dailyStreak: (json['dailyStreak'] as num?)?.toInt() ?? 0,
+      bestDailyStreak: (json['bestDailyStreak'] as num?)?.toInt() ?? 0,
+      lastDailyDate: json['lastDailyDate'] as String?,
       stats: json['stats'] == null
           ? const UserStatsModel()
           : UserStatsModel.fromJson(json['stats'] as Map<String, dynamic>),
@@ -49,6 +52,9 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'elo': instance.elo,
       'leaguePoints': instance.leaguePoints,
       'leagueTier': instance.leagueTier,
+      'dailyStreak': instance.dailyStreak,
+      'bestDailyStreak': instance.bestDailyStreak,
+      'lastDailyDate': instance.lastDailyDate,
       'stats': instance.stats,
       'subscription': instance.subscription,
       'dailyGames': instance.dailyGames,

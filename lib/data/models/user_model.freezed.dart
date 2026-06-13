@@ -27,6 +27,9 @@ mixin _$UserModel {
   int get elo => throw _privateConstructorUsedError;
   int get leaguePoints => throw _privateConstructorUsedError;
   int get leagueTier => throw _privateConstructorUsedError;
+  int get dailyStreak => throw _privateConstructorUsedError;
+  int get bestDailyStreak => throw _privateConstructorUsedError;
+  String? get lastDailyDate => throw _privateConstructorUsedError;
   UserStatsModel get stats => throw _privateConstructorUsedError;
   SubscriptionModel get subscription => throw _privateConstructorUsedError;
   DailyGamesModel get dailyGames => throw _privateConstructorUsedError;
@@ -58,6 +61,9 @@ abstract class $UserModelCopyWith<$Res> {
       int elo,
       int leaguePoints,
       int leagueTier,
+      int dailyStreak,
+      int bestDailyStreak,
+      String? lastDailyDate,
       UserStatsModel stats,
       SubscriptionModel subscription,
       DailyGamesModel dailyGames,
@@ -93,6 +99,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? elo = null,
     Object? leaguePoints = null,
     Object? leagueTier = null,
+    Object? dailyStreak = null,
+    Object? bestDailyStreak = null,
+    Object? lastDailyDate = freezed,
     Object? stats = null,
     Object? subscription = null,
     Object? dailyGames = null,
@@ -130,6 +139,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.leagueTier
           : leagueTier // ignore: cast_nullable_to_non_nullable
               as int,
+      dailyStreak: null == dailyStreak
+          ? _value.dailyStreak
+          : dailyStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      bestDailyStreak: null == bestDailyStreak
+          ? _value.bestDailyStreak
+          : bestDailyStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastDailyDate: freezed == lastDailyDate
+          ? _value.lastDailyDate
+          : lastDailyDate // ignore: cast_nullable_to_non_nullable
+              as String?,
       stats: null == stats
           ? _value.stats
           : stats // ignore: cast_nullable_to_non_nullable
@@ -208,6 +229,9 @@ abstract class _$$UserModelImplCopyWith<$Res>
       int elo,
       int leaguePoints,
       int leagueTier,
+      int dailyStreak,
+      int bestDailyStreak,
+      String? lastDailyDate,
       UserStatsModel stats,
       SubscriptionModel subscription,
       DailyGamesModel dailyGames,
@@ -244,6 +268,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? elo = null,
     Object? leaguePoints = null,
     Object? leagueTier = null,
+    Object? dailyStreak = null,
+    Object? bestDailyStreak = null,
+    Object? lastDailyDate = freezed,
     Object? stats = null,
     Object? subscription = null,
     Object? dailyGames = null,
@@ -281,6 +308,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.leagueTier
           : leagueTier // ignore: cast_nullable_to_non_nullable
               as int,
+      dailyStreak: null == dailyStreak
+          ? _value.dailyStreak
+          : dailyStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      bestDailyStreak: null == bestDailyStreak
+          ? _value.bestDailyStreak
+          : bestDailyStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastDailyDate: freezed == lastDailyDate
+          ? _value.lastDailyDate
+          : lastDailyDate // ignore: cast_nullable_to_non_nullable
+              as String?,
       stats: null == stats
           ? _value.stats
           : stats // ignore: cast_nullable_to_non_nullable
@@ -324,6 +363,9 @@ class _$UserModelImpl extends _UserModel {
       this.elo = 1000,
       this.leaguePoints = 0,
       this.leagueTier = 2,
+      this.dailyStreak = 0,
+      this.bestDailyStreak = 0,
+      this.lastDailyDate,
       this.stats = const UserStatsModel(),
       this.subscription = const SubscriptionModel(),
       this.dailyGames = const DailyGamesModel(),
@@ -355,6 +397,14 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey()
   final int leagueTier;
+  @override
+  @JsonKey()
+  final int dailyStreak;
+  @override
+  @JsonKey()
+  final int bestDailyStreak;
+  @override
+  final String? lastDailyDate;
   @override
   @JsonKey()
   final UserStatsModel stats;
@@ -389,7 +439,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userId: $userId, displayName: $displayName, email: $email, photoUrl: $photoUrl, elo: $elo, leaguePoints: $leaguePoints, leagueTier: $leagueTier, stats: $stats, subscription: $subscription, dailyGames: $dailyGames, createdAt: $createdAt, lastLoginAt: $lastLoginAt, friends: $friends, pendingFriendRequests: $pendingFriendRequests)';
+    return 'UserModel(userId: $userId, displayName: $displayName, email: $email, photoUrl: $photoUrl, elo: $elo, leaguePoints: $leaguePoints, leagueTier: $leagueTier, dailyStreak: $dailyStreak, bestDailyStreak: $bestDailyStreak, lastDailyDate: $lastDailyDate, stats: $stats, subscription: $subscription, dailyGames: $dailyGames, createdAt: $createdAt, lastLoginAt: $lastLoginAt, friends: $friends, pendingFriendRequests: $pendingFriendRequests)';
   }
 
   @override
@@ -408,6 +458,12 @@ class _$UserModelImpl extends _UserModel {
                 other.leaguePoints == leaguePoints) &&
             (identical(other.leagueTier, leagueTier) ||
                 other.leagueTier == leagueTier) &&
+            (identical(other.dailyStreak, dailyStreak) ||
+                other.dailyStreak == dailyStreak) &&
+            (identical(other.bestDailyStreak, bestDailyStreak) ||
+                other.bestDailyStreak == bestDailyStreak) &&
+            (identical(other.lastDailyDate, lastDailyDate) ||
+                other.lastDailyDate == lastDailyDate) &&
             (identical(other.stats, stats) || other.stats == stats) &&
             (identical(other.subscription, subscription) ||
                 other.subscription == subscription) &&
@@ -433,6 +489,9 @@ class _$UserModelImpl extends _UserModel {
       elo,
       leaguePoints,
       leagueTier,
+      dailyStreak,
+      bestDailyStreak,
+      lastDailyDate,
       stats,
       subscription,
       dailyGames,
@@ -466,6 +525,9 @@ abstract class _UserModel extends UserModel {
       final int elo,
       final int leaguePoints,
       final int leagueTier,
+      final int dailyStreak,
+      final int bestDailyStreak,
+      final String? lastDailyDate,
       final UserStatsModel stats,
       final SubscriptionModel subscription,
       final DailyGamesModel dailyGames,
@@ -492,6 +554,12 @@ abstract class _UserModel extends UserModel {
   int get leaguePoints;
   @override
   int get leagueTier;
+  @override
+  int get dailyStreak;
+  @override
+  int get bestDailyStreak;
+  @override
+  String? get lastDailyDate;
   @override
   UserStatsModel get stats;
   @override
