@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,8 +27,24 @@ class AudioService {
   // Canales de audio independientes
   final Map<GameSound, AudioPlayer> _players = {};
 
+  // Música de fondo (loop aleatorio entre los tracks de ambiente) y stingers
+  // puntuales (VS / fin de partida) sirven desde assets locales.
+  AudioPlayer? _musicPlayer;
+  AudioPlayer? _stingerPlayer;
+  StreamSubscription<void>? _musicCompleteSub;
+  final Random _random = Random();
+
   bool _sfxEnabled = true;
   bool _musicEnabled = true;
+
+  // Rutas relativas a assets/ (audioplayers AssetSource antepone 'assets/').
+  static const List<String> _ambientTracks = [
+    'audio/ambient_1.mp3',
+    'audio/ambient_2.mp3',
+    'audio/ambient_3.mp3',
+  ];
+  static const String _vsAsset = 'audio/vs.mp3';
+  static const String _matchEndAsset = 'audio/match_end.mp3';
 
   // URLs de Mixkit (CDN gratuito, licencia CC0)
   static const Map<GameSound, String> _soundUrls = {
@@ -89,6 +108,61 @@ class AudioService {
     await play(GameSound.defeat);
   }
 
+  /// Iniciar la música de fondo (loop aleatorio entre los tracks de ambiente).
+  /// Idempotente: si ya está sonando o la música está deshabilitada, no hace nada.
+  /// Nota: en web el navegador bloquea el autoplay hasta la primera interacción
+  /// del usuario; en ese caso la reproducción falla silenciosamente.
+  Future<void> startAmbientMusic() async {
+    if (!_musicEnabled || _musicPlayer != null) return;
+
+    final player = AudioPlayer();
+    _musicPlayer = player;
+    _musicCompleteSub =
+        player.onPlayerComplete.listen((_) => _playNextAmbient());
+    await _playNextAmbient();
+  }
+
+  Future<void> _playNextAmbient() async {
+    final player = _musicPlayer;
+    if (player == null || !_musicEnabled) return;
+    try {
+      final track = _ambientTracks[_random.nextInt(_ambientTracks.length)];
+      await player.play(AssetSource(track), volume: 0.25);
+    } catch (e) {
+      // Fallar silenciosamente (p. ej. autoplay bloqueado en web)
+    }
+  }
+
+  /// Detener y liberar la música de fondo.
+  Future<void> stopAmbientMusic() async {
+    await _musicCompleteSub?.cancel();
+    _musicCompleteSub = null;
+    await _musicPlayer?.stop();
+    await _musicPlayer?.dispose();
+    _musicPlayer = null;
+  }
+
+  /// Stinger de la pantalla VS (emparejamiento encontrado)
+  Future<void> playVs() async {
+    if (!_sfxEnabled) return;
+    await _playStinger(_vsAsset, 0.7);
+  }
+
+  /// Stinger de fin de partida
+  Future<void> playMatchEnd() async {
+    if (!_sfxEnabled) return;
+    await _playStinger(_matchEndAsset, 0.8);
+  }
+
+  Future<void> _playStinger(String asset, double volume) async {
+    try {
+      final player = _stingerPlayer ??= AudioPlayer();
+      await player.play(AssetSource(asset), volume: volume);
+    } catch (e) {
+      // Fallar silenciosamente
+    }
+  }
+
   /// Obtener volumen dinámico por tipo de sonido
   double _getVolumeForSound(GameSound sound) {
     switch (sound) {
@@ -117,6 +191,11 @@ class AudioService {
     _musicEnabled = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('audio_music_enabled', enabled);
+    if (enabled) {
+      await startAmbientMusic();
+    } else {
+      await stopAmbientMusic();
+    }
   }
 
   /// Obtener estado actual
@@ -128,6 +207,8 @@ class AudioService {
     for (var player in _players.values) {
       await player.stop();
     }
+    await _stingerPlayer?.stop();
+    await stopAmbientMusic();
   }
 
   /// Limpiar recursos
@@ -137,5 +218,7 @@ class AudioService {
       await player.dispose();
     }
     _players.clear();
+    await _stingerPlayer?.dispose();
+    _stingerPlayer = null;
   }
 }

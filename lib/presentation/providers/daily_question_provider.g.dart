@@ -6,7 +6,7 @@ part of 'daily_question_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dailyQuestionHash() => r'92dc98a0b155d79d1838ecba582aa566721131c6';
+String _$dailyQuestionHash() => r'7cda16ad3c1cb6fc3535e42cf7113dccd942025a';
 
 /// See also [DailyQuestion].
 @ProviderFor(DailyQuestion)

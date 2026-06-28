@@ -55,3 +55,7 @@ app.*.map.json
 /jpeg_analyzer.html
 /AlwaysOnTop.bas
 /ThisWorkbook.cls
+
+# Firebase admin service account (NO commitear)
+scripts/serviceAccount.json
+scripts/node_modules/

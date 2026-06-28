@@ -1,5 +1,18 @@
 # Design System Document
 
+> ⚠️ **DEPRECADO (era geografía).** Este documento describe el tema antiguo
+> "Modern Explorer's Journal" (paleta clara, verde `#426445`, papel `#f9f9f7`)
+> heredado del fork. **NO refleja el tema actual.**
+>
+> El design system real es **"Stadium Arena"** (modo oscuro forzado):
+> - Tokens de color: `lib/core/theme/app_colors.dart`
+> - Spec visual: [`Pantallas/DESIGN.md`](Pantallas/DESIGN.md)
+>
+> Los principios de layout/responsividad de más abajo siguen siendo válidos; las
+> decisiones de **color y tipografía** deben tomarse de Stadium Arena.
+
+---
+
 ## 1. Overview & Creative North Star: "FutKO"
 This design system moves away from the sterile, "app-as-a-utility" look to embrace the aesthetic of a **Modern Explorer’s Journal**. Our Creative North Star is **FutKO**: a design language that balances the intellectual rigor of geography with the high-stakes energy of a competitive battle.
 

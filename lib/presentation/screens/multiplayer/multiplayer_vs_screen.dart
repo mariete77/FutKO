@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../services/audio_service.dart';
 import '../../providers/multiplayer_provider.dart';
 import '../../providers/user_provider.dart';
 
@@ -46,6 +47,8 @@ class _MultiplayerVsScreenState extends ConsumerState<MultiplayerVsScreen>
     _vsController.forward();
     _slideLeft.forward();
     _slideRight.forward();
+
+    AudioService().playVs();
 
     _autoStartTimer = Timer(const Duration(seconds: 5), _startGame);
   }

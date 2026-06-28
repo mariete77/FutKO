@@ -374,16 +374,16 @@ class MatchRepositoryImpl implements MatchRepository {
     required MatchResult result,
   }) async {
     try {
+      // Only the outcome the client owns: scores + winner. ELO and league are
+      // resolved authoritatively by the onMatchFinished Cloud Function and
+      // merged into result.* there. Writing them here would be overwritten,
+      // and on the second player's finish could clobber the function's values.
       await _firestore
           .collection(FirebaseConstants.matches)
           .doc(matchId)
           .update({
-        'result': {
-          'winnerId': result.winnerId,
-          'scores': result.scores,
-          'eloChanges': result.eloChanges,
-          'newElo': result.newElo,
-        },
+        'result.winnerId': result.winnerId,
+        'result.scores': result.scores,
       });
       return const Right(null);
     } on ServerException catch (e) {

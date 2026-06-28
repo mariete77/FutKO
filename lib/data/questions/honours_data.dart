@@ -77,6 +77,7 @@ class HonoursData {
     _ClubTitle('Champions League', 2022, 'Real Madrid'),
     _ClubTitle('Champions League', 2023, 'Manchester City'),
     _ClubTitle('Champions League', 2024, 'Real Madrid'),
+    _ClubTitle('Champions League', 2025, 'Paris Saint-Germain'),
     // Europa League / UEFA Cup
     _ClubTitle('Europa League', 1990, 'Juventus'),
     _ClubTitle('Europa League', 1991, 'Inter Milan'),
@@ -113,6 +114,7 @@ class HonoursData {
     _ClubTitle('Europa League', 2022, 'Eintracht Frankfurt'),
     _ClubTitle('Europa League', 2023, 'Sevilla FC'),
     _ClubTitle('Europa League', 2024, 'Atalanta'),
+    _ClubTitle('Europa League', 2025, 'Tottenham Hotspur'),
   ];
 
   /// Domestic-league champions. `league` is the display fragment used in the
@@ -154,10 +156,11 @@ class HonoursData {
     _LeagueTitle('La Liga', 2022, 'Real Madrid'),
     _LeagueTitle('La Liga', 2023, 'FC Barcelona'),
     _LeagueTitle('La Liga', 2024, 'Real Madrid'),
+    _LeagueTitle('La Liga', 2025, 'FC Barcelona'),
     // ── Premier League (Inglaterra) ──
-    _LeagueTitle('la Premier League', 1990, 'Liverpool'),
-    _LeagueTitle('la Premier League', 1991, 'Arsenal'),
-    _LeagueTitle('la Premier League', 1992, 'Leeds United'),
+    _LeagueTitle('la liga inglesa', 1990, 'Liverpool'),
+    _LeagueTitle('la liga inglesa', 1991, 'Arsenal'),
+    _LeagueTitle('la liga inglesa', 1992, 'Leeds United'),
     _LeagueTitle('la Premier League', 1993, 'Manchester United'),
     _LeagueTitle('la Premier League', 1994, 'Manchester United'),
     _LeagueTitle('la Premier League', 1995, 'Blackburn Rovers'),
@@ -190,6 +193,7 @@ class HonoursData {
     _LeagueTitle('la Premier League', 2022, 'Manchester City'),
     _LeagueTitle('la Premier League', 2023, 'Manchester City'),
     _LeagueTitle('la Premier League', 2024, 'Manchester City'),
+    _LeagueTitle('la Premier League', 2025, 'Liverpool'),
     // ── Serie A (Italia) ── (2005 omitted: Calciopoli, not awarded)
     _LeagueTitle('la Serie A', 1990, 'Napoli'),
     _LeagueTitle('la Serie A', 1991, 'Sampdoria'),
@@ -225,6 +229,7 @@ class HonoursData {
     _LeagueTitle('la Serie A', 2022, 'AC Milan'),
     _LeagueTitle('la Serie A', 2023, 'Napoli'),
     _LeagueTitle('la Serie A', 2024, 'Inter Milan'),
+    _LeagueTitle('la Serie A', 2025, 'Napoli'),
     // ── Bundesliga (Alemania) ──
     _LeagueTitle('la Bundesliga', 1990, 'Bayern Munich'),
     _LeagueTitle('la Bundesliga', 1991, 'Kaiserslautern'),
@@ -261,6 +266,7 @@ class HonoursData {
     _LeagueTitle('la Bundesliga', 2022, 'Bayern Munich'),
     _LeagueTitle('la Bundesliga', 2023, 'Bayern Munich'),
     _LeagueTitle('la Bundesliga', 2024, 'Bayer Leverkusen'),
+    _LeagueTitle('la Bundesliga', 2025, 'Bayern Munich'),
     // ── Primeira Liga (Portugal) ── from 2010
     _LeagueTitle('la Primeira Liga', 2010, 'Benfica'),
     _LeagueTitle('la Primeira Liga', 2011, 'FC Porto'),
@@ -277,6 +283,7 @@ class HonoursData {
     _LeagueTitle('la Primeira Liga', 2022, 'FC Porto'),
     _LeagueTitle('la Primeira Liga', 2023, 'Benfica'),
     _LeagueTitle('la Primeira Liga', 2024, 'Sporting CP'),
+    _LeagueTitle('la Primeira Liga', 2025, 'Sporting CP'),
     // ── Ligue 1 (Francia) ── from 2010
     _LeagueTitle('la Ligue 1', 2010, 'Olympique Marseille'),
     _LeagueTitle('la Ligue 1', 2011, 'Lille OSC'),
@@ -293,6 +300,7 @@ class HonoursData {
     _LeagueTitle('la Ligue 1', 2022, 'Paris Saint-Germain'),
     _LeagueTitle('la Ligue 1', 2023, 'Paris Saint-Germain'),
     _LeagueTitle('la Ligue 1', 2024, 'Paris Saint-Germain'),
+    _LeagueTitle('la Ligue 1', 2025, 'Paris Saint-Germain'),
   ];
 }
 

@@ -152,49 +152,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       children: [
                         const Spacer(flex: 3),
 
-                        // Logo ball
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.emerald950,
-                            border: Border.all(
-                              color: AppColors.yellow500.withOpacity(0.5),
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.yellow500.withOpacity(0.3),
-                                blurRadius: 40,
-                                spreadRadius: 4,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.sports_soccer,
-                            size: 56,
-                            color: AppColors.yellow500,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Brand Typography
-                        Text(
-                          'FutKO',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 56,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.yellow500,
-                            letterSpacing: -2,
-                            fontStyle: FontStyle.italic,
-                            shadows: [
-                              Shadow(
-                                color: AppColors.yellow500.withOpacity(0.4),
-                                blurRadius: 20,
-                              ),
-                            ],
-                          ),
+                        // Logo wordmark (FutKO con balón)
+                        Image.asset(
+                          'assets/images/futko_wordmark.png',
+                          width: 260,
+                          fit: BoxFit.contain,
                         ),
 
                         const SizedBox(height: 40),

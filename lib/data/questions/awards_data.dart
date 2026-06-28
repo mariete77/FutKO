@@ -34,6 +34,7 @@ class AwardsData {
     _BallonDor(2022, 'Karim Benzema', 'Francia'),
     _BallonDor(2023, 'Lionel Messi', 'Argentina'),
     _BallonDor(2024, 'Rodri', 'España'),
+    _BallonDor(2025, 'Ousmane Dembélé', 'Francia'),
   ];
 
   static const List<_WorldCupGoldenBoot> worldCupGoldenBoots = [
@@ -77,6 +78,7 @@ class AwardsData {
     _EuropeanGoldenShoe(2022, 'Robert Lewandowski', 'Polonia', 'FC Barcelona', 35),
     _EuropeanGoldenShoe(2023, 'Erling Haaland', 'Noruega', 'Manchester City', 36),
     _EuropeanGoldenShoe(2024, 'Harry Kane', 'Inglaterra', 'Bayern Munich', 36),
+    _EuropeanGoldenShoe(2025, 'Kylian Mbappé', 'Francia', 'Real Madrid', 31),
   ];
 }
 

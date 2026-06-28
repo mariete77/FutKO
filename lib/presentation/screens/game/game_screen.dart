@@ -7,6 +7,7 @@ import '../../providers/game_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/active_players_provider.dart';
 import 'widgets/timer_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'widgets/question_card.dart';
 import 'widgets/answer_options_widget.dart';
 import 'widgets/answer_feedback_widget.dart';
@@ -314,13 +315,14 @@ class GameScreen extends ConsumerWidget {
         ? GameConstants.secondsPerTypeQuestion
         : GameConstants.secondsPerQuestion;
     final timeRemaining = (timerProgress * maxTime).ceil();
+    final userElo = ref.watch(currentUserProvider)?.elo;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
       child: Column(
         children: [
           // ── Scoreboard ──────────────────────
-          _buildScoreboard(context, currentQuestionIndex, timeRemaining, score, maxTime),
+          _buildScoreboard(context, currentQuestionIndex, timeRemaining, score, maxTime, userElo),
           const SizedBox(height: 24),
 
           // ── Question ────────────────────────
@@ -356,7 +358,7 @@ class GameScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScoreboard(BuildContext context, int currentQuestionIndex, int timeRemaining, int score, int maxTime) {
+  Widget _buildScoreboard(BuildContext context, int currentQuestionIndex, int timeRemaining, int score, int maxTime, int? userElo) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow.withOpacity(0.8),
@@ -412,7 +414,7 @@ class GameScreen extends ConsumerWidget {
                     Column(
                       children: [
                         Text(
-                          'Ranking Global',
+                          'Tu ELO',
                           style: GoogleFonts.lexend(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -422,7 +424,7 @@ class GameScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '#42',
+                          '${userElo ?? GameConstants.initialElo}',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
@@ -539,6 +541,35 @@ class GameScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 20),
+
+        // Question image (badge / player / stadium), if any
+        if (currentQuestion.imageUrl != null) ...[
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.outlineVariant.withOpacity(0.4)),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: CachedNetworkImage(
+              imageUrl: currentQuestion.imageUrl as String,
+              fit: BoxFit.contain,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+              errorWidget: (context, url, error) => const Center(
+                child: Icon(Icons.image_not_supported,
+                    size: 48, color: AppColors.outline),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
 
         // Question text
         Text(

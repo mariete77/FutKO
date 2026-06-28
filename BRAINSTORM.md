@@ -5,7 +5,7 @@
 
 ## 🎯 Diagnóstico (design read)
 
-FutKO ya tiene buen esqueleto y un tema sólido (Stadium Arena oscuro), pero **la
+FutKO ya tiene buen esqueleto y un tema sólido (FutKO oscuro), pero **la
 partida se siente más estática de lo que debería**: el 1v1 no se vive en tiempo
 real (las respuestas del rival se leen al *final*), hay un "hueco muerto" tras
 cada respuesta, el timer solo cambia de color, y faltaba *juiciness* (sin

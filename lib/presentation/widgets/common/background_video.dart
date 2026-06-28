@@ -7,7 +7,7 @@ import '../../../core/theme/app_colors.dart';
 class BackgroundVideo extends StatefulWidget {
   const BackgroundVideo({
     super.key,
-    this.asset = 'assets/Fondo.mp4',
+    this.asset = 'assets/Fondo_loop_stadium.mp4',
     this.overlayOpacity = 0.45,
   });
 
@@ -57,7 +57,27 @@ class _BackgroundVideoState extends State<BackgroundVideo> {
                 child: VideoPlayer(_controller),
               ),
             ),
-          Container(color: Colors.black.withOpacity(widget.overlayOpacity)),
+          // Cinematic vignette scrim: darker at the top (app bar) and bottom
+          // (content / nav) for readability, lighter in the middle so the
+          // stadium stays visible.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.background.withOpacity(
+                      (widget.overlayOpacity + 0.1).clamp(0.0, 1.0)),
+                  Colors.black.withOpacity(
+                      (widget.overlayOpacity * 0.45).clamp(0.0, 1.0)),
+                  AppColors.background
+                      .withOpacity((widget.overlayOpacity + 0.25).clamp(0.0, 1.0)),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: const SizedBox.expand(),
+          ),
         ],
       ),
     );

@@ -1,0 +1,11 @@
+TOTAL preguntas únicas: 85544
+
+=== ESCRIBIR AMBIGUO (0) ===
+
+=== ESCRIBIR FILTRADO (0) ===
+
+=== MC CON VARIOS CORRECTOS (0) ===
+
+=== MC OPCIONES INVÁLIDAS (0) ===
+
+=== ESCRIBIR SEMÁNTICAMENTE AMBIGUO (0) ===

@@ -9,7 +9,7 @@ class ExtraFootballData {
     _Coach('Vicente del Bosque', 'España', ['Real Madrid', 'Selección Española'], 2),
     _Coach('Zinedine Zidane', 'Francia', ['Real Madrid'], 3),
     _Coach('Diego Simeone', 'Argentina', ['Estudiantes', 'River Plate', 'Atlético Madrid', 'Inter Milan'], 0),
-    _Coach('Antonio Conte', 'Italia', ['Juventus', 'Chelsea', 'Inter Milan', 'Tottenham', 'Napoli'], 1),
+    _Coach('Antonio Conte', 'Italia', ['Juventus', 'Chelsea', 'Inter Milan', 'Tottenham', 'Napoli'], 0),
     _Coach('Louis van Gaal', 'Países Bajos', ['Ajax', 'FC Barcelona', 'Bayern Munich', 'Manchester United'], 1),
     _Coach('Marcello Lippi', 'Italia', ['Juventus', 'Inter Milan', 'Selección Italiana', 'Guangzhou Evergrande'], 1),
     _Coach('Fabio Capello', 'Italia', ['AC Milan', 'Real Madrid', 'AS Roma', 'Juventus', 'Inglaterra'], 1),
@@ -26,6 +26,7 @@ class ExtraFootballData {
     _Coach('Mauricio Pochettino', 'Argentina', ['Espanyol', 'Tottenham', 'PSG', 'Chelsea'], 0),
     _Coach('Ottmar Hitzfeld', 'Alemania', ['Borussia Dortmund', 'Bayern Munich'], 2),
     _Coach('Ernesto Valverde', 'España', ['Olympiacos', 'FC Barcelona', 'Athletic Bilbao'], 0),
+    _Coach('Luis Enrique', 'España', ['Celta de Vigo', 'AS Roma', 'FC Barcelona', 'Selección Española', 'PSG'], 2),
   ];
 
   static const List<_Derby> derbies = [
@@ -140,6 +141,8 @@ class ExtraFootballData {
     _NationalTeamData('Dinamarca', 'Danish Dynamite', ['Rojo', 'Blanco'], 0, 'Peter Schmeichel'),
     _NationalTeamData('Suiza', 'Nati / Rossocrociati', ['Rojo', 'Blanco'], 0, 'Stephan Lichtsteiner'),
     _NationalTeamData('Polonia', 'Biało-czerwoni', ['Blanco', 'Rojo'], 0, 'Robert Lewandowski'),
+    _NationalTeamData('Estados Unidos', 'Stars and Stripes', ['Blanco', 'Azul', 'Rojo'], 0, 'Cobi Jones'),
+    _NationalTeamData('Ghana', 'Black Stars', ['Blanco', 'Rojo', 'Verde'], 0, 'Asamoah Gyan'),
   ];
 
   static const List<_Kit> kits = [

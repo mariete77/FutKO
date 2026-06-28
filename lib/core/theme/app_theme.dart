@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// FutKO Design System — Material 3 theme configuration.
-/// Stadium Arena dark theme only.
+/// FutKO dark theme only.
 class AppTheme {
   AppTheme._();
 

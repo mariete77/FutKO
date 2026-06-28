@@ -120,44 +120,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       // ── Brand Section ─────────────────
                       Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.emerald950,
-                              border: Border.all(
-                                color: AppColors.yellow500.withOpacity(0.3),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.yellow500.withOpacity(0.2),
-                                  blurRadius: 30,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              Icons.sports_soccer,
-                              size: 48,
-                              color: AppColors.yellow500,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'FutKO',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 48,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.secondaryFixed,
-                              fontStyle: FontStyle.italic,
-                              letterSpacing: -2,
-                              shadows: [
-                                Shadow(
-                                  color: AppColors.yellow500.withOpacity(0.4),
-                                  blurRadius: 20,
-                                ),
-                              ],
-                            ),
+                          Image.asset(
+                            'assets/images/futko_wordmark.png',
+                            width: 240,
+                            fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 8),
                           Text(

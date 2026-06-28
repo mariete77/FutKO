@@ -1,25 +1,35 @@
-# FutKO Battle 🌍🎮
+# FutKO ⚽🎮
 
-Juego móvil de preguntas 1v1 sobre geografía con partidas de 1 minuto.
+Juego móvil/web de preguntas 1v1 de **fútbol** en tiempo real: 10 preguntas × 10 s por partida, ranking por **Ligas** (pirámide española) sobre un ELO oculto, multijugador en vivo y modelo freemium.
+
+> **Fork rebranded.** FutKO nació como un juego de geografía ("GeoC"). Quedan
+> algunos artefactos heredados; el tema real es el oscuro **"Stadium Arena"**
+> (`lib/core/theme/app_colors.dart`, la app fuerza `ThemeMode.dark`). El locale
+> por defecto es **español** (`lib/l10n/app_es.arb`).
 
 ## 📋 Descripción
 
-FutKO Battle es un juego competitivo de geografía donde dos jugadores comparten respondiendo preguntas en tiempo real. Cada partida dura 1 minuto con 10 preguntas de 10 segundos cada una.
+FutKO es un juego competitivo de trivial de fútbol donde dos jugadores se
+enfrentan respondiendo preguntas en tiempo real. Cada partida dura ~1 min con
+10 preguntas de 10 s cada una (15 s en las de respuesta escrita).
 
 ### 🎯 Características Principales
 
-- **Modos de juego**: Partida rápida (casual) y Ranked
-- **Matchmaking**: Tiempo real y asíncrono (ghostRun)
-- **7 tipos de preguntas**:
-  - Siluetas de países
-  - Banderas
-  - Capitales
-  - Población comparativa
-  - Ríos
-  - Fotos de ciudades
-  - Extensión territorial
-- **Sistema ELO**: Ranking competitivo basado en rendimiento
-- **Modelo Freemium**: 1 casual + 1 ranked gratis/día, suscripción para 5 ranked/día
+- **Modos de juego**: Partida rápida (casual), Ranked, Reto de amigo y
+  *Ghost Run* (contra mejores partidas grabadas)
+- **Matchmaking**: cola en tiempo real (Realtime Database) por rango ELO ±200,
+  con fallback asíncrono
+- **Tipos de preguntas**: jugador, equipo, competición, historia, reglas,
+  estadio, escudo, silueta/imagen de jugador, estadística, transferencia.
+  ~30% se convierten en respuesta escrita (validación *fuzzy*, ≥0.85 = correcto)
+- **Sistema de Ligas**: 5 tiers (Tercera RFEF → Primera División) con puntos
+  0–99; ascenso/descenso por partida ranked. El ELO queda como MMR oculto
+  (ver `ELO_LIGAS_DESIGN.md`). **El cálculo de ELO + LP es autoritativo en el
+  backend** (Cloud Function `onMatchFinished`)
+- **Modelo Freemium**: 1 casual + 1 ranked gratis/día; suscripción para más
+  ranked (RevenueCat)
+- **Game feel**: haptics, feedback instantáneo, "+puntos" flotante, timer con
+  tensión, comodines en vivo (+tiempo, doble puntos), racha diaria y logros
 
 ## 🛠️ Stack Tecnológico
 
@@ -83,15 +93,15 @@ flutter run
 ## 🎮 Modos de Juego
 
 ### Casual (Partida Rápida)
-- Sin afectar ELO
+- Sin afectar ELO ni liga (el backend lo ignora)
 - 1 partida gratis/día (free users)
 - Matchmaking casual
 
 ### Ranked
-- Afecta tu ELO
+- Afecta tu ELO y tus puntos de Liga (autoritativo en el backend)
 - 1 partida gratis/día (free users), 5/día (premium)
 - Matchmaking por rango de ELO
-- Sistema de ligas: Bronce → Plata → Oro → Platino → Diamante
+- Sistema de ligas (pirámide española): Tercera RFEF → Primera División
 
 ## 💰 Monetización
 
@@ -102,37 +112,36 @@ flutter run
 | Sin anuncios | ❌ | ✅ |
 | Estadísticas avanzadas | ❌ | ✅ |
 
-## 🏆 Sistema ELO
+## 🏆 Sistema de Ligas y ELO
 
-- **ELO inicial**: 1000
-- **ELO mínimo**: 100
-- **K-factor (nuevos)**: 32 (<30 partidas)
-- **K-factor (establecidos)**: 16 (≥30 partidas)
-- **Rango de matchmaking**: ±200 ELO
+- **ELO** (MMR oculto): inicial 1000, mínimo 100, K 32 (<30 partidas) / 16.
+  Solo se usa para emparejar y modular los puntos de liga.
+- **Ligas** (visible): 5 tiers — Tercera RFEF, Segunda RFEF, Primera RFEF,
+  Segunda División, Primera División. Puntos 0–99 por liga; al cruzar 100
+  asciendes, al bajar de 0 desciendes. Escudo anti-descenso en placement
+  (5 primeras ranked).
+- **Autoritativo:** ELO + LP los calcula la Cloud Function `onMatchFinished`
+  al cerrar la partida ranked; el cliente solo reporta `scores` + `winnerId`.
+- Rango de matchmaking: ±200 ELO.
+- Detalle de diseño: [`ELO_LIGAS_DESIGN.md`](ELO_LIGAS_DESIGN.md)
 
 ## 📖 Documentación
 
-### Guías por Fase
-- [FASE 1: Fundamentos Backend](docs/FASE1_INSTRUCCIONES.md)
-- [FASE 2: Autenticación y Home](docs/FASE2_INSTRUCCIONES.md)
-- [FASE 3: Base de Datos de Preguntas](docs/FASE3_INSTRUCCIONES.md)
+- [`PROGRESS.md`](PROGRESS.md) — estado actual del proyecto (fuente de verdad)
+- [`CLAUDE.md`](CLAUDE.md) — arquitectura, comandos y *gotchas* del fork
+- [`AGENTS.md`](AGENTS.md) — protocolo para agentes IA (worktrees, coordinación)
+- [`ELO_LIGAS_DESIGN.md`](ELO_LIGAS_DESIGN.md) — diseño del sistema de Ligas
+- [`BRAINSTORM.md`](BRAINSTORM.md) — mejoras de *game feel* priorizadas
+- [`Pantallas/DESIGN.md`](Pantallas/DESIGN.md) — design system **Stadium Arena** (el real)
+- [`docs/GITEA_OAUTH_SETUP.md`](docs/GITEA_OAUTH_SETUP.md) — OAuth Gitea
 
-### Scripts Disponibles
-- **generate_questions.dart** - Genera preguntas desde REST Countries API (4 tipos)
-- **generate_questions_with_manual.dart** - Genera TODAS las preguntas automáticas (5 tipos, incluye ríos)
-- **import_questions_firestore.dart** - Importa preguntas JSON a Firestore
-- **rivers_manual.dart** - Datos manuales de 25 ríos famosos
+> `DESIGN.md` (raíz) y secciones de fases más abajo son de la era geografía y
+> están desactualizadas; consultar `PROGRESS.md` y `CLAUDE.md` para la verdad.
 
-### Guía Completa
-Consulta la [GUIA_COMPLETA.md](docs/GUIA_COMPLETA.md) para detalles detallados de:
-- Estructura de modelos de datos
-- Sistema de autenticación
-- Implementación de cada tipo de pregunta
-- Sistema de matchmaking
-- Cálculo de ELO
-- Cloud Functions
-- Testing
-- Despliegue
+### Scripts Disponibles (`scripts/`)
+- **seed_questions.dart** — siembra preguntas en Firestore desde `lib/data/questions/football_data.dart`
+- **upload_images.dart** / **download_images.dart** — subir/bajar imágenes de preguntas a Firebase Storage
+- **update_image_urls.dart** — actualizar `imageUrl` en preguntas existentes
 
 ## 🧪 Testing
 
@@ -186,43 +195,16 @@ firebase deploy --only storage
 - 📄 [Instrucciones detalladas](docs/FASE2_INSTRUCCIONES.md)
 
 ### ✅ FASE 3: Base de Datos de Preguntas (Completada)
-- ✅ Script generador desde REST Countries API
-- ✅ Script de importación a Firestore
-- ✅ Datos manuales de ríos (25 ríos)
-- ✅ 5 tipos de preguntas automáticas:
-  - Banderas (~100)
-  - Capitales (~100)
-  - Población (50)
-  - Extensión (50)
-  - Ríos (25)
-- 📄 [Instrucciones detalladas](docs/FASE3_INSTRUCCIONES.md)
+- ✅ Dataset de fútbol en `lib/data/questions/football_data.dart`
+- ✅ Seeder a Firestore (`scripts/seed_questions.dart`, `lib/services/question_seeder_service.dart`)
+- ✅ ~10 tipos de preguntas (jugador, equipo, competición, estadio, escudo, etc.)
+- ✅ Distractores coherentes por categoría (`_enrichOptions`)
+- 🔴 Imágenes de preguntas pendientes de subir a Storage (escudos/estadios/siluetas)
 
-### ⏳ FASE 4: Core del Juego (Pendiente)
-- ⏳ GameProvider
-- ⏳ GameScreen
-- ⏳ Question widgets (silueta, bandera, capital, etc.)
-- ⏳ Timer circular
-- ⏳ ResultScreen
-
-### ⏳ FASE 5: Matchmaking Multiplayer (Pendiente)
-- ⏳ MatchmakingService
-- ⏳ MatchmakingScreen
-- ⏳ Cloud Functions (matchmaking, ELO, daily reset)
-
-### ⏳ FASE 6: Ghost Runs (Async) (Pendiente)
-- ⏳ AsyncMatchService
-- ⏳ Lógica de comparación con ghost runs
-
-### ⏳ FASE 7: Monetización (Pendiente)
-- ⏳ RevenueCat configuration
-- ⏳ SubscriptionScreen
-- ⏳ Daily limits enforcement
-
-### ⏳ FASE 8: Polish y Despliegue (Pendiente)
-- ⏳ LeaderboardScreen
-- ⏳ ProfileScreen
-- ⏳ Testing
-- ⏳ Deploy a stores
+> Las fases 4–8 (core del juego, matchmaking, ghost runs, monetización, polish)
+> están **implementadas**. El detalle vivo del estado está en
+> [`PROGRESS.md`](PROGRESS.md) — esta sección ya no se mantiene aquí para evitar
+> dos fuentes de verdad.
 
 ## 📊 Arquitectura
 

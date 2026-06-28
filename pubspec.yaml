@@ -81,6 +81,14 @@ dev_dependencies:
   fake_cloud_firestore: ^4.1.1
   integration_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/futko_icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
 
 flutter:
   generate: true
@@ -92,6 +100,8 @@ flutter:
     - assets/audio/
     - assets/lottie/
     - assets/Fondo.mp4
+    - assets/Fondo_loop.mp4
+    - assets/Fondo_loop_stadium.mp4
 
   # fonts:
   #   - family: Poppins

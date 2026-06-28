@@ -1,0 +1,13 @@
+{
+  "name": "futko-scripts",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Scripts de administración de FutKO (siembra de preguntas).",
+  "scripts": {
+    "seed": "cd .. && flutter test test/question_export_test.dart && node scripts/seed_admin.js",
+    "seed:upload": "node seed_admin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

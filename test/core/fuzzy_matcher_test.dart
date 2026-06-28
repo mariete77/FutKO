@@ -59,10 +59,25 @@ void main() {
       final sim = answerSimilarity('abc', 'xyz');
       expect(sim, lessThan(0.5));
     });
+
+    test('ignores accents', () {
+      expect(answerSimilarity('Iniesta', 'Iniésta'), 1.0);
+      expect(answerSimilarity('España', 'Espana'), 1.0);
+    });
+
+    test('Thier Henry is very close to Thierry Henry', () {
+      final sim = answerSimilarity('Thier Henry', 'Thierry Henry');
+      expect(sim, greaterThanOrEqualTo(0.8));
+    });
+
+    test('ignores punctuation and extra spaces', () {
+      expect(answerSimilarity('Luka Modric!', 'Luka Modric'), 1.0);
+      expect(answerSimilarity('Luka   Modric', 'Luka Modric'), 1.0);
+    });
   });
 
   group('calculateTypedScore', () {
-    test('similarity below 0.5 returns 0', () {
+    test('similarity below 0.6 returns 0', () {
       final score = calculateTypedScore(
         similarity: 0.3,
         timeRemaining: 10,
@@ -70,6 +85,40 @@ void main() {
         streak: 0,
       );
       expect(score, 0);
+    });
+
+    test('partial credit between 0.6 and 0.85', () {
+      final partial = calculateTypedScore(
+        similarity: 0.7,
+        timeRemaining: 10,
+        maxTime: 15,
+        streak: 0,
+      );
+      final perfect = calculateTypedScore(
+        similarity: 1.0,
+        timeRemaining: 10,
+        maxTime: 15,
+        streak: 0,
+      );
+      expect(partial, greaterThan(0));
+      expect(partial, lessThan(perfect));
+    });
+
+    test('partial credit between 0.85 and 1.0', () {
+      final partial = calculateTypedScore(
+        similarity: 0.9,
+        timeRemaining: 10,
+        maxTime: 15,
+        streak: 0,
+      );
+      final perfect = calculateTypedScore(
+        similarity: 1.0,
+        timeRemaining: 10,
+        maxTime: 15,
+        streak: 0,
+      );
+      expect(partial, greaterThan(0));
+      expect(partial, lessThan(perfect));
     });
 
     test('perfect match with full time gives max score', () {
@@ -124,15 +173,11 @@ void main() {
       expect(accuracyLabel(0.9), '¡Casi!');
     });
 
-    test('0.7+ returns Cerca', () {
+    test('0.6+ returns Cerca', () {
       expect(accuracyLabel(0.75), 'Cerca');
     });
 
-    test('0.5+ returns Aprobable', () {
-      expect(accuracyLabel(0.6), 'Aprobable');
-    });
-
-    test('below 0.5 returns Incorrecto', () {
+    test('below 0.6 returns Incorrecto', () {
       expect(accuracyLabel(0.3), 'Incorrecto');
     });
   });
@@ -142,7 +187,15 @@ void main() {
       expect(accuracyColor(1.0), 0xFFFFD700);
     });
 
-    test('below 0.5 returns red', () {
+    test('0.85+ returns green', () {
+      expect(accuracyColor(0.9), 0xFF4CAF50);
+    });
+
+    test('0.6+ returns orange', () {
+      expect(accuracyColor(0.75), 0xFFFF9800);
+    });
+
+    test('below 0.6 returns red', () {
       expect(accuracyColor(0.3), 0xFFF44336);
     });
   });

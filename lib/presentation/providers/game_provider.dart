@@ -7,16 +7,18 @@ import '../../data/repositories/question_repository_impl.dart';
 import '../../data/repositories/quiz_attempt_repository_impl.dart';
 import '../../domain/entities/question.dart';
 import '../../domain/entities/match.dart';
+import '../../domain/entities/user.dart';
 import '../../domain/repositories/question_repository.dart';
 import '../../domain/repositories/quiz_attempt_repository.dart';
 import '../../data/models/quiz_attempt_model.dart';
 import '../../core/constants/game_constants.dart';
 import '../../core/utils/score_calculator.dart';
 import '../../core/utils/fuzzy_matcher.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import '../../services/analytics_service.dart';
 import '../../services/audio_service.dart';
 import '../../services/haptics_service.dart';
+import 'user_provider.dart';
 
 part 'game_provider.freezed.dart';
 part 'game_provider.g.dart';
@@ -220,7 +222,7 @@ class GameNotifier extends _$GameNotifier {
 
     final question = currentState.questions[currentState.currentQuestionIndex];
     final similarity = answerSimilarity(typedAnswer, question.correctAnswer);
-    final isCorrect = similarity >= 0.85; // 85%+ counts as correct
+    final isCorrect = similarity >= 0.6; // 60%+ counts as correct (partial credit)
 
     final maxTime = _getTimeForQuestion(question);
 
@@ -486,10 +488,45 @@ class GameNotifier extends _$GameNotifier {
       averageTime: averageTime,
     );
 
+    AudioService().playMatchEnd();
+
     AnalyticsService.instance.logMatchFinished(
       score: score,
       correctAnswers: correctAnswers,
     );
+
+    _updateUserStatsAfterCasual(correctAnswers);
+  }
+
+  /// Persiste el resultado de una partida casual en el perfil del usuario:
+  /// incrementa partidas jugadas, aciertos totales y el contador de partidas
+  /// casuales del día.
+  Future<void> _updateUserStatsAfterCasual(int correctAnswers) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+
+      final notifier = ref.read(userNotifierProvider.notifier);
+      User? user = ref.read(userNotifierProvider).valueOrNull;
+      if (user == null) {
+        await notifier.getUserProfile(currentUser.uid);
+        user = ref.read(userNotifierProvider).valueOrNull;
+        if (user == null) return;
+      }
+
+      final updatedStats = user.stats.copyWith(
+        totalGames: user.stats.totalGames + 1,
+        totalCorrectAnswers: user.stats.totalCorrectAnswers + correctAnswers,
+      );
+
+      await notifier.updateUserProfile(
+        user.copyWith(stats: updatedStats),
+      );
+      await notifier.recordGamePlayed(user.userId, false);
+    } catch (e) {
+      // No bloquear la UI si falla la persistencia.
+      print('Error updating casual game stats: $e');
+    }
   }
 
   /// Cancel game
@@ -530,6 +567,12 @@ class GameNotifier extends _$GameNotifier {
     return questions.map((q) {
       // Skip conversion for comparison/selection types
       if (neverConvertTypes.contains(q.type)) {
+        return q;
+      }
+      // Only convert prompts whose answer is unique & not given away. The
+      // seeder marks these with extraData['taEligible']; ambiguous prompts
+      // (e.g. "club fundado en 1905") stay multiple-choice.
+      if (q.extraData?['taEligible'] != true) {
         return q;
       }
       // 30% chance to convert to type-answer

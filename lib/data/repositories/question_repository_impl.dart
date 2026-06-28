@@ -259,25 +259,78 @@ class QuestionRepositoryImpl implements QuestionRepository {
         ? <String>[]
         : List<String>.from(question.options);
 
+    // Reserve a slot for the correct answer FIRST so the distractor loop can't
+    // fill all 4 slots and then push a 5th when re-adding it below.
+    if (!enrichedOptions.contains(question.correctAnswer)) {
+      enrichedOptions.add(question.correctAnswer);
+    }
+
     // Collect distractors only from questions of the SAME type to avoid
     // incoherent options (e.g. a player name in a stadium question).
     final sameTypeQuestions = allQuestions
         .where((q) => q.type == question.type)
         .toList();
 
-    var allAnswers = sameTypeQuestions
+    // Prefer distractors that share the question's context (country, league,
+    // position, era, category, transfer period, competition type). Falls back
+    // to any same-type answer, then to any type, if the context pool is small.
+    List<String> poolFrom(List<Question> src) => src
         .map((q) => q.correctAnswer)
-        .where((a) => a.isNotEmpty && a != question.correctAnswer)
+        .where((a) =>
+            a.isNotEmpty &&
+            a != question.correctAnswer &&
+            !enrichedOptions.contains(a))
         .toSet()
         .toList();
 
-    // If not enough same-type distractors, fall back to any type
+    final contextKeys = _contextKeys(question);
+    final sameTypeByContext = <String, List<String>>{};
+    for (final key in contextKeys) {
+      sameTypeByContext[key] = poolFrom(sameTypeQuestions
+          .where((q) => _contextKeys(q).contains(key))
+          .toList());
+    }
+
+    // Fill distractors in priority order: country > league > position > era
+    // > category > transfer era > competition type. Keys are prefixed with
+    // the question type to avoid mixing players, teams, competitions, etc.
+    final typePrefix = question.type.name;
+    final priorityPrefixes = [
+      '$typePrefix:country:',
+      '$typePrefix:league:',
+      '$typePrefix:position:',
+      '$typePrefix:birthDecade:',
+      '$typePrefix:birthEra:',
+      '$typePrefix:category:',
+      '$typePrefix:transferHalfDecade:',
+      '$typePrefix:transferDecade:',
+      '$typePrefix:awardDecade:',
+      '$typePrefix:compType:',
+    ];
+    var allAnswers = <String>[];
+    for (final prefix in priorityPrefixes) {
+      for (final key in contextKeys.where((k) => k.startsWith(prefix))) {
+        final pool = sameTypeByContext[key] ?? [];
+        allAnswers = [
+          ...allAnswers,
+          ...pool.where((a) => !allAnswers.contains(a)),
+        ];
+      }
+      if (allAnswers.length >= 3) break;
+    }
+
+    // Fall back to any same-type answer, then to any type.
+    if (allAnswers.length < 3) {
+      final sameType = poolFrom(sameTypeQuestions);
+      allAnswers = [...allAnswers, ...sameType.where((a) => !allAnswers.contains(a))];
+    }
     if (allAnswers.length < 3) {
       final fallbackAnswers = allQuestions
           .map((q) => q.correctAnswer)
           .where((a) =>
               a.isNotEmpty &&
               a != question.correctAnswer &&
+              !enrichedOptions.contains(a) &&
               !allAnswers.contains(a))
           .toSet()
           .toList();
@@ -290,7 +343,7 @@ class QuestionRepositoryImpl implements QuestionRepository {
     // Shuffle distractors for randomness
     allAnswers.shuffle(random);
 
-    // Add distractors until we have 4 options
+    // Add distractors until we have 4 options (correct answer already in place)
     for (final distractor in allAnswers) {
       if (enrichedOptions.length >= 4) break;
       if (!enrichedOptions.contains(distractor)) {
@@ -300,11 +353,6 @@ class QuestionRepositoryImpl implements QuestionRepository {
 
     // If we still don't have 4, that's OK — return what we have
     if (enrichedOptions.length < 2) return question;
-
-    // Ensure correct answer is in the options
-    if (!enrichedOptions.contains(question.correctAnswer)) {
-      enrichedOptions.add(question.correctAnswer);
-    }
 
     // Shuffle final options
     enrichedOptions.shuffle(random);
@@ -319,6 +367,57 @@ class QuestionRepositoryImpl implements QuestionRepository {
       questionText: question.questionText,
       extraData: question.extraData,
     );
+  }
+
+  /// Context keys used to group questions whose distractors should be coherent
+  /// with each other (same country, league, position, era, category, transfer
+  /// period or competition type). Returns an empty list when no usable signal
+  /// is stored in [extraData].
+  static List<String> _contextKeys(Question q) {
+    final data = q.extraData;
+    if (data == null) return const [];
+    final prefix = q.type.name;
+    final keys = <String>[];
+    final country = data['country'];
+    if (country is String && country.isNotEmpty) {
+      keys.add('$prefix:country:$country');
+    }
+    final league = data['league'];
+    if (league is String && league.isNotEmpty) {
+      keys.add('$prefix:league:$league');
+    }
+    final position = data['position'];
+    if (position is String && position.isNotEmpty) {
+      keys.add('$prefix:position:$position');
+    }
+    final birthYear = data['birthYear'];
+    if (birthYear is int) {
+      final decade = (birthYear ~/ 10) * 10;
+      keys.add('$prefix:birthDecade:$decade');
+      final era = (decade ~/ 20) * 20;
+      keys.add('$prefix:birthEra:$era');
+    }
+    final category = data['category'];
+    if (category is String && category.isNotEmpty) {
+      keys.add('$prefix:category:$category');
+    }
+    final transferYear = data['transferYear'];
+    if (transferYear is int) {
+      final halfDecade = (transferYear ~/ 5) * 5;
+      keys.add('$prefix:transferHalfDecade:$halfDecade');
+      final decade = (transferYear ~/ 10) * 10;
+      keys.add('$prefix:transferDecade:$decade');
+    }
+    final year = data['year'];
+    if (year is int) {
+      final decade = (year ~/ 10) * 10;
+      keys.add('$prefix:awardDecade:$decade');
+    }
+    final compType = data['type'];
+    if (compType is String && compType.isNotEmpty) {
+      keys.add('$prefix:compType:$compType');
+    }
+    return keys;
   }
 
   /// Check if options contain placeholder text (e.g. "Opción Incorrecta A")

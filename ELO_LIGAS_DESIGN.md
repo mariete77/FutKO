@@ -7,9 +7,11 @@
 > **Estado (v1, rama `feat/league-system`):** modelo híbrido implementado.
 > Decidido: inicio en Segunda RFEF, 5 ligas planas, sin temporadas/recompensas
 > aún. Hecho: `LeagueSystem` (+ tests), campos `leagueTier`/`leaguePoints` en
-> `User`/`UserModel`, actualización de LP al cerrar partida multijugador, y
-> Liga + barra de puntos en home y perfil. Pendiente: banner de ascenso/descenso
-> en pantalla de resultado, gating casual vs ranked, temporadas y recompensas.
+> `User`/`UserModel`, **cálculo de LP + ELO autoritativo en el backend**
+> (Cloud Function `onMatchFinished`, ranked-only; el casual no toca ELO/LP),
+> banner de ascenso/descenso en la pantalla de resultado (`_LeagueChangeBanner`),
+> y Liga + barra de puntos en home y perfil. Pendiente: temporadas y
+> recompensas por ascenso, y ordenar el leaderboard por (tier, lp).
 
 ---
 
@@ -29,7 +31,7 @@ baja esos puntos. Quieres saber *cuál es la mejor manera* de hacerlo.
   (matchmaking por cola en Realtime DB, rango ELO ±200).
 - **Partidas cortas y con azar** (10 preguntas, banco limitado). El resultado
   tiene varianza → conviene un sistema que no castigue demasiado una mala racha.
-- **Freemium**, móvil, en español, tema "Stadium Arena". La progresión es
+- **Freemium**, móvil, en español, tema "FutKO". La progresión es
   gancho de retención: tiene que *sentirse* y verse.
 
 ---

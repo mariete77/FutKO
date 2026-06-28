@@ -61,11 +61,13 @@ void main() {
   });
 
   group('User.rank', () {
-    User makeUser({int elo = 1000}) {
+    // rank derives from leagueTier (Spanish pyramid), not from ELO anymore.
+    User makeUser({int leagueTier = 2}) {
       return User(
         userId: 'test',
         displayName: 'Test',
-        elo: elo,
+        elo: 1000,
+        leagueTier: leagueTier,
         stats: const UserStats(),
         subscription: const Subscription(),
         dailyGames: DailyGames.today(),
@@ -73,24 +75,24 @@ void main() {
       );
     }
 
-    test('Bronze below 1200', () {
-      expect(makeUser(elo: 800).rank, 'Bronze');
+    test('Tercera RFEF (tier 1)', () {
+      expect(makeUser(leagueTier: 1).rank, 'Tercera RFEF');
     });
 
-    test('Silver at 1200', () {
-      expect(makeUser(elo: 1200).rank, 'Silver');
+    test('Segunda RFEF (tier 2)', () {
+      expect(makeUser(leagueTier: 2).rank, 'Segunda RFEF');
     });
 
-    test('Gold at 1400', () {
-      expect(makeUser(elo: 1400).rank, 'Gold');
+    test('Primera RFEF (tier 3)', () {
+      expect(makeUser(leagueTier: 3).rank, 'Primera RFEF');
     });
 
-    test('Platinum at 1600', () {
-      expect(makeUser(elo: 1600).rank, 'Platinum');
+    test('Segunda División (tier 4)', () {
+      expect(makeUser(leagueTier: 4).rank, 'Segunda División');
     });
 
-    test('Diamond at 1800', () {
-      expect(makeUser(elo: 1800).rank, 'Diamond');
+    test('Primera División (tier 5)', () {
+      expect(makeUser(leagueTier: 5).rank, 'Primera División');
     });
   });
 

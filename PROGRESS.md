@@ -1,6 +1,44 @@
 # FutKO — Progreso y Roadmap
 
-> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 06/06/2026.
+> Estado actual del proyecto FutKO (Football Quiz Battle). Última actualización: 20/06/2026.
+
+---
+
+## 🔄 Sesión 2026-06-20 (LP autoritativo en backend)
+
+**Hecho (rama `feat/league-system`):**
+- **LP de Liga se calcula ahora en el backend**, no en el cliente. La Cloud Function
+  `onMatchFinished` resuelve ELO **y** puntos de liga (tier/leaguePoints) para los dos
+  jugadores a la vez, usando el ELO autoritativo para modular los LP → deltas coherentes
+  y a prueba de manipulación cliente. Escribe `result.eloChanges/newElo/lpChanges/league`
+  en el match y `elo/leagueTier/leaguePoints` en ambos usuarios.
+- **Bug latente corregido:** `finishMatch` (que pone `status=finished`) **no se llamaba
+  nunca** → la Cloud Function `onMatchFinished` jamás se disparaba y el ELO se calculaba
+  100% en cliente. Ahora `_finishMatch` marca la partida como terminada y la función
+  dispara una sola vez (guard por transición de estado).
+- **Gating casual vs ranked:** la función **ignora** ELO/LP en partidas `casual`
+  (incluye retos de amigos). Solo `ranked` mueve ELO y liga.
+- **Separación de responsabilidades:** el cliente ya **no persiste** `elo/leagueTier/
+  leaguePoints` (la función es la autoridad); sigue escribiendo `stats` + `dailyGames`
+  (inmediato, robusto si la función tarda/no está desplegada). `saveMatchResult` hace
+  merge (dot-notation) de `scores`+`winnerId` sin pisar el resultado autoritativo.
+- Tests `User.rank` actualizados al sistema de ligas (pirámide española).
+
+**Hecho adicional (2026-06-20, misma sesión):**
+- **Banco de preguntas ampliado:** re-sembrado de 90 → **~963 preguntas** en
+  Firestore vía `lib/main_seed.dart` (regla `questions` abierta temporalmente
+  y revertida a `write: if false` después). Dataset en `lib/data/questions/`:
+  99 teams, 94 players, 169 league titles, 104 top scorers, 40 derbies,
+  40 nicknames, 40 kits, 70 club titles, 34 Ballon d'Or, etc.
+
+**Pendiente / acción del usuario:**
+- **Redeploy de la regla** (revertida en el repo a `write: if false`):
+  `firebase deploy --only firestore:rules` para cerrar la escritura.
+- **Subir imágenes físicas a Storage** (escudos/estadios/siluetas): las
+  preguntas `badge`/`playerImage`/`stadium` ya guardan su `imageUrl` pero el
+  archivo aún no existe. Scripts en `scripts/upload_images.dart`.
+- (Preexistente, ajeno) `home_screen_test.dart` falla por `pumpAndSettle`
+  timeout (animaciones/video del Home).
 
 ---
 
@@ -30,17 +68,17 @@
 
 | Aspecto | Estado |
 |---------|--------|
-| `flutter analyze` | ✅ 0 errores (warnings/info menores) |
-| `flutter build` | ⚠️ Bloqueado — falta `firebase_options.dart` (ya generado) |
-| Tests | ❌ No hay tests unitarios ni de integración |
+| `flutter analyze` | ✅ 0 errores (warnings/info menores, preexistentes) |
+| `flutter build` | ✅ `firebase_options.dart` ya generado (proyecto `futko-battle`) |
+| Tests | ✅ ~100 tests (core/data/widgets); `home_screen_test` con timeout pendiente |
 
 ---
 
-## 1. Diseño y UI — Stadium Arena
+## 1. Diseño y UI — FutKO
 
 | Módulo | Estado | Notas |
 |--------|--------|-------|
-| Design System (`AppColors`, `AppTheme`) | ✅ Completado | Paleta dark Stadium Arena implementada |
+| Design System (`AppColors`, `AppTheme`) | ✅ Completado | Paleta dark FutKO implementada |
 | Splash Screen | ✅ Completado | Glow radial, césped, portería, barra de progreso tipo campo |
 | Login Screen | ✅ Completado | Glassmorphism, botón KICK OFF dorado, social login, pro tip |
 | Home Screen | ✅ Completado | TopAppBar con logo mejorado, stats jugador, modos de juego, bottom nav con iconos fútbol |
@@ -49,11 +87,11 @@
 | Answer Feedback | ✅ Completado | "¡GOOOOL!" / "¡Tarjeta Roja!", stats grid, dato del partido |
 | Game Result | ✅ Completado | Resumen champion, stats ELO, timeline de respuestas |
 | Leaderboard Screen | ⚠️ Existe | Necesita revisar que use los nuevos colores del tema |
-| Friends Screen | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
-| Match History | ⚠️ Existe | Necesita aplicar el tema Stadium Arena |
+| Friends Screen | ⚠️ Existe | Necesita aplicar el tema FutKO |
+| Match History | ⚠️ Existe | Necesita aplicar el tema FutKO |
 | Subscription Modal | ⚠️ UI básica | Diseño funcional pero no integrado con RevenueCat |
-| Multiplayer Game | ✅ Completado | Tema Stadium Arena aplicado (AppColors), sin colores hardcodeados |
-| Matchmaking Screen | ✅ Completado | Tema Stadium Arena aplicado, gradient con `primaryDark` añadido |
+| Multiplayer Game | ✅ Completado | Tema FutKO aplicado (AppColors), sin colores hardcodeados |
+| Matchmaking Screen | ✅ Completado | Tema FutKO aplicado, gradient con `primaryDark` añadido |
 | Leaderboard Screen | ✅ Completado | Ya usaba AppColors correctamente |
 | Friends Screen | ✅ Completado | Ya usaba AppColors correctamente |
 | Match History | ✅ Completado | Ya usaba AppColors correctamente |
@@ -109,7 +147,7 @@
 | `ghostRuns` | ✅ Definida | Partidas fantasma para entrenamiento |
 | `questionReports` | ✅ Definida | Reportes de preguntas erróneas |
 | `quizAttempts` | ✅ Definida | Intentos de quiz individuales |
-| **Población de preguntas** | ✅ **90 preguntas insertadas** | Seed REST API ejecutado (8 tipos) |
+| **Población de preguntas** | ✅ **~963 preguntas insertadas** | Re-sembrado 2026-06-20 vía `lib/main_seed.dart` (`QuestionSeederService`) desde `lib/data/questions/*.dart`: 99 teams, 94 players, 169 league titles, 104 top scorers, 40 derbies, 40 nicknames, 40 kits, 70 club titles, 34 Ballon d'Or, 28 European Golden Shoes, 25 national teams, etc. (antes solo había 90 del seeder hardcoded). |
 
 ### 3.3 Funciones Backend
 
@@ -253,12 +291,12 @@ Este es un punto crítico. La app obtiene preguntas desde Firestore (`questions`
 
 ### Fase 2: Calidad y Experiencia (En Progreso)
 
-5. **Aplicar tema Stadium Arena a pantallas restantes** ✅
+5. **Aplicar tema FutKO a pantallas restantes** ✅
    - MultiplayerGameScreen ✅ (eliminados ~20 colores hardcodeados)
    - MatchmakingScreen ✅ (incluye fix `primaryDark` faltante)
-   - LeaderboardScreen ✅ (ya usaba Stadium Arena)
-   - FriendsScreen ✅ (ya usaba Stadium Arena)
-   - MatchHistoryScreen ✅ (ya usaba Stadium Arena)
+   - LeaderboardScreen ✅ (ya usaba FutKO)
+   - FriendsScreen ✅ (ya usaba FutKO)
+   - MatchHistoryScreen ✅ (ya usaba FutKO)
    - SubscriptionModal ✅ (actualizado en Fase 1.4)
    - `app_colors.dart`: añadido `primaryDark`
 

@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'app.dart';
+import 'services/audio_service.dart';
 import 'services/crashlytics_service.dart';
 import 'services/messaging_service.dart';
 import 'services/revenuecat_service.dart';
@@ -32,6 +33,15 @@ void main() async {
     await RevenueCatService.initialize();
   } catch (e) {
     debugPrint('RevenueCat init failed: $e');
+  }
+
+  // Música de fondo en loop. En web el autoplay puede estar bloqueado hasta la
+  // primera interacción del usuario (limitación del navegador).
+  try {
+    await AudioService().initialize();
+    await AudioService().startAmbientMusic();
+  } catch (e) {
+    debugPrint('Ambient music init failed: $e');
   }
 
   runApp(

@@ -17,6 +17,7 @@ import '../../core/utils/score_calculator.dart';
 import '../../core/utils/fuzzy_matcher.dart';
 import '../../core/utils/elo_calculator.dart';
 import '../../core/utils/league_system.dart';
+import '../../services/audio_service.dart';
 import 'user_provider.dart';
 
 /// Repository providers
@@ -736,7 +737,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
 
     final question = _questions[currentIndex];
     final similarity = answerSimilarity(typedAnswer, question.correctAnswer);
-    final isCorrect = similarity >= 0.85;
+    final isCorrect = similarity >= 0.6; // 60%+ counts as correct (partial credit)
 
     final maxTime = question.options.isEmpty
         ? GameConstants.secondsPerTypeQuestion
@@ -956,6 +957,16 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
                 matchId: currentMatch.id,
                 result: matchResult,
               ).catchError((e) => print('Error saving match result: $e'));
+
+          // Mark the match finished so the onMatchFinished Cloud Function
+          // resolves ELO + league authoritatively for BOTH players. Scores are
+          // already written above, so the function has what it needs. Isolated
+          // so a failure here still lets us update the local profile below.
+          try {
+            await _ref.read(matchRepositoryProvider).finishMatch(currentMatch.id);
+          } catch (e) {
+            print('Error finishing match: $e');
+          }
         }
 
         // Update local user profile
@@ -1001,10 +1012,11 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
                       (dgToday ? dg.rankedPlayed : 0) + (isRanked ? 1 : 0),
                 );
 
+          // Stats + dailyGames are client-owned (immediate, robust if the
+          // function is delayed/undeployed). ELO and league are resolved
+          // authoritatively by the Cloud Function; the optimistic values
+          // computed above (newElo, league.*) feed only the result UI via state.
           final updatedUser = currentUser.copyWith(
-            elo: newElo,
-            leagueTier: league.tier,
-            leaguePoints: league.leaguePoints,
             dailyGames: newDaily,
             stats: currentUser.stats.copyWith(
               totalGames: currentUser.stats.totalGames + 1,
@@ -1038,6 +1050,8 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
         // Fallback if no user
         state = state.copyWith(status: MultiplayerStatus.finished);
       }
+
+      AudioService().playMatchEnd();
     } catch (e, stack) {
       print('CRITICAL ERROR in _finishMatch: $e\n$stack');
       state = state.copyWith(

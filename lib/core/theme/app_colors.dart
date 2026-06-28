@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// FutKO Design System — "Stadium Arena" dark palette.
+/// FutKO Design System — "FutKO" dark palette.
 ///
 /// Deep pitch green, championship gold, energetic white. Dark mode only.
-/// Based on DESIGN.md — Stadium Arena design system.
+/// Based on DESIGN.md — FutKO design system.
 class AppColors {
   AppColors._();
 

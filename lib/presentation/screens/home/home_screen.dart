@@ -5,15 +5,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../providers/active_players_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
-import '../../providers/elo_history_provider.dart';
-import '../../providers/match_history_provider.dart';
 import '../../widgets/common/background_video.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/game_constants.dart';
+import '../../../core/utils/league_system.dart';
 import '../../../domain/entities/user.dart';
-import 'package:intl/intl.dart';
+import 'widgets/subscription_modal.dart';
 
 /// Home screen — "PantallaPrincipal" mockup.
-/// Stadium atmosphere with top app bar, player stats, game modes, bottom nav.
+/// Stadium atmosphere with top app bar, compact player card, game-mode cards
+/// and bottom nav.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -23,27 +24,31 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
-  late final AnimationController _ballSpinController;
-  late final AnimationController _trophyController;
+  late final AnimationController _statsController;
+  late final Animation<double> _lpAnimation;
+  late final Animation<double> _statsFade;
 
   @override
   void initState() {
     super.initState();
-    _ballSpinController = AnimationController(
+    _statsController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat();
-
-    _trophyController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 1400),
+    );
+    _lpAnimation = CurvedAnimation(
+      parent: _statsController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+    );
+    _statsFade = CurvedAnimation(
+      parent: _statsController,
+      curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
+    );
+    _statsController.forward();
   }
 
   @override
   void dispose() {
-    _ballSpinController.dispose();
-    _trophyController.dispose();
+    _statsController.dispose();
     super.dispose();
   }
 
@@ -52,8 +57,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final currentUser = ref.watch(currentUserProvider);
     final userState = ref.watch(userNotifierProvider);
     final dailyGames = ref.watch(dailyGamesStatusProvider);
-    final eloHistory = ref.watch(eloHistoryProvider);
-    final matchHistory = ref.watch(matchHistoryProvider);
 
     if (currentUser != null &&
         userState.valueOrNull == null &&
@@ -84,7 +87,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       body: Stack(
         children: [
           // Background stadium video
-          const BackgroundVideo(overlayOpacity: 0.6),
+          const BackgroundVideo(
+            asset: 'assets/Fondo_loop_stadium.mp4',
+            overlayOpacity: 0.6,
+          ),
 
           // Main content
           SafeArea(
@@ -92,39 +98,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: Column(
               children: [
                 // ── Top App Bar ─────────────────────
-                _buildTopBar(context, ref, displayUser),
+                _buildTopBar(context),
 
                 // ── Scrollable Content ──────────────
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Player Stats
-                        _buildPlayerStats(context, displayUser, eloHistory),
-                        const SizedBox(height: 24),
-
-                        // Sections label
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 12),
-                          child: Text(
-                            'SECCIONES',
-                            style: GoogleFonts.lexend(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurfaceVariant,
-                              letterSpacing: 3,
-                            ),
-                          ),
-                        ),
-
-                        // Game Modes
-                        _buildGameModes(context, ref, dailyGames),
+                        // Compact player card
+                        _buildPlayerCard(context, displayUser),
                         const SizedBox(height: 20),
 
-                        // Last Challenge
-                        _buildLastChallenge(context, ref, matchHistory, displayUser.userId),
+                        // Stats panel
+                        _buildStatsPanel(displayUser),
+                        const SizedBox(height: 28),
+
+                        // Game-mode cards
+                        _buildGameModeCards(context, displayUser, dailyGames),
                       ],
                     ),
                   ),
@@ -134,450 +126,438 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavBar(context),
+      bottomNavigationBar: _buildBottomNavBar(context, displayUser),
     );
   }
 
   // ── Top App Bar ─────────────────────────────────────────
-  Widget _buildTopBar(BuildContext context, WidgetRef ref, User user) {
-    final activePlayersAsync = ref.watch(activePlayersProvider);
-    final activeCount = activePlayersAsync.valueOrNull ?? 0;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.emerald950.withOpacity(0.9),
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withOpacity(0.1),
-          ),
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Center(
+        child: Image.asset(
+          'assets/images/futko_wordmark.png',
+          height: 44,
+          fit: BoxFit.contain,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo with football icon
-          Row(
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.yellow500.withOpacity(0.3),
-                          Colors.transparent,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.sports_soccer,
-                      size: 26,
-                      color: AppColors.yellow500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'FutKO',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.yellow500,
-                      fontStyle: FontStyle.italic,
-                      shadows: [
-                        Shadow(
-                          color: AppColors.yellow500.withOpacity(0.4),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'BATTLE',
-                      style: GoogleFonts.lexend(
-                        fontSize: 7,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // Right side
-          Row(
-            children: [
-              // Match indicator
-              if (activeCount > 0)
-                Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(9999),
-                    border: Border.all(
-                      color: AppColors.success.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.success,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.success.withOpacity(0.5),
-                                  blurRadius: 6,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.success.withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '$activeCount',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.success,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              // Profile avatar with jersey icon
-              GestureDetector(
-                onTap: () => context.push('/profile/${user.userId}'),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.yellow500,
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.yellow500.withOpacity(0.2),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 17,
-                        backgroundImage:
-                            user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
-                        backgroundColor: AppColors.surfaceContainerHigh,
-                        child: user.photoUrl == null
-                            ? Text(
-                                user.displayName.isNotEmpty
-                                    ? user.displayName[0].toUpperCase()
-                                    : '?',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onSurface,
-                                  fontSize: 14,
-                                ),
-                              )
-                            : null,
-                      ),
-                      Positioned(
-                        right: -2,
-                        bottom: -2,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: AppColors.emerald950,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.yellow500,
-                              width: 1,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.style,
-                            size: 10,
-                            color: AppColors.yellow500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
 
-  // ── Player Stats Section ────────────────────────────────
-  Widget _buildPlayerStats(
-      BuildContext context, User user, EloHistoryState eloHistory) {
-    final winStreak = user.stats.currentWinStreak;
-    final totalGames = user.stats.wins + user.stats.losses + user.stats.draws;
-    final winRate = totalGames > 0
-        ? ((user.stats.wins / totalGames) * 100).round()
-        : 0;
+  // ── Player Card with League Progress ────────────────────
+  Widget _buildPlayerCard(BuildContext context, User user) {
+    final leagueColor = Color(LeagueSystem.colorForTier(user.leagueTier));
+    final leagueName = user.rank;
+    final lpProgress = user.leaguePoints / GameConstants.lpToPromote;
+    final lpRemaining = GameConstants.lpToPromote - user.leaguePoints;
+    final displayName = user.displayName.isNotEmpty ? user.displayName : 'Jugador';
+    final initials = displayName.split(' ').take(2).map((s) => s.isNotEmpty ? s[0].toUpperCase() : '').join();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.primaryContainer.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+    return AnimatedBuilder(
+      animation: _lpAnimation,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _lpAnimation,
+          child: Transform.translate(
+            offset: Offset(0, -16 * (1 - _lpAnimation.value)),
+            child: child,
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // Decorative soccer ball
-            Positioned(
-              top: -30,
-              right: -20,
-              child: Opacity(
-                opacity: 0.08,
-                child: Transform.rotate(
-                  angle: 0.2,
-                  child: Icon(
-                    Icons.sports_soccer,
-                    size: 140,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              leagueColor.withOpacity(0.28),
+              AppColors.primaryContainer.withOpacity(0.35),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: leagueColor.withOpacity(0.35)),
+          boxShadow: [
+            BoxShadow(
+              color: leagueColor.withOpacity(0.15),
+              blurRadius: 24,
+              spreadRadius: -4,
+              offset: const Offset(0, 6),
             ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Top row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.displayName,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryContainer,
-                              borderRadius: BorderRadius.circular(9999),
-                            ),
-                            child: Text(
-                              user.rank.toUpperCase(),
-                              style: GoogleFonts.lexend(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.onSecondaryContainer,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          // Barra de puntos de la liga actual (0–100)
-                          SizedBox(
-                            width: 150,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(3),
-                                  child: LinearProgressIndicator(
-                                    value: (user.leaguePoints / 100).clamp(0.0, 1.0),
-                                    minHeight: 5,
-                                    backgroundColor:
-                                        AppColors.yellow500.withOpacity(0.15),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(
-                                      AppColors.yellow500,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${user.leaguePoints}/100 pts para ascender',
-                                  style: GoogleFonts.lexend(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'ELO GLOBAL',
-                            style: GoogleFonts.lexend(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onPrimaryContainer.withOpacity(0.7),
-                              letterSpacing: 2,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${user.elo}',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.yellow500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Stats grid
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatBox(
-                          label: 'Racha',
-                          value: '$winStreak',
-                          icon: Icons.local_fire_department,
-                          iconColor: AppColors.yellow500,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatBox(
-                          label: '% Victoria',
-                          value: '$winRate%',
-                          icon: Icons.emoji_events,
-                          iconColor: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.22),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
+        child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // Avatar
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: leagueColor, width: 2.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: leagueColor.withOpacity(0.25),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 26,
+                  backgroundImage:
+                      user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+                  backgroundColor: AppColors.surfaceContainerHigh,
+                  child: user.photoUrl == null
+                      ? Text(
+                          initials.isNotEmpty ? initials : '?',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.onSurface,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayName,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: leagueColor.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: leagueColor.withOpacity(0.4)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.shield, size: 14, color: leagueColor),
+                          const SizedBox(width: 6),
+                          Text(
+                            leagueName,
+                            style: GoogleFonts.lexend(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: leagueColor,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // League tier number
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: leagueColor.withOpacity(0.18),
+                  border: Border.all(color: leagueColor.withOpacity(0.5)),
+                ),
+                child: Center(
+                  child: Text(
+                    '${user.leagueTier}',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: leagueColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'PROGRESO DE LIGA',
+                style: GoogleFonts.lexend(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              Text(
+                '${user.leaguePoints} / ${GameConstants.lpToPromote} LP',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Stack(
+              children: [
+                Container(
+                  height: 12,
+                  color: Colors.white.withOpacity(0.08),
+                ),
+                AnimatedBuilder(
+                  animation: _lpAnimation,
+                  builder: (context, child) {
+                    return FractionallySizedBox(
+                      widthFactor: (lpProgress * _lpAnimation.value)
+                          .clamp(0.0, 1.0),
+                      child: Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              leagueColor,
+                              leagueColor.withOpacity(0.75),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            user.leaguePoints >= GameConstants.lpToPromote - 1
+                ? '¡Una victoria más y asciendes!'
+                : '$lpRemaining LP para el ascenso',
+            style: GoogleFonts.workSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+  // ── Stats Panel ─────────────────────────────────────────
+  Widget _buildStatsPanel(User user) {
+    final stats = user.stats;
+    final totalQuestions = stats.totalGames * GameConstants.questionsPerMatch;
+    final accuracy = totalQuestions > 0
+        ? (stats.totalCorrectAnswers / totalQuestions) * 100
+        : 0.0;
+    final totalMultiplayer = stats.wins + stats.losses + stats.draws;
+
+    return AnimatedBuilder(
+      animation: _statsFade,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _statsFade,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - _statsFade.value)),
+            child: child,
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'TU RENDIMIENTO',
+            style: GoogleFonts.lexend(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.onSurfaceVariant,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 14),
+          GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.55,
+            children: [
+              _buildStatCard(
+                icon: Icons.sports_soccer,
+                label: 'Partidas jugadas',
+                value: '${stats.totalGames}',
+                sublabel: 'modo casual + ranked',
+                color: AppColors.primary,
+              ),
+              _buildStatCard(
+                icon: Icons.percent,
+                label: 'Precisión global',
+                value: '${accuracy.toStringAsFixed(0)}%',
+                sublabel: '${stats.totalCorrectAnswers} aciertos',
+                color: AppColors.secondaryFixed,
+              ),
+              _buildStatCard(
+                icon: Icons.emoji_events,
+                label: 'Victorias',
+                value: '${stats.wins}',
+                sublabel: totalMultiplayer > 0
+                    ? '${(stats.wins / totalMultiplayer * 100).toStringAsFixed(0)}% ranked'
+                    : 'en ranked',
+                color: AppColors.yellow500,
+              ),
+              _buildStatCard(
+                icon: Icons.local_fire_department,
+                label: 'Mejor racha',
+                value: '${stats.bestWinStreak}',
+                sublabel: 'victorias seguidas',
+                color: AppColors.tertiary,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildMultiplayerRecord(stats),
+        ],
       ),
     );
   }
 
-  Widget _buildStatBox({
+  Widget _buildStatCard({
+    required IconData icon,
     required String label,
     required String value,
-    required IconData icon,
-    required Color iconColor,
+    required String sublabel,
+    required Color color,
   }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(icon, size: 20, color: color),
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.workSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                sublabel,
+                style: GoogleFonts.workSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMultiplayerRecord(UserStats stats) {
+    final total = stats.wins + stats.losses + stats.draws;
+    if (total == 0) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.06),
-        ),
+        color: AppColors.surfaceContainerLow.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label.toUpperCase(),
+            'BALANCE MULTIJUGADOR',
             style: GoogleFonts.lexend(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: AppColors.onSurfaceVariant,
-              letterSpacing: 1,
+              letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 18, color: iconColor),
-              const SizedBox(width: 6),
-              Text(
-                value,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface,
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                _buildRecordBarSegment(
+                  flex: stats.wins,
+                  total: total,
+                  color: AppColors.success,
                 ),
-              ),
+                _buildRecordBarSegment(
+                  flex: stats.draws,
+                  total: total,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                _buildRecordBarSegment(
+                  flex: stats.losses,
+                  total: total,
+                  color: AppColors.error,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildRecordLegend('Victorias', stats.wins, AppColors.success),
+              _buildRecordLegend('Empates', stats.draws, AppColors.onSurfaceVariant),
+              _buildRecordLegend('Derrotas', stats.losses, AppColors.error),
             ],
           ),
         ],
@@ -585,364 +565,215 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  // ── Game Modes ──────────────────────────────────────────
-  Widget _buildGameModes(
-    BuildContext context,
-    WidgetRef ref,
-    DailyGamesStatus dailyGames,
-  ) {
-    return Column(
+  Widget _buildRecordBarSegment({
+    required int flex,
+    required int total,
+    required Color color,
+  }) {
+    if (total == 0 || flex <= 0) return const SizedBox.shrink();
+    return Flexible(
+      flex: flex,
+      child: Container(
+        height: 10,
+        color: color,
+      ),
+    );
+  }
+
+  Widget _buildRecordLegend(String label, int value, Color color) {
+    return Row(
       children: [
-        _buildModeCard(
-          context,
-          title: 'Partida Rápida',
-          subtitle: 'Salta directo a la acción contra otros jugadores.',
-          icon: Icons.sports_soccer,
-          iconBgColor: AppColors.yellow500,
-          iconColor: AppColors.emerald950,
-          cardColor: AppColors.emerald900,
-          glowColor: AppColors.yellow500.withOpacity(0.1),
-          onTap: dailyGames.canPlayCasual
-              ? () => context.go('/game/easy')
-              : null,
-          customIcon: AnimatedBuilder(
-            animation: _ballSpinController,
-            builder: (context, child) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppColors.yellow500,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.yellow500.withOpacity(0.3),
-                      blurRadius: 15,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Transform.rotate(
-                  angle: _ballSpinController.value * 6.28,
-                  child: const Icon(
-                    Icons.sports_soccer,
-                    size: 28,
-                    color: AppColors.emerald950,
-                  ),
-                ),
-              );
-            },
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color,
           ),
         ),
-        const SizedBox(height: 12),
-        _buildModeCard(
-          context,
-          title: 'Clasificatoria',
-          subtitle: 'Escala en la tabla y conviértete en leyenda.',
-          icon: Icons.emoji_events,
-          iconBgColor: AppColors.surfaceContainerHighest,
-          iconColor: AppColors.yellow500,
-          cardColor: AppColors.surfaceContainerHigh,
-          borderColor: Colors.white.withOpacity(0.06),
-          onTap: dailyGames.canPlayRanked
-              ? () => context.go('/matchmaking/ranked')
-              : null,
-          customIcon: AnimatedBuilder(
-            animation: _trophyController,
-            builder: (context, child) {
-              final glow = 0.3 + (_trophyController.value * 0.5);
-              final scale = 0.85 + (_trophyController.value * 0.15);
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.yellow500.withOpacity(glow),
-                      blurRadius: 12 + (_trophyController.value * 12),
-                      spreadRadius: 1 + (_trophyController.value * 2),
-                    ),
-                  ],
-                ),
-                child: Transform.scale(
-                  scale: scale,
-                  child: const Icon(
-                    Icons.emoji_events,
-                    size: 28,
-                    color: AppColors.yellow500,
-                  ),
-                ),
-              );
-            },
+        const SizedBox(width: 6),
+        Text(
+          '$label ',
+          style: GoogleFonts.workSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AppColors.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 12),
-        _buildModeCard(
-          context,
-          title: 'Pregunta del Día',
-          subtitle: 'Responde la pregunta diaria y gana puntos extra.',
-          icon: Icons.calendar_today,
-          iconBgColor: AppColors.surfaceContainerHighest,
-          iconColor: AppColors.primary,
-          cardColor: AppColors.surfaceContainerHigh,
-          borderColor: Colors.white.withOpacity(0.06),
-          onTap: () => context.go('/daily-question'),
+        Text(
+          '$value',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildModeCard(
+  // ── Game-mode Cards ─────────────────────────────────────
+  Widget _buildGameModeCards(
+    BuildContext context,
+    User user,
+    DailyGamesStatus dailyGames,
+  ) {
+    final dailyAvailable = user.lastDailyDate != _todayKey();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildGameCard(
+          context,
+          icon: Icons.emoji_events,
+          title: 'Clasificatorio',
+          subtitle: dailyGames.canPlayRanked
+              ? '${dailyGames.rankedRemaining} ${dailyGames.rankedRemaining == 1 ? 'partida' : 'partidas'} disponible${dailyGames.rankedRemaining == 1 ? '' : 's'}'
+              : 'Límite diario alcanzado',
+          accentColor: AppColors.yellow500,
+          enabled: dailyGames.canPlayRanked,
+          onTap: dailyGames.canPlayRanked
+              ? () => context.go('/matchmaking/ranked')
+              : null,
+        ),
+        const SizedBox(height: 14),
+        _buildGameCard(
+          context,
+          icon: Icons.sports_soccer,
+          title: 'Partido Casual',
+          subtitle: dailyGames.canPlayCasual
+              ? (dailyGames.casualRemaining >= 999
+                  ? 'Partidas ilimitadas'
+                  : '${dailyGames.casualRemaining} ${dailyGames.casualRemaining == 1 ? 'partida' : 'partidas'} disponible${dailyGames.casualRemaining == 1 ? '' : 's'}')
+              : 'Límite diario alcanzado',
+          accentColor: AppColors.primary,
+          enabled: dailyGames.canPlayCasual,
+          onTap: dailyGames.canPlayCasual
+              ? () => context.go('/game/easy')
+              : null,
+        ),
+        const SizedBox(height: 14),
+        _buildGameCard(
+          context,
+          icon: Icons.event_available,
+          title: 'Pregunta del Día',
+          subtitle: dailyAvailable ? '¡Disponible ahora!' : 'Vuelve mañana',
+          accentColor: dailyAvailable ? AppColors.primary : AppColors.error,
+          enabled: true,
+          onTap: () => context.push('/daily-question'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGameCard(
     BuildContext context, {
+    required IconData icon,
     required String title,
     required String subtitle,
-    required IconData icon,
-    required Color iconBgColor,
-    required Color iconColor,
-    required Color cardColor,
-    Color? glowColor,
-    Color? borderColor,
+    required Color accentColor,
+    bool enabled = true,
     VoidCallback? onTap,
-    Widget? customIcon,
   }) {
     return Material(
-      color: cardColor,
-      borderRadius: BorderRadius.circular(16),
+      color: AppColors.surfaceContainerHigh.withOpacity(0.9),
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         onTap: onTap,
         child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: borderColor != null
-                ? Border.all(color: borderColor)
-                : null,
-            gradient: glowColor != null
-                ? LinearGradient(
-                    colors: [glowColor, Colors.transparent],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  )
-                : null,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: customIcon ??
-                      Container(
-                        decoration: BoxDecoration(
-                          color: iconBgColor,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: glowColor != null
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.yellow500.withOpacity(0.3),
-                                    blurRadius: 15,
-                                    spreadRadius: 1,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Icon(icon, size: 28, color: iconColor),
-                      ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: glowColor != null
-                              ? Colors.white
-                              : AppColors.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: GoogleFonts.lexend(
-                          fontSize: 13,
-                          color: glowColor != null
-                              ? Colors.white.withOpacity(0.6)
-                              : AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: glowColor != null
-                      ? Colors.white.withOpacity(0.3)
-                      : AppColors.onSurfaceVariant.withOpacity(0.3),
-                ),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: enabled
+                  ? accentColor.withOpacity(0.35)
+                  : Colors.white.withOpacity(0.08),
+            ),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                accentColor.withOpacity(enabled ? 0.16 : 0.04),
+                AppColors.surfaceContainerHigh.withOpacity(0.3),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  // ── Last Challenge ──────────────────────────────────────
-  Widget _buildLastChallenge(
-    BuildContext context,
-    WidgetRef ref,
-    MatchHistoryState matchHistory,
-    String currentUserId,
-  ) {
-    final matches = matchHistory.matches;
-
-    if (matches.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final lastMatch = matches.first;
-    final result = lastMatch.result;
-    final isWin = result?.winnerId == currentUserId;
-    final myScore = result?.scores[currentUserId] ?? 0;
-    final opponentId = lastMatch.getOpponentId(currentUserId);
-    final opponentScore = result?.scores[opponentId] ?? 0;
-    final dateStr = lastMatch.finishedAt != null
-        ? _formatRelativeDate(lastMatch.finishedAt!)
-        : '';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.06),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withOpacity(0.06),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(enabled ? 0.2 : 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: accentColor.withOpacity(enabled ? 0.4 : 0.15),
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  size: 28,
+                  color: enabled
+                      ? accentColor
+                      : AppColors.onSurfaceVariant.withOpacity(0.4),
                 ),
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Último Desafío'.toUpperCase(),
-                  style: GoogleFonts.lexend(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                    letterSpacing: 2,
-                  ),
-                ),
-                if (dateStr.isNotEmpty)
-                  Text(
-                    dateStr,
-                    style: GoogleFonts.lexend(
-                      fontSize: 11,
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          // Content
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$myScore - $opponentScore',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: enabled
+                            ? Colors.white
+                            : AppColors.onSurfaceVariant.withOpacity(0.5),
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isWin ? AppColors.success : AppColors.error,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${isWin ? 'Victoria' : 'Derrota'} vs Oponente',
-                            style: GoogleFonts.lexend(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.onSurfaceVariant,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.emerald950,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
                     ),
-                  ),
-                  child: Icon(
-                    Icons.celebration,
-                    color: AppColors.yellow500,
-                  ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.lexend(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: enabled
+                            ? accentColor
+                            : AppColors.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: enabled
+                    ? accentColor.withOpacity(0.6)
+                    : AppColors.onSurfaceVariant.withOpacity(0.3),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  String _formatRelativeDate(DateTime date) {
+  String _todayKey() {
     final now = DateTime.now();
-    final diff = now.difference(date);
-    if (diff.inMinutes < 1) return 'ahora';
-    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes}m';
-    if (diff.inHours < 24) return 'hace ${diff.inHours}h';
-    if (diff.inDays == 1) return 'ayer';
-    return DateFormat('dd MMM', 'es_ES').format(date);
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
   // ── Bottom Navigation Bar ───────────────────────────────
-  Widget _buildBottomNavBar(BuildContext context) {
+  Widget _buildBottomNavBar(BuildContext context, User user) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.emerald950,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border(
-          top: BorderSide(
-            color: Colors.white.withOpacity(0.08),
-          ),
+          top: BorderSide(color: Colors.white.withOpacity(0.08)),
         ),
         boxShadow: [
           BoxShadow(
@@ -960,24 +791,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(
-                icon: Icons.sports_soccer,
-                label: 'Jugar',
+                icon: Icons.home,
+                label: 'Inicio',
                 isActive: true,
               ),
               _buildNavItem(
                 icon: Icons.emoji_events,
-                label: 'Rankings',
+                label: 'Ligas',
                 onTap: () => context.go('/leaderboard'),
               ),
               _buildNavItem(
-                icon: Icons.stadium,
-                label: 'Reglas',
-                onTap: () => context.push('/rules'),
+                icon: Icons.person,
+                label: 'Perfil',
+                onTap: () => context.push('/profile/${user.userId}'),
               ),
               _buildNavItem(
-                icon: Icons.style,
-                label: 'Perfil',
-                onTap: () => context.push('/profile/me'),
+                icon: Icons.shopping_bag,
+                label: 'Tienda',
+                onTap: () => SubscriptionModal.show(context),
+              ),
+              _buildNavItem(
+                icon: Icons.settings,
+                label: 'Ajustes',
+                onTap: () => context.push('/settings'),
               ),
             ],
           ),
@@ -995,7 +831,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: isActive
             ? BoxDecoration(
                 color: Colors.white.withOpacity(0.05),
@@ -1015,7 +851,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             Icon(
               icon,
               size: 24,
-              color: isActive ? AppColors.yellow500 : AppColors.onSurfaceVariant.withOpacity(0.5),
+              color: isActive
+                  ? AppColors.yellow500
+                  : AppColors.onSurfaceVariant.withOpacity(0.5),
             ),
             const SizedBox(height: 4),
             Text(
@@ -1023,8 +861,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: isActive ? AppColors.yellow500 : AppColors.onSurfaceVariant.withOpacity(0.5),
-                letterSpacing: 1,
+                color: isActive
+                    ? AppColors.yellow500
+                    : AppColors.onSurfaceVariant.withOpacity(0.5),
+                letterSpacing: 0.5,
               ),
             ),
           ],
@@ -1033,4 +873,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 }
-
